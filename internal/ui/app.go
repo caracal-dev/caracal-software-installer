@@ -22,16 +22,16 @@ var theme = struct {
 	Danger     tcell.Color
 	FocusMute  tcell.Color
 }{
-	Background: tcell.NewHexColor(0x0f172a),
-	Panel:      tcell.NewHexColor(0x111827),
-	Accent:     tcell.NewHexColor(0x38bdf8),
-	AccentWarm: tcell.NewHexColor(0xf59e0b),
-	Text:       tcell.NewHexColor(0xe5eefb),
-	Muted:      tcell.NewHexColor(0x94a3b8),
-	Success:    tcell.NewHexColor(0x4ade80),
-	Warning:    tcell.NewHexColor(0xfbbf24),
-	Danger:     tcell.NewHexColor(0xfb7185),
-	FocusMute:  tcell.NewHexColor(0x475569),
+		Background: tcell.NewHexColor(0x181616), 
+    Panel:      tcell.NewHexColor(0x1d1c19), 
+    Accent:     tcell.NewHexColor(0x8ba4b0), 
+    AccentWarm: tcell.NewHexColor(0xff9e3b), 
+    Text:       tcell.NewHexColor(0xc5c9c5), 
+    Muted:      tcell.NewHexColor(0x7a8382), 
+    Success:    tcell.NewHexColor(0x8a9a7b), 
+    Warning:    tcell.NewHexColor(0xe46876), 
+    Danger:     tcell.NewHexColor(0xc4746e), 
+    FocusMute:  tcell.NewHexColor(0x2d3139), 
 }
 
 const (

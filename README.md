@@ -19,7 +19,10 @@
   - Surge XT
   - Decent Sampler
 - Effects
-  - Audio Assault section placeholder
+  - Audio Assault
+    - Drum Locker
+    - Amp Locker
+    - Mix Locker
   - TAL effects section placeholder
 - Utilities
   - RTCQS
@@ -47,8 +50,8 @@ Pull requests welcome. Just create a feature branch and submit a pull request wi
 If you are currently running a Fedora Atomic image, you can clone this repo and run it locally and see if the installation you added work.
 
 ## TODO
-1. Add sudo password and installation processing to happen within the program program so the user does not exit and then return.
-2. Move all the Caracal default plugins and music software here and embed install into Caracal OS
-3. Add more plugins
-4. Fix general jank
-
+1. Add an uninstall option
+2. Add sudo password and installation processing to happen within the program program so the user does not exit and then return.
+3. Move all the Caracal default plugins and music software here and embed install into Caracal OS
+4. Add more plugins
+5. Fix general jank

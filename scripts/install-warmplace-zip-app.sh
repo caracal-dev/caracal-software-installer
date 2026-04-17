@@ -57,6 +57,32 @@ find_launcher() {
     local root="$1"
     local exec_name="$2"
     local launcher=""
+    local arch=""
+    local -a arch_dirs=()
+
+    arch="$(uname -m 2>/dev/null || true)"
+    case "${arch}" in
+        x86_64|amd64)
+            arch_dirs=("linux_x86_64" "linux_x86")
+            ;;
+        aarch64|arm64)
+            arch_dirs=("linux_arm64" "linux_arm")
+            ;;
+        armv7l|armv7*|armhf)
+            arch_dirs=("linux_arm")
+            ;;
+        i386|i486|i586|i686)
+            arch_dirs=("linux_x86")
+            ;;
+    esac
+
+    for arch_dir in "${arch_dirs[@]}"; do
+        launcher="$(find "${root}" -type f -path "*/${arch_dir}/${exec_name}" | head -n 1)"
+        if [[ -n "${launcher}" ]]; then
+            printf '%s\n' "${launcher}"
+            return
+        fi
+    done
 
     launcher="$(find "${root}" -type f -name 'START_LINUX*' | head -n 1)"
     if [[ -n "${launcher}" ]]; then

@@ -279,8 +279,63 @@ func Build(scriptDir string) []*Category {
 				{
 					ID:          "audio-assault",
 					Name:        "Audio Assault",
-					Description: "Reserved for Audio Assault amp sims and effects once the preferred Linux delivery flow is pinned down.",
-					Packages:    []*Package{},
+					Description: "User-local VST3 and LV2 installs from Audio Assault's Linux plugin archives.",
+					Packages: []*Package{
+						{
+							ID:          "audio-assault-drum-locker",
+							Name:        "Drum Locker",
+							Vendor:      "Audio Assault",
+							Summary:     "Drum and groove production plugin installed from the official Linux archive.",
+							Description: "Downloads Drum Locker and installs its VST3 and LV2 bundles into the current user's ~/.vst3 and ~/.lv2 directories.",
+							Notes: []string{
+								"Does not require sudo.",
+								"Installed as a user-local plugin so it works cleanly on immutable systems.",
+							},
+							InstalledMarkers: []string{
+								".vst3/Drum Locker.vst3",
+								".lv2/Drum Locker.lv2",
+							},
+							Actions: []Action{
+								{Title: "Install Drum Locker", Exec: script("install-audio-assault-drumlocker.sh")},
+							},
+						},
+						{
+							ID:          "audio-assault-amp-locker",
+							Name:        "Amp Locker",
+							Vendor:      "Audio Assault",
+							Summary:     "Amp sim platform installed from the official Linux archive.",
+							Description: "Downloads Amp Locker and installs its VST3 and LV2 bundles into the current user's ~/.vst3 and ~/.lv2 directories.",
+							Notes: []string{
+								"Does not require sudo.",
+								"Installed as a user-local plugin so it works cleanly on immutable systems.",
+							},
+							InstalledMarkers: []string{
+								".vst3/Amp Locker.vst3",
+								".lv2/Amp Locker.lv2",
+							},
+							Actions: []Action{
+								{Title: "Install Amp Locker", Exec: script("install-audio-assault-amplocker.sh")},
+							},
+						},
+						{
+							ID:          "audio-assault-mix-locker",
+							Name:        "Mix Locker",
+							Vendor:      "Audio Assault",
+							Summary:     "Channel-strip and mix processing platform installed from the official Linux archive.",
+							Description: "Downloads Mix Locker and installs its VST3 and LV2 bundles into the current user's ~/.vst3 and ~/.lv2 directories.",
+							Notes: []string{
+								"Does not require sudo.",
+								"Installed as a user-local plugin so it works cleanly on immutable systems.",
+							},
+							InstalledMarkers: []string{
+								".vst3/Mix Locker.vst3",
+								".lv2/Mix Locker.lv2",
+							},
+							Actions: []Action{
+								{Title: "Install Mix Locker", Exec: script("install-audio-assault-mixlocker.sh")},
+							},
+						},
+					},
 				},
 				{
 					ID:          "tal",
