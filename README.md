@@ -40,3 +40,15 @@ The app looks for installer scripts in:
 3. `scripts/` in the current repo or a parent directory
 
 Most package installs write to `/opt`, `/usr/local`, or the current user's home directory so they work on an atomic Caracal system without rpm layering.
+
+## Contributing
+Pull requests welcome. Just create a feature branch and submit a pull request with details about the change, what software you are adding to the catalog etc.
+
+If you are currently running a Fedora Atomic image, you can clone this repo and run it locally and see if the installation you added work.
+
+## TODO
+1. Add sudo password and installation processing to happen within the program program so the user does not exit and then return.
+2. Move all the Caracal default plugins and music software here and embed install into Caracal OS
+3. Add more plugins
+4. Fix general jank
+

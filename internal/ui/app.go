@@ -20,6 +20,7 @@ var theme = struct {
 	Success    tcell.Color
 	Warning    tcell.Color
 	Danger     tcell.Color
+	FocusMute  tcell.Color
 }{
 	Background: tcell.NewHexColor(0x0f172a),
 	Panel:      tcell.NewHexColor(0x111827),
@@ -30,7 +31,13 @@ var theme = struct {
 	Success:    tcell.NewHexColor(0x4ade80),
 	Warning:    tcell.NewHexColor(0xfbbf24),
 	Danger:     tcell.NewHexColor(0xfb7185),
+	FocusMute:  tcell.NewHexColor(0x475569),
 }
+
+const (
+	paneLibrary = "library"
+	paneQueue   = "queue"
+)
 
 type nodeRef struct {
 	Category    *catalog.Category
@@ -42,6 +49,7 @@ type App struct {
 	pages            *tview.Pages
 	categories       []*catalog.Category
 	logo             string
+	activePane       string
 	currentCategory  *catalog.Category
 	currentSubcat    *catalog.Subcategory
 	selected         map[string]bool
@@ -60,6 +68,7 @@ func New(categories []*catalog.Category, logo string) *App {
 		pages:        tview.NewPages(),
 		categories:   categories,
 		logo:         logo,
+		activePane:   paneLibrary,
 		selected:     make(map[string]bool),
 		states:       make(map[string]installer.PackageState),
 		header:       tview.NewTextView(),
@@ -128,6 +137,15 @@ func (a *App) buildLayout() {
 	a.tree.SetSelectedFunc(func(node *tview.TreeNode) {
 		node.SetExpanded(!node.IsExpanded())
 	})
+	a.tree.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		a.activePane = paneLibrary
+		a.refreshChrome()
+		if event.Key() == tcell.KeyTAB {
+			a.setActivePane(paneQueue)
+			return nil
+		}
+		return event
+	})
 
 	a.packageTable.SetBorder(true)
 	a.packageTable.SetTitle(" Queue ")
@@ -150,9 +168,11 @@ func (a *App) buildLayout() {
 		}
 	})
 	a.packageTable.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		a.activePane = paneQueue
+		a.refreshChrome()
 		switch event.Key() {
 		case tcell.KeyTAB:
-			a.app.SetFocus(a.tree)
+			a.setActivePane(paneLibrary)
 			return nil
 		case tcell.KeyRune:
 			if event.Rune() == ' ' {
@@ -199,41 +219,35 @@ func (a *App) buildLayout() {
 	if a.logo != "" {
 		a.pages.AddPage("splash", a.buildSplash(), true, true)
 	}
+	a.refreshChrome()
 	a.updateStatus()
 }
 
 func (a *App) buildSplash() tview.Primitive {
+	logoLines := strings.Count(a.logo, "\n") + 1
 	logoView := tview.NewTextView().
 		SetTextAlign(tview.AlignCenter).
 		SetText(a.renderSplash()).
 		SetWrap(false)
 	logoView.SetTextColor(theme.Text)
-	logoView.SetBackgroundColor(theme.Background)
+	logoView.SetBackgroundColor(theme.Panel)
 
 	card := tview.NewFrame(logoView)
-	card.SetBorders(0, 0, 0, 0, 0, 0)
+	card.SetBorders(1, 1, 1, 1, 3, 3)
 	card.SetBorder(true)
 	card.SetTitle(" Caracal ")
 	card.SetBorderColor(theme.Accent)
 	card.SetBackgroundColor(theme.Panel)
 	card.AddText("Press Enter, Space, or Esc to continue", true, tview.AlignCenter, theme.Muted)
 
-	center := tview.NewFlex().
+	splash := tview.NewFlex().
+		SetDirection(tview.FlexRow).
 		AddItem(nil, 0, 1, false).
-		AddItem(
-			tview.NewFlex().
-				SetDirection(tview.FlexRow).
-				AddItem(nil, 0, 1, false).
-				AddItem(card, 0, 1, true).
-				AddItem(nil, 0, 1, false),
-			0,
-			3,
-			true,
-		).
+		AddItem(card, logoLines+8, 0, true).
 		AddItem(nil, 0, 1, false)
-	center.SetBackgroundColor(theme.Background)
+	splash.SetBackgroundColor(theme.Background)
 
-	return center
+	return splash
 }
 
 func (a *App) populateTree() {
@@ -320,8 +334,8 @@ func (a *App) refreshPackageTable() {
 		mark := "[ ]"
 		markColor := theme.Muted
 		if a.selected[pkg.ID] {
-			mark = "[x]"
-			markColor = theme.Accent
+			mark = "[X]"
+			markColor = theme.Success
 		}
 
 		statusText := "Ready"
@@ -334,7 +348,17 @@ func (a *App) refreshPackageTable() {
 			statusColor = theme.Danger
 		}
 
-		a.packageTable.SetCell(index+1, 0, tview.NewTableCell(mark).SetTextColor(markColor))
+		markCell := tview.NewTableCell(mark).
+			SetTextColor(markColor).
+			SetAlign(tview.AlignCenter).
+			SetMaxWidth(5)
+		if a.selected[pkg.ID] {
+			markCell.SetSelectedStyle(tcell.StyleDefault.Background(theme.Panel).Foreground(theme.Success).Bold(true))
+		} else {
+			markCell.SetSelectedStyle(tcell.StyleDefault.Background(theme.Panel).Foreground(theme.Muted).Bold(true))
+		}
+
+		a.packageTable.SetCell(index+1, 0, markCell)
 		a.packageTable.SetCell(index+1, 1, tview.NewTableCell(statusText).SetTextColor(statusColor))
 		a.packageTable.SetCell(index+1, 2, tview.NewTableCell(pkg.Name).SetTextColor(theme.Text).SetExpansion(1))
 		a.packageTable.SetCell(index+1, 3, tview.NewTableCell(pkg.Summary).SetTextColor(theme.Muted).SetExpansion(4))
@@ -570,12 +594,12 @@ func (a *App) handleGlobalKeys(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyEnter, tcell.KeyEsc:
 			a.pages.RemovePage("splash")
-			a.app.SetFocus(a.tree)
+			a.setActivePane(paneLibrary)
 			return nil
 		case tcell.KeyRune:
 			if event.Rune() == ' ' {
 				a.pages.RemovePage("splash")
-				a.app.SetFocus(a.tree)
+				a.setActivePane(paneLibrary)
 				return nil
 			}
 		}
@@ -586,10 +610,10 @@ func (a *App) handleGlobalKeys(event *tcell.EventKey) *tcell.EventKey {
 		a.app.Stop()
 		return nil
 	case tcell.KeyTAB:
-		if a.app.GetFocus() == a.tree {
-			a.app.SetFocus(a.packageTable)
+		if a.activePane == paneLibrary {
+			a.setActivePane(paneQueue)
 		} else {
-			a.app.SetFocus(a.tree)
+			a.setActivePane(paneLibrary)
 		}
 		return nil
 	}
@@ -621,4 +645,63 @@ func subcategoryBelongsTo(category *catalog.Category, target *catalog.Subcategor
 		}
 	}
 	return false
+}
+
+func (a *App) setActivePane(pane string) {
+	a.activePane = pane
+	switch pane {
+	case paneQueue:
+		a.app.SetFocus(a.packageTable)
+	default:
+		a.activePane = paneLibrary
+		a.app.SetFocus(a.tree)
+	}
+
+	a.refreshChrome()
+}
+
+func (a *App) refreshChrome() {
+	libraryActive := a.activePane == paneLibrary
+	queueActive := a.activePane == paneQueue
+
+	if libraryActive {
+		a.tree.SetBorderColor(theme.Accent)
+		a.tree.SetTitle(" Library • Active ")
+		a.setTreeSelectionStyle(tcell.StyleDefault.Background(theme.Accent).Foreground(theme.Background))
+	} else {
+		a.tree.SetBorderColor(theme.FocusMute)
+		a.tree.SetTitle(" Library ")
+		a.setTreeSelectionStyle(tcell.StyleDefault.Background(theme.Panel).Foreground(theme.Muted))
+	}
+
+	if queueActive {
+		a.packageTable.SetBorderColor(theme.AccentWarm)
+		a.packageTable.SetTitle(" Queue • Active ")
+		a.details.SetBorderColor(theme.AccentWarm)
+		a.details.SetTitle(" Details • Active ")
+		a.packageTable.SetSelectedStyle(tcell.StyleDefault.Background(theme.AccentWarm).Foreground(theme.Background))
+	} else {
+		a.packageTable.SetBorderColor(theme.FocusMute)
+		a.packageTable.SetTitle(" Queue ")
+		a.details.SetBorderColor(theme.FocusMute)
+		a.details.SetTitle(" Details ")
+		a.packageTable.SetSelectedStyle(tcell.StyleDefault.Background(theme.Background).Foreground(theme.Text))
+	}
+}
+
+func (a *App) setTreeSelectionStyle(style tcell.Style) {
+	root := a.tree.GetRoot()
+	if root == nil {
+		return
+	}
+
+	var walk func(node *tview.TreeNode)
+	walk = func(node *tview.TreeNode) {
+		node.SetSelectedTextStyle(style)
+		for _, child := range node.GetChildren() {
+			walk(child)
+		}
+	}
+
+	walk(root)
 }
