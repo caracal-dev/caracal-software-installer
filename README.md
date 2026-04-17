@@ -50,7 +50,7 @@ Pull requests welcome. Just create a feature branch and submit a pull request wi
 If you are currently running a Fedora Atomic image, you can clone this repo and run it locally and see if the installation you added work.
 
 ## TODO
-~~1. Add an uninstall option~~
+1. ~~Add an uninstall option~~
 2. Add sudo password and installation processing to happen within the program program so the user does not exit and then return.
 3. Move all the Caracal default plugins and music software here and embed install into Caracal OS
 4. Add more plugins
