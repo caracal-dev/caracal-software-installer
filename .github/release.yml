@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run tests
+        run: go test ./...
+
+      - name: Build release bundle
+        env:
+          GOOS: linux
+          GOARCH: amd64
+        run: |
+          VERSION="${GITHUB_REF_NAME:-manual}"
+          APP_NAME="caracal-software-installer"
+          STAGING_DIR="dist/${APP_NAME}-${VERSION}-linux-amd64"
+          ARCHIVE_PATH="dist/${APP_NAME}-${VERSION}-linux-amd64.tar.gz"
+
+          rm -rf dist
+          mkdir -p "${STAGING_DIR}"
+
+          go build -trimpath -ldflags="-s -w" -o "${STAGING_DIR}/${APP_NAME}" ./cmd/caracal-software-installer
+
+          cp -R scripts "${STAGING_DIR}/scripts"
+          cp logo.txt README.md LICENSE "${STAGING_DIR}/"
+
+          tar -C dist -czf "${ARCHIVE_PATH}" "$(basename "${STAGING_DIR}")"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.tar.gz
+          generate_release_notes: true
