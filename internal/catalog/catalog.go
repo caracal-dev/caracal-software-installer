@@ -3,6 +3,7 @@ package catalog
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/caracal-os/caracal-software-installer/internal/downloadindex"
 )
@@ -96,6 +97,96 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 	sourceUninstall := func(projectName string, displayName string) []string {
 		return script("uninstall-source-plugin.sh", projectName, displayName)
 	}
+	splitFormats := func(raw string) []string {
+		if raw == "" {
+			return nil
+		}
+
+		parts := strings.Split(raw, ",")
+		formats := make([]string, 0, len(parts))
+		for _, part := range parts {
+			format := strings.TrimSpace(part)
+			if format == "" {
+				continue
+			}
+			formats = append(formats, format)
+		}
+		return formats
+	}
+	formatLabel := func(format string) string {
+		switch format {
+		case "clap":
+			return "CLAP"
+		case "vst":
+			return "VST2"
+		case "vst3":
+			return "VST3"
+		case "lv2":
+			return "LV2"
+		default:
+			return strings.ToUpper(format)
+		}
+	}
+	joinLabels := func(values []string) string {
+		switch len(values) {
+		case 0:
+			return ""
+		case 1:
+			return values[0]
+		case 2:
+			return values[0] + " and " + values[1]
+		default:
+			return strings.Join(values[:len(values)-1], ", ") + ", and " + values[len(values)-1]
+		}
+	}
+	archiveTargets := func(id string) string {
+		entry := mustEntry(id)
+		formats := splitFormats(entry["formats"])
+		if len(formats) == 0 {
+			return "plugin payloads"
+		}
+
+		labels := make([]string, 0, len(formats))
+		for _, format := range formats {
+			labels = append(labels, formatLabel(format))
+		}
+
+		suffix := " plugin targets"
+		if len(labels) == 1 {
+			suffix = " plugin target"
+		}
+
+		return joinLabels(labels) + suffix
+	}
+	archiveInstalledMarkers := func(id string) []string {
+		entry := mustEntry(id)
+		primaryBundleName := entry["primary_bundle_name"]
+		formats := splitFormats(entry["formats"])
+		markers := make([]string, 0, len(formats)+1)
+
+		for _, format := range formats {
+			switch format {
+			case "clap":
+				markers = append(markers, ".clap/"+primaryBundleName+".clap")
+			case "vst":
+				markers = append(markers, ".vst/"+primaryBundleName+".so")
+			case "vst3":
+				markers = append(markers, ".vst3/"+primaryBundleName+".vst3")
+			case "lv2":
+				markers = append(markers, ".lv2/"+primaryBundleName+".lv2")
+			}
+		}
+
+		dataTargetName := entry["data_target_name"]
+		if dataTargetName == "" {
+			dataTargetName = entry["data_dir_name"]
+		}
+		if dataTargetName != "" {
+			markers = append(markers, "Audio Assault/PluginData/Audio Assault/"+dataTargetName)
+		}
+
+		return markers
+	}
 	linkForID := func(id string) []Link {
 		entry := mustEntry(id)
 		var links []Link
@@ -106,6 +197,29 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			links = append(links, Link{Label: "Source", URL: entry["repo_url"]})
 		}
 		return links
+	}
+	genericArchivePackage := func(id string, vendor string, summary string) *Package {
+		entry := mustEntry(id)
+		name := entry["name"]
+		return &Package{
+			ID:          id,
+			Name:        name,
+			Vendor:      vendor,
+			Summary:     summary,
+			Description: fmt.Sprintf("Downloads the upstream Linux archive and installs the contained %s into the current user's plugin directories.", archiveTargets(id)),
+			Notes: []string{
+				"Does not require sudo.",
+				"Installed as a user-local plugin so it works cleanly on immutable systems.",
+			},
+			Links:            linkForID(id),
+			InstalledMarkers: archiveInstalledMarkers(id),
+			InstallActions: []Action{
+				{Title: fmt.Sprintf("Install %s", name), Exec: archiveInstall(id)},
+			},
+			UninstallActions: []Action{
+				{Title: fmt.Sprintf("Uninstall %s", name), Exec: archiveUninstall(id)},
+			},
+		}
 	}
 
 	return []*Category{
@@ -399,6 +513,27 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall TAL-Noisemaker", Exec: archiveUninstall("tal-noisemaker")},
 							},
 						},
+						{
+							ID:          "yoshimi",
+							Name:        "Yoshimi",
+							Vendor:      "Yoshimi",
+							Summary:     "Open-source synth built from source into ~/.local.",
+							Description: "Downloads the current Yoshimi source archive, builds it locally, and installs its standalone and plugin payloads into the current user's ~/.local tree.",
+							Notes: []string{
+								"Does not require sudo.",
+								"Builds from source, so make and the required development libraries must already be available.",
+							},
+							Links: linkForID("yoshimi"),
+							InstalledMarkers: []string{
+								".local/bin/yoshimi",
+							},
+							InstallActions: []Action{
+								{Title: "Install Yoshimi", Exec: sourceInstall("yoshimi", "yoshimi")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall Yoshimi", Exec: sourceUninstall("yoshimi", "Yoshimi")},
+							},
+						},
 					},
 				},
 				{
@@ -597,6 +732,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Drum Locker", Exec: archiveUninstall("drum-locker")},
 							},
 						},
+						genericArchivePackage("drum-groove-pro", "InToEtherion", "Drum performance plugin distributed as a Linux VST3 archive."),
+						genericArchivePackage("black-widow-drums", "odoare", "Drum instrument packaged as a Linux VST3 bundle."),
 					},
 				},
 			},
@@ -732,6 +869,9 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Mix Locker", Exec: archiveUninstall("mix-locker")},
 							},
 						},
+						genericArchivePackage("the-trick", "Mouse Plugins", "Focused EQ processor distributed as a Linux VST3 archive."),
+						genericArchivePackage("polarity", "Polarity", "Spectral compressor plugin packaged with CLAP and VST3 targets."),
+						genericArchivePackage("nine-strip", "blablack", "Channel-strip processor distributed as Linux VST3 and LV2 bundles."),
 					},
 				},
 				{
@@ -762,6 +902,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Dragonfly Reverb", Exec: script("uninstall-dragonfly.sh")},
 							},
 						},
+						genericArchivePackage("wet-delay", "yonie", "Delay plugin distributed as a Linux VST3 archive."),
+						genericArchivePackage("wet-reverb", "yonie", "Reverb plugin distributed as a Linux VST3 archive."),
 					},
 				},
 				{
@@ -788,6 +930,29 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 							},
 							UninstallActions: []Action{
 								{Title: "Uninstall INTERSECT", Exec: archiveUninstall("intersect")},
+							},
+						},
+						genericArchivePackage("spectrus", "Morphulus", "Multi-effect processor distributed as Linux VST3 and LV2 bundles."),
+						genericArchivePackage("warp-core", "Manas World", "Pitch-focused processor distributed as Linux LV2 and VST3 bundles."),
+						{
+							ID:          "zam-plugins",
+							Name:        "Zam Plugin Suite",
+							Vendor:      "ZamAudio",
+							Summary:     "LV2 effect suite distributed as a Linux archive with multiple plugin bundles.",
+							Description: "Downloads the upstream Linux archive and installs the contained LV2 plugin bundles into the current user's plugin directories.",
+							Notes: []string{
+								"Does not require sudo.",
+								"The suite ships multiple LV2 bundles, so uninstall uses wildcard cleanup across the installed Zam plugin directories.",
+							},
+							Links: linkForID("zam-plugins"),
+							InstalledMarkers: []string{
+								".lv2/Zam*.lv2",
+							},
+							InstallActions: []Action{
+								{Title: "Install Zam Plugin Suite", Exec: archiveInstall("zam-plugins")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall Zam Plugin Suite", Exec: script("uninstall-zam-plugins.sh")},
 							},
 						},
 					},

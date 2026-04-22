@@ -10,15 +10,15 @@
   - Bitwig Studio
 - Virtual Instruments
   - Warmplace: SunVox, Virtual ANS, Fractal Bits
-  - Open Synths: Cardinal, Surge XT, Wavetable, OB-Xf, Odin2, TAL-Noisemaker
+  - Open Synths: Cardinal, Surge XT, Wavetable, OB-Xf, Odin2, TAL-Noisemaker, Yoshimi
   - Samplers & Players: Loopino, Decent Sampler
   - rncbc Instruments: Synthv1, Samplv1, Padhv1
-  - Drums & Percussion: jDrummer, Drumkv1, Drum Locker
+  - Drums & Percussion: jDrummer, Drumkv1, Drum Locker, Drum Groove Pro, Black Widow Drums
 - Effects
   - Amp & Guitar: Amp Locker, BYOD, Neural Amp Modeler, AIDA-X
-  - Mixing & Channel Strip: Mix Locker
-  - Reverb & Spatial: Dragonfly Reverb
-  - Creative & Utility: INTERSECT
+  - Mixing & Channel Strip: Mix Locker, The Trick, Polarity, NineStrip
+  - Reverb & Spatial: Dragonfly Reverb, WetDelay, WetReverb
+  - Creative & Utility: INTERSECT, Spectrus, WarpCore, Zam Plugin Suite
 - Utilities
   - RTCQS
 

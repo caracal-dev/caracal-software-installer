@@ -1,4 +1,4 @@
-id,name,version,url,formats,primary_bundle_name,data_dir_name,data_target_name,warmplace_subdir,launcher_name,desktop_id,desktop_comment,repo_url,extract_dir
+id,name,version,url,formats,primary_bundle_name,data_dir_name,data_target_name,warmplace_subdir,launcher_name,desktop_id,desktop_comment,repo_url,extract_dir,category
 reaper,REAPER,765,https://www.reaper.fm/files/7.x/reaper765_linux_x86_64.tar.xz,,,,,,,,,,
 renoise,Renoise,3.5.4,https://files.renoise.com/demo/Renoise_3_5_4_Demo_Linux_x86_64.tar.gz,,,,,,,,,,Renoise_3_5_4_Demo_Linux_x86_64
 bitwig-studio,Bitwig Studio,,https://www.bitwig.com/dl/?id=419&os=installer_linux,,,,,,,,,,
@@ -26,3 +26,14 @@ neural-amp-model,Neural Amp Modeler,0.1.9,https://github.com/mikeoliphant/neural
 aida-x,AIDA-X,1.1.0,https://github.com/AidaDSP/AIDA-X/releases/download/1.1.0/AIDA-X-1.1.0-linux-x86_64.tar.xz,"clap,vst3,lv2",AIDA-X,,,,,,,,
 dragonfly,Dragonfly Reverb,3.2.10,https://github.com/michaelwillis/dragonfly-reverb/releases/download/3.2.10/dragonfly-reverb-3.2.10-linux-x86_64.tar.xz,"clap,vst3,lv2",DragonflyHall,,,,,,,,
 rtcqs,RTCQS,,https://pypi.org/project/rtcqs/,,,,,,,,,,
+yoshimi,Yoshimi,2.3.6.1,https://github.com/Yoshimi/yoshimi/archive/2.3.6.1.zip,,,,,,,,,,,Synth
+zam-plugins,Zam Plugin Suite,4.5,https://github.com/zamaudio/zam-plugins/releases/download/4.5/zam-plugins-4.5-linux-x86_64.tar.xz,lv2,zam-plugins-4.5,,,,,,,,,Plugin Suite
+spectrus,Spectrus,1.1.1,https://downloads.morphulus.com/Spectrus-1.1.1-Linux.tar.gz,"vst3,lv2",Spectrus,,,,,,,,,Multi Effect
+the-trick,The Trick,1.0.0,https://mouseplugins.com/en/products/thetrick/download/1.0.0/linux/tar.gz,vst3,TheTrick,,,,,,,,,EQ
+polarity,Polarity,,https://polarity.me/go.php?c=p-sc-linux,"clap,vst3",Polarity-SC-Dark,,,,,,,,,Spectral Compressor
+nine-strip,NineStrip,0.1.1,https://github.com/blablack/nine-strip/releases/download/v0.1.1/NineStrip-Linux.tar.gz,"vst3,lv2",NineStrip,,,,,,,,,Channel Strip
+warp-core,WarpCore,0.0.11,https://github.com/ManasWolrd/WarpCore/releases/download/v0.0.11/WarpCore-linux-v0.0.11.zip,"lv2,vst3",WarpCore,,,,,,,,,Pitch
+wet-delay,WetDelay,1.1.4,https://github.com/yonie/WetDelay/releases/download/v1.1.4/WetDelay-v1.1.4.zip,vst3,WetDelay,,,,,,,,,Delay
+wet-reverb,WetReverb,1.0.1,https://github.com/yonie/WetReverb/releases/download/v1.0.1/WetReverb-v1.0.1.zip,vst3,WetReverb,,,,,,,,,Reverb
+drum-groove-pro,Drum Groove Pro,01.0.0,https://github.com/InToEtherion/DrumGroovePro/releases/download/V1.0.0_RC2/DrumGroovePro_v01.0.0_RC2_LINUX_x64.zip,vst3,Drum Groove Pro,,,,,,,,,Drum Midi
+black-widow-drums,Black Widow Drums,0.1,https://github.com/odoare/FxmeSampler/releases/download/0.1/BlackWidowDrums.0.1.LIN.x64.VST3.zip,vst3,BlackWidowDrums,,,,,,,,,Drums

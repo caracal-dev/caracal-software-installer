@@ -10,6 +10,7 @@ virtual-instruments,Virtual Instruments,open-synths,Open Synths,wavetable,Waveta
 virtual-instruments,Virtual Instruments,open-synths,Open Synths,ob-xf,OB-Xf,Surge Synth Team,Download,https://github.com/surge-synthesizer/OB-Xf/releases/download/v1.0.3/ob-xf-Linux-v1.0.3.zip
 virtual-instruments,Virtual Instruments,open-synths,Open Synths,odin2,Odin2,TheWaveWarden,Download,https://www.dropbox.com/scl/fi/eshk5a54xirgi4fshuyh5/Odin2.4.1Linux.zip?rlkey=e4d4eqqecep0cr98cfyso4ty7&st=00ebtald&dl=1
 virtual-instruments,Virtual Instruments,open-synths,Open Synths,tal-noisemaker,TAL-Noisemaker,TAL Software,Download,https://tal-software.com/downloads/plugins/TAL-NoiseMaker_64_linux.zip
+virtual-instruments,Virtual Instruments,open-synths,Open Synths,yoshimi,Yoshimi,Yoshimi,Download,https://github.com/Yoshimi/yoshimi/archive/2.3.6.1.zip
 virtual-instruments,Virtual Instruments,samplers-and-players,Samplers & Players,loopino,Loopino,brummer10,Source,https://github.com/brummer10/Loopino.git
 virtual-instruments,Virtual Instruments,samplers-and-players,Samplers & Players,decent-sampler,Decent Sampler,Decent Samples,Download,https://cdn.decentsamples.com/production/builds/ds/1.18.1/Decent_Sampler-1.18.1-Linux-Static-x86_64.tar.gz
 virtual-instruments,Virtual Instruments,rncbc-instruments,rncbc Instruments,synthv1,Synthv1,rncbc,Download,https://github.com/rncbc/synthv1/archive/refs/heads/main.tar.gz
@@ -18,11 +19,21 @@ virtual-instruments,Virtual Instruments,rncbc-instruments,rncbc Instruments,padh
 virtual-instruments,Virtual Instruments,drums-and-percussion,Drums & Percussion,jdrummer,jDrummer,jmantra,Download,https://github.com/jmantra/jdrummer/releases/download/Second/jdrummer_Linux_VST3.zip
 virtual-instruments,Virtual Instruments,drums-and-percussion,Drums & Percussion,drumkv1,Drumkv1,rncbc,Download,https://github.com/rncbc/drumkv1/archive/refs/heads/main.tar.gz
 virtual-instruments,Virtual Instruments,drums-and-percussion,Drums & Percussion,drum-locker,Drum Locker,Audio Assault,Download,https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/DrumLockerLinux.zip
+virtual-instruments,Virtual Instruments,drums-and-percussion,Drums & Percussion,drum-groove-pro,Drum Groove Pro,InToEtherion,Download,https://github.com/InToEtherion/DrumGroovePro/releases/download/V1.0.0_RC2/DrumGroovePro_v01.0.0_RC2_LINUX_x64.zip
+virtual-instruments,Virtual Instruments,drums-and-percussion,Drums & Percussion,black-widow-drums,Black Widow Drums,odoare,Download,https://github.com/odoare/FxmeSampler/releases/download/0.1/BlackWidowDrums.0.1.LIN.x64.VST3.zip
 effects,Effects,amp-and-guitar,Amp & Guitar,amp-locker,Amp Locker,Audio Assault,Download,https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/AmpLockerLinux.zip
 effects,Effects,amp-and-guitar,Amp & Guitar,byod,BYOD,Chowdhury DSP,Download,https://github.com/Chowdhury-DSP/BYOD/releases/download/v1.3.0/BYOD-Linux-x64-1.3.0.deb
 effects,Effects,amp-and-guitar,Amp & Guitar,neural-amp-model,Neural Amp Modeler,Mike Oliphant,Download,https://github.com/mikeoliphant/neural-amp-modeler-lv2/releases/download/v0.1.9/neural_amp_modeler_lv2_linux_x64.tgz
 effects,Effects,amp-and-guitar,Amp & Guitar,aida-x,AIDA-X,AidaDSP,Download,https://github.com/AidaDSP/AIDA-X/releases/download/1.1.0/AIDA-X-1.1.0-linux-x86_64.tar.xz
 effects,Effects,mixing-and-channel-strip,Mixing & Channel Strip,mix-locker,Mix Locker,Audio Assault,Download,https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/MixLockerLinux.zip
+effects,Effects,mixing-and-channel-strip,Mixing & Channel Strip,the-trick,The Trick,Mouse Plugins,Download,https://mouseplugins.com/en/products/thetrick/download/1.0.0/linux/tar.gz
+effects,Effects,mixing-and-channel-strip,Mixing & Channel Strip,polarity,Polarity,Polarity,Download,https://polarity.me/go.php?c=p-sc-linux
+effects,Effects,mixing-and-channel-strip,Mixing & Channel Strip,nine-strip,NineStrip,blablack,Download,https://github.com/blablack/nine-strip/releases/download/v0.1.1/NineStrip-Linux.tar.gz
 effects,Effects,reverb-and-spatial,Reverb & Spatial,dragonfly,Dragonfly Reverb,Michael Willis,Download,https://github.com/michaelwillis/dragonfly-reverb/releases/download/3.2.10/dragonfly-reverb-3.2.10-linux-x86_64.tar.xz
+effects,Effects,reverb-and-spatial,Reverb & Spatial,wet-delay,WetDelay,yonie,Download,https://github.com/yonie/WetDelay/releases/download/v1.1.4/WetDelay-v1.1.4.zip
+effects,Effects,reverb-and-spatial,Reverb & Spatial,wet-reverb,WetReverb,yonie,Download,https://github.com/yonie/WetReverb/releases/download/v1.0.1/WetReverb-v1.0.1.zip
 effects,Effects,creative-and-utility,Creative & Utility,intersect,INTERSECT,tucktuckg00se,Download,https://github.com/tucktuckg00se/INTERSECT/releases/download/v0.10.8/INTERSECT-v0.10.8-Linux-x64.zip
+effects,Effects,creative-and-utility,Creative & Utility,spectrus,Spectrus,Morphulus,Download,https://downloads.morphulus.com/Spectrus-1.1.1-Linux.tar.gz
+effects,Effects,creative-and-utility,Creative & Utility,warp-core,WarpCore,Manas World,Download,https://github.com/ManasWolrd/WarpCore/releases/download/v0.0.11/WarpCore-linux-v0.0.11.zip
+effects,Effects,creative-and-utility,Creative & Utility,zam-plugins,Zam Plugin Suite,ZamAudio,Download,https://github.com/zamaudio/zam-plugins/releases/download/4.5/zam-plugins-4.5-linux-x86_64.tar.xz
 utilities,Utilities,system-tuning,System Tuning,rtcqs,RTCQS,rtcqs,Download,https://pypi.org/project/rtcqs/
