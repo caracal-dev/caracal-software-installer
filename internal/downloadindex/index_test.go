@@ -50,6 +50,22 @@ func TestValidateRejectsDuplicateIDs(t *testing.T) {
 	}
 }
 
+func TestValidateAcceptsVariableLengthRows(t *testing.T) {
+	indexPath := writeTestIndex(t, strings.Join([]string{
+		"id,name,url,repo_url,category",
+		"reaper,REAPER,https://example.test/reaper",
+		"loopino,Loopino,,https://example.test/repo.git,Synth",
+	}, "\n"))
+
+	count, err := Validate(indexPath)
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+	if count != 2 {
+		t.Fatalf("unexpected entry count %d", count)
+	}
+}
+
 func writeTestIndex(t *testing.T, contents string) string {
 	t.Helper()
 

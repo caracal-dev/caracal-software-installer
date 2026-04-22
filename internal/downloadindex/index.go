@@ -27,6 +27,7 @@ var knownFields = map[string]struct{}{
 	"desktop_comment":     {},
 	"repo_url":            {},
 	"extract_dir":         {},
+	"category":            {},
 }
 
 var requiredFields = []string{"id", "name"}
@@ -189,6 +190,7 @@ func loadRows(indexPath string) ([]Entry, error) {
 	defer file.Close()
 
 	reader := csv.NewReader(file)
+	reader.FieldsPerRecord = -1
 	header, err := reader.Read()
 	if err != nil {
 		if err == io.EOF {
