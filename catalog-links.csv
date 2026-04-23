@@ -11,6 +11,12 @@ virtual-instruments,Virtual Instruments,open-synths,Open Synths,ob-xf,OB-Xf,Surg
 virtual-instruments,Virtual Instruments,open-synths,Open Synths,odin2,Odin2,TheWaveWarden,Download,https://www.dropbox.com/scl/fi/eshk5a54xirgi4fshuyh5/Odin2.4.1Linux.zip?rlkey=e4d4eqqecep0cr98cfyso4ty7&st=00ebtald&dl=1
 virtual-instruments,Virtual Instruments,open-synths,Open Synths,tal-noisemaker,TAL-Noisemaker,TAL Software,Download,https://tal-software.com/downloads/plugins/TAL-NoiseMaker_64_linux.zip
 virtual-instruments,Virtual Instruments,open-synths,Open Synths,yoshimi,Yoshimi,Yoshimi,Download,https://github.com/Yoshimi/yoshimi/archive/2.3.6.1.zip
+virtual-instruments,Virtual Instruments,open-synths,Open Synths,ensoniq,Ensoniq SD 1,sojusrecords,Download,https://github.com/sojusrecords/Ensoniq-SD-1-32-Voice-VST-emulation/releases/download/v0.9.9/EnsoniqSD1-v.0.9.9-LINUX-Generic.7z
+virtual-instruments,Virtual Instruments,open-synths,Open Synths,kr106,KR106,kayrockscreenprinting,Download,https://github.com/kayrockscreenprinting/ultramaster_kr106/releases/latest/download/KR106-Linux.zip
+virtual-instruments,Virtual Instruments,open-synths,Open Synths,tb4006,TB4006,Robot Planet,Download,https://www.robotplanet.dk/audio_plugins/tb4006/TB4006_Linux_VST.7z
+virtual-instruments,Virtual Instruments,open-synths,Open Synths,suboctb,Suboctb,yimrakhee,Download,https://codeberg.org/yimrakhee/suboctb/releases/download/v0.2.0/suboctb_v0.2.0_Linux_x64.zip
+virtual-instruments,Virtual Instruments,open-synths,Open Synths,floe-vst,Floe,floe audio,Download,https://github.com/floe-audio/Floe/releases/download/v1.1.2/Floe-VST3-v1.1.2-Linux.tar.gz
+virtual-instruments,Virtual Instruments,open-synths,Open Synths,floe-clap,Floe,floe audio,Download,https://github.com/floe-audio/Floe/releases/download/v1.1.2/Floe-CLAP-v1.1.2-Linux.tar.gz
 virtual-instruments,Virtual Instruments,samplers-and-players,Samplers & Players,loopino,Loopino,brummer10,Source,https://github.com/brummer10/Loopino.git
 virtual-instruments,Virtual Instruments,samplers-and-players,Samplers & Players,decent-sampler,Decent Sampler,Decent Samples,Download,https://cdn.decentsamples.com/production/builds/ds/1.18.1/Decent_Sampler-1.18.1-Linux-Static-x86_64.tar.gz
 virtual-instruments,Virtual Instruments,rncbc-instruments,rncbc Instruments,synthv1,Synthv1,rncbc,Download,https://github.com/rncbc/synthv1/archive/refs/heads/main.tar.gz

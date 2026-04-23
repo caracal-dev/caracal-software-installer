@@ -37,3 +37,9 @@ wet-delay,WetDelay,1.1.4,https://github.com/yonie/WetDelay/releases/download/v1.
 wet-reverb,WetReverb,1.0.1,https://github.com/yonie/WetReverb/releases/download/v1.0.1/WetReverb-v1.0.1.zip,vst3,WetReverb,,,,,,,,,Reverb
 drum-groove-pro,Drum Groove Pro,01.0.0,https://github.com/InToEtherion/DrumGroovePro/releases/download/V1.0.0_RC2/DrumGroovePro_v01.0.0_RC2_LINUX_x64.zip,vst3,Drum Groove Pro,,,,,,,,,Drum Midi
 black-widow-drums,Black Widow Drums,0.1,https://github.com/odoare/FxmeSampler/releases/download/0.1/BlackWidowDrums.0.1.LIN.x64.VST3.zip,vst3,BlackWidowDrums,,,,,,,,,Drums
+ensoniq,Ensoniq SD 1,0.9.9,https://github.com/sojusrecords/Ensoniq-SD-1-32-Voice-VST-emulation/releases/download/v0.9.9/EnsoniqSD1-v.0.9.9-LINUX-Generic.7z,vst3,ensoniq-sd-1,,,,,,,,,Synth
+kr106,KR106,,https://github.com/kayrockscreenprinting/ultramaster_kr106/releases/latest/download/KR106-Linux.zip,"vst3,lv2",kr106-linux,,,,,,,,,Synth
+tb4006,TB4006,,https://www.robotplanet.dk/audio_plugins/tb4006/TB4006_Linux_VST.7z,vst3,tb4006_linux,,,,,,,,,Synth
+suboctb,Suboctb,0.2.0,https://codeberg.org/yimrakhee/suboctb/releases/download/v0.2.0/suboctb_v0.2.0_Linux_x64.zip,"clap,vst3",suboctb,,,,,,,,,Synth
+floe-vst,Floe,1.1.2,https://github.com/floe-audio/Floe/releases/download/v1.1.2/Floe-VST3-v1.1.2-Linux.tar.gz,vst3,Floe,,,,,,,,,Synth
+floe-clap,Floe,1.1.2,https://github.com/floe-audio/Floe/releases/download/v1.1.2/Floe-CLAP-v1.1.2-Linux.tar.gz,clap,Floe,,,,,,,,,Synth

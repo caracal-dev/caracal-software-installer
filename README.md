@@ -10,7 +10,7 @@
   - Bitwig Studio
 - Virtual Instruments
   - Warmplace: SunVox, Virtual ANS, Fractal Bits
-  - Open Synths: Cardinal, Surge XT, Wavetable, OB-Xf, Odin2, TAL-Noisemaker, Yoshimi
+  - Open Synths: Cardinal, Surge XT, Wavetable, OB-Xf, Odin2, TAL-Noisemaker, Yoshimi, Ensoniq SD 1, KR106, TB4006, Suboctb, Floe (VST3), Floe (CLAP)
   - Samplers & Players: Loopino, Decent Sampler
   - rncbc Instruments: Synthv1, Samplv1, Padhv1
   - Drums & Percussion: jDrummer, Drumkv1, Drum Locker, Drum Groove Pro, Black Widow Drums

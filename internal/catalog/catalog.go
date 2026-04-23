@@ -534,6 +534,12 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Yoshimi", Exec: sourceUninstall("yoshimi", "Yoshimi")},
 							},
 						},
+						genericArchivePackage("ensoniq", "sojusrecords", "Ensoniq SD-1 inspired synth packaged as a Linux VST3 archive."),
+						genericArchivePackage("kr106", "kayrockscreenprinting", "Vintage-inspired synth distributed as Linux VST3 and LV2 bundles."),
+						genericArchivePackage("tb4006", "Robot Planet", "Bassline synth distributed as a Linux VST3 archive."),
+						genericArchivePackage("suboctb", "yimrakhee", "Sub-octave focused synth packaged with CLAP and VST3 targets."),
+						genericArchivePackage("floe-vst", "floe audio", "Synth voice distributed as a Linux VST3 archive."),
+						genericArchivePackage("floe-clap", "floe audio", "Synth voice distributed as a Linux CLAP archive."),
 					},
 				},
 				{

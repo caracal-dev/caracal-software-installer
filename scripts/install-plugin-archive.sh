@@ -58,6 +58,26 @@ extract_zip() {
   exit 1
 }
 
+extract_with_7z_or_bsdtar() {
+  local archive="$1"
+  local destination="$2"
+  local format_label="$3"
+
+  mkdir -p "${destination}"
+  if command -v 7z >/dev/null 2>&1; then
+    7z x -y "-o${destination}" "${archive}" >/dev/null
+    return
+  fi
+
+  if command -v bsdtar >/dev/null 2>&1; then
+    bsdtar -xf "${archive}" -C "${destination}"
+    return
+  fi
+
+  echo "Need 7z or bsdtar to unpack ${format_label} archives." >&2
+  exit 1
+}
+
 extract_deb() {
   local archive="$1"
   local destination="$2"
@@ -104,6 +124,9 @@ extract_archive() {
   case "${lower_archive}" in
     *.zip)
       extract_zip "${archive}" "${destination}"
+      ;;
+    *.7z)
+      extract_with_7z_or_bsdtar "${archive}" "${destination}" "7z"
       ;;
     *.deb)
       extract_deb "${archive}" "${destination}"
