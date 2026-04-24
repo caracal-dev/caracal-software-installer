@@ -159,7 +159,11 @@ func resolveDownloadIndexPath(scriptDir string) (string, error) {
 		candidates = append(candidates, candidateRelativePaths(filepath.Dir(exe), filepath.Join("data", "download-index.csv"))...)
 	}
 
-	candidates = append(candidates, "/usr/lib/caracal-software-installer/data/download-index.csv")
+	candidates = append(
+		candidates,
+		"/usr/lib/caracal-software-installer/data/download-index.csv",
+		"/usr/share/caracal-software-installer/data/download-index.csv",
+	)
 
 	seen := make(map[string]struct{})
 	for _, path := range candidates {
@@ -178,7 +182,7 @@ func resolveDownloadIndexPath(scriptDir string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("could not find download index; checked CARACAL_INSTALLER_DOWNLOAD_INDEX_PATH, /usr/lib/caracal-software-installer/data/download-index.csv, and repo-local data directories")
+	return "", fmt.Errorf("could not find download index; checked CARACAL_INSTALLER_DOWNLOAD_INDEX_PATH, /usr/lib/caracal-software-installer/data/download-index.csv, /usr/share/caracal-software-installer/data/download-index.csv, and repo-local data directories")
 }
 
 func candidateFiles(start string, name string) []string {

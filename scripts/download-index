@@ -3,7 +3,31 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "${script_dir}/.." && pwd)"
-index_path="${CARACAL_INSTALLER_DOWNLOAD_INDEX_PATH:-${repo_root}/data/download-index.csv}"
+
+resolve_index_path() {
+    if [[ -n "${CARACAL_INSTALLER_DOWNLOAD_INDEX_PATH:-}" ]]; then
+        printf '%s\n' "${CARACAL_INSTALLER_DOWNLOAD_INDEX_PATH}"
+        return
+    fi
+
+    local candidates=(
+        "${repo_root}/data/download-index.csv"
+        "/usr/lib/caracal-software-installer/data/download-index.csv"
+        "/usr/share/caracal-software-installer/data/download-index.csv"
+    )
+
+    local candidate=""
+    for candidate in "${candidates[@]}"; do
+        if [[ -f "${candidate}" ]]; then
+            printf '%s\n' "${candidate}"
+            return
+        fi
+    done
+
+    printf '%s\n' "${repo_root}/data/download-index.csv"
+}
+
+index_path="$(resolve_index_path)"
 
 find_helper() {
     local candidates=()
