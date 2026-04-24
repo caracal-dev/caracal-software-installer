@@ -1,6 +1,7 @@
 name: Release
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "v*"
@@ -25,28 +26,43 @@ jobs:
       - name: Run tests
         run: go test ./...
 
-      - name: Build release bundle
+      - name: Validate download index
+        run: scripts/download-index validate
+
+      - name: Build release package
         env:
           GOOS: linux
           GOARCH: amd64
         run: |
+          set -euo pipefail
+
           VERSION="${GITHUB_REF_NAME:-manual}"
           APP_NAME="caracal-software-installer"
           STAGING_DIR="dist/${APP_NAME}-${VERSION}-linux-amd64"
           ARCHIVE_PATH="dist/${APP_NAME}-${VERSION}-linux-amd64.tar.gz"
 
           rm -rf dist
-          mkdir -p "${STAGING_DIR}"
+          install -d \
+            "${STAGING_DIR}/usr/bin" \
+            "${STAGING_DIR}/usr/lib/caracal-software-installer/bin" \
+            "${STAGING_DIR}/usr/share/caracal-software-installer"
 
-          go build -trimpath -ldflags="-s -w" -o "${STAGING_DIR}/${APP_NAME}" ./cmd/caracal-software-installer
+          go build -trimpath -ldflags="-s -w" -o "${STAGING_DIR}/usr/bin/${APP_NAME}" ./cmd/caracal-software-installer
+          go build -trimpath -ldflags="-s -w" -o "${STAGING_DIR}/usr/lib/caracal-software-installer/bin/caracal-download-index" ./cmd/caracal-download-index
 
-          cp -R scripts "${STAGING_DIR}/scripts"
-          cp logo.txt README.md LICENSE "${STAGING_DIR}/"
+          cp -R scripts data "${STAGING_DIR}/usr/lib/caracal-software-installer/"
+          cp -R assets "${STAGING_DIR}/usr/share/caracal-software-installer/"
+          cp logo.txt "${STAGING_DIR}/usr/share/caracal-software-installer/"
+          cp README.md LICENSE "${STAGING_DIR}/"
 
           tar -C dist -czf "${ARCHIVE_PATH}" "$(basename "${STAGING_DIR}")"
+          sha256sum "${ARCHIVE_PATH}" > "${ARCHIVE_PATH}.sha256"
 
       - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/*.tar.gz
+          files: |
+            dist/*.tar.gz
+            dist/*.tar.gz.sha256
           generate_release_notes: true
