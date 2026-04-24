@@ -1,12 +1,14 @@
 %global debug_package %{nil}
+%global upstream_version %{?version_override}%{!?version_override:1.7}
+%global source_tag %{?source_tag_override}%{!?source_tag_override:v%{upstream_version}}
 
 Name:           caracal-software-installer
-Version:        %{?version_override}%{!?version_override:0.0.0}
+Version:        %{upstream_version}
 Release:        %{?release_override}%{!?release_override:1}%{?dist}
 Summary:        Catalog-driven installer for optional audio software
 License:        MIT
 URL:            https://github.com/caracal-os/caracal-software-installer
-Source0:        %{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/%{source_tag}/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  golang >= 1.25
@@ -58,5 +60,5 @@ install -Dpm0644 packaging/caracal-software-installer.desktop %{buildroot}%{_dat
 %{_datadir}/applications/caracal-software-installer.desktop
 
 %changelog
-* Fri Apr 24 2026 Codex <codex@openai.com> - 0.0.0-1
-- Initial RPM packaging
+* Sat Apr 25 2026 Codex <codex@openai.com> - 1.7-1
+- Make Source0 fetchable by COPR and default to the latest tagged release
