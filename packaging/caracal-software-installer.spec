@@ -1,5 +1,5 @@
 %global debug_package %{nil}
-%global upstream_version %{?version_override}%{!?version_override:1.9}
+%global upstream_version %{?version_override}%{!?version_override:1.6}
 %global source_tag %{?source_tag_override}%{!?source_tag_override:v%{upstream_version}}
 
 Name:           caracal-software-installer
@@ -58,7 +58,3 @@ install -Dpm0644 packaging/caracal-software-installer.desktop %{buildroot}%{_dat
 %{_datadir}/caracal-software-installer/logo.txt
 %{_datadir}/caracal-software-installer/assets/images/*
 %{_datadir}/applications/caracal-software-installer.desktop
-
-%changelog
-* Sat Apr 25 2026 Codex <codex@openai.com> - 1.9-1
-- Make Source0 fetchable by COPR and default to the latest tagged release
