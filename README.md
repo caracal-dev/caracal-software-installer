@@ -20,6 +20,7 @@
   - Reverb & Spatial: Dragonfly Reverb, WetDelay, WetReverb
   - Creative & Utility: INTERSECT, Spectrus, WarpCore, Zam Plugin Suite
 - Utilities
+  - MuseScore Studio
   - RTCQS
 
 The UI is catalog-driven, and download URLs plus related archive metadata now live in `data/download-index.csv`. The catalog and helper scripts resolve package metadata from that index so link updates stay spreadsheet-friendly.

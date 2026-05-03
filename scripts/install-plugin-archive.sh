@@ -144,6 +144,10 @@ extract_archive() {
       echo "Need tar or bsdtar to unpack ${archive_name}." >&2
       exit 1
       ;;
+    *.clap|*.vst3|*.so)
+      mkdir -p "${destination}"
+      cp -a "${archive}" "${destination}/"
+      ;;
     *)
       echo "Unsupported archive format for ${archive_name}." >&2
       exit 1
@@ -228,6 +232,9 @@ if has_format "vst3"; then
   while IFS= read -r -d '' vst3_bundle; do
     copy_bundle_dir "${vst3_bundle}" "${target_vst3_dir}"
   done < <(find_bundle_dirs "${extract_dir}" "vst3")
+  while IFS= read -r -d '' vst3_file; do
+    copy_plugin_file "${vst3_file}" "${target_vst3_dir}"
+  done < <(find_plugin_files "${extract_dir}" "vst3")
 fi
 
 if has_format "lv2"; then

@@ -91,6 +91,10 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 		})
 		return append([]string{"bash", filepath.Join(scriptDir, "uninstall-plugin-archive.sh")}, args...)
 	}
+	appImageInstall := func(id string) []string {
+		entry := mustEntry(id)
+		return script("install-appimage-with-gearlever.sh", id, entry["name"], entry["url"])
+	}
 	sourceInstall := func(id string, projectName string) []string {
 		return script("install-source-plugin.sh", id, mustEntry(id)["name"], projectName)
 	}
@@ -206,7 +210,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			Name:        name,
 			Vendor:      vendor,
 			Summary:     summary,
-			Description: fmt.Sprintf("Downloads the upstream Linux archive and installs the contained %s into the current user's plugin directories.", archiveTargets(id)),
+			Description: fmt.Sprintf("Downloads the upstream Linux payload and installs the contained %s into the current user's plugin directories.", archiveTargets(id)),
 			Notes: []string{
 				"Does not require sudo.",
 				"Installed as a user-local plugin so it works cleanly on immutable systems.",
@@ -219,6 +223,19 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			UninstallActions: []Action{
 				{Title: fmt.Sprintf("Uninstall %s", name), Exec: archiveUninstall(id)},
 			},
+		}
+	}
+	linkOnlyPackage := func(id string, vendor string, summary string, description string, availabilityNote string) *Package {
+		entry := mustEntry(id)
+		return &Package{
+			ID:               id,
+			Name:             entry["name"],
+			Vendor:           vendor,
+			Summary:          summary,
+			Description:      description,
+			Notes:            []string{"Listed in the catalog with the upstream download link, but no unattended installer action is wired yet."},
+			Links:            linkForID(id),
+			AvailabilityNote: availabilityNote,
 		}
 	}
 
@@ -592,6 +609,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Decent Sampler", Exec: sudoScript("uninstall-decent-sampler.sh")},
 							},
 						},
+						genericArchivePackage("looper-pedal", "rbmannchued", "Looper plugin distributed as a Linux LV2 bundle."),
 					},
 				},
 				{
@@ -845,6 +863,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall AIDA-X", Exec: archiveUninstall("aida-x")},
 							},
 						},
+						genericArchivePackage("neampmod-the-tweed-vst3", "danielwray", "Tweed-style amp sim distributed as a direct Linux VST3 download."),
+						genericArchivePackage("neampmod-the-tweed-clap", "danielwray", "Tweed-style amp sim distributed as a direct Linux CLAP download."),
 					},
 				},
 				{
@@ -878,12 +898,15 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("the-trick", "Mouse Plugins", "Focused EQ processor distributed as a Linux VST3 archive."),
 						genericArchivePackage("polarity", "Polarity", "Spectral compressor plugin packaged with CLAP and VST3 targets."),
 						genericArchivePackage("nine-strip", "blablack", "Channel-strip processor distributed as Linux VST3 and LV2 bundles."),
+						genericArchivePackage("4k-eq", "dusk audio", "EQ processor distributed as Linux LV2 and VST3 bundles."),
+						genericArchivePackage("multi-comp", "dusk audio", "Compressor distributed as Linux LV2 and VST3 bundles."),
+						genericArchivePackage("multi-q", "dusk audio", "Surgical EQ distributed as Linux LV2 and VST3 bundles."),
 					},
 				},
 				{
 					ID:          "reverb-and-spatial",
-					Name:        "Reverb & Spatial",
-					Description: "Spatial processors and reverb suites.",
+					Name:        "Time & Spatial",
+					Description: "Reverbs, delays, modulation, and spatial processors.",
 					Packages: []*Package{
 						{
 							ID:          "dragonfly",
@@ -908,6 +931,11 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Dragonfly Reverb", Exec: script("uninstall-dragonfly.sh")},
 							},
 						},
+						genericArchivePackage("del2", "magnetophon", "Delay processor distributed as Linux VST3 and CLAP bundles."),
+						genericArchivePackage("panoramatone", "PilCAki", "Vibrato processor distributed as a Linux VST3 bundle."),
+						genericArchivePackage("aelapse", "smiarx", "Delay and reverb processor distributed as Linux VST3 and LV2 bundles."),
+						genericArchivePackage("tapemachine", "dusk audio", "Tape delay processor distributed as Linux LV2 and VST3 bundles."),
+						genericArchivePackage("duskverb", "dusk audio", "Reverb processor distributed as Linux LV2 and VST3 bundles."),
 						genericArchivePackage("wet-delay", "yonie", "Delay plugin distributed as a Linux VST3 archive."),
 						genericArchivePackage("wet-reverb", "yonie", "Reverb plugin distributed as a Linux VST3 archive."),
 					},
@@ -940,6 +968,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						},
 						genericArchivePackage("spectrus", "Morphulus", "Multi-effect processor distributed as Linux VST3 and LV2 bundles."),
 						genericArchivePackage("warp-core", "Manas World", "Pitch-focused processor distributed as Linux LV2 and VST3 bundles."),
+						genericArchivePackage("chord-analyzer", "dusk audio", "Chord analysis plugin distributed as Linux LV2 and VST3 bundles."),
 						{
 							ID:          "zam-plugins",
 							Name:        "Zam Plugin Suite",
@@ -971,6 +1000,40 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			Description: "Audio-adjacent helpers and diagnostics.",
 			Accent:      "#c084fc",
 			Subcategories: []*Subcategory{
+				{
+					ID:          "creative-and-desktop",
+					Name:        "Creative & Desktop",
+					Description: "Standalone composition and utility apps that complement the plugin catalog.",
+					Packages: []*Package{
+						{
+							ID:          "musescore-studio",
+							Name:        "MuseScore Studio",
+							Vendor:      "MuseScore",
+							Summary:     "Standalone notation and scoring app distributed as a Linux AppImage.",
+							Description: "Downloads the upstream MuseScore Studio AppImage into the current user's local Caracal appimage directory, then asks Gear Lever to integrate it into the desktop session.",
+							Notes: []string{
+								"Does not require sudo.",
+								"Requires the Gear Lever Flatpak because desktop integration is delegated to `flatpak run it.mijorus.gearlever --integrate`.",
+							},
+							Links: linkForID("musescore-studio"),
+							InstalledMarkers: []string{
+								"AppImages/musescore-studio.appimage",
+								"AppImages/*musescore*.appimage",
+								".local/share/applications/*musescore*.desktop",
+							},
+							InstallActions: []Action{
+								{Title: "Install MuseScore Studio", Exec: appImageInstall("musescore-studio")},
+							},
+						},
+						linkOnlyPackage(
+							"sas",
+							"PJDude",
+							"Standalone audio utility distributed as a Linux ZIP archive.",
+							"Links to the upstream SAS Linux ZIP so it is visible in the catalog even though the current installer flow does not yet manage this standalone desktop archive.",
+							"Standalone ZIP download is available, but there is no managed install or uninstall action for it yet.",
+						),
+					},
+				},
 				{
 					ID:          "system-tuning",
 					Name:        "System Tuning",

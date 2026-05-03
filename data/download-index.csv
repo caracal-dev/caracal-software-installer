@@ -43,3 +43,17 @@ tb4006,TB4006,,https://www.robotplanet.dk/audio_plugins/tb4006/TB4006_Linux_VST.
 suboctb,Suboctb,0.2.0,https://codeberg.org/yimrakhee/suboctb/releases/download/v0.2.0/suboctb_v0.2.0_Linux_x64.zip,"clap,vst3",suboctb,,,,,,,,,Synth
 floe-vst,Floe,1.1.2,https://github.com/floe-audio/Floe/releases/download/v1.1.2/Floe-VST3-v1.1.2-Linux.tar.gz,vst3,Floe,,,,,,,,,Synth
 floe-clap,Floe,1.1.2,https://github.com/floe-audio/Floe/releases/download/v1.1.2/Floe-CLAP-v1.1.2-Linux.tar.gz,clap,Floe,,,,,,,,,Synth
+musescore-studio,MuseScore Studio,4.6.5,https://cdn.jsdelivr.net/musescore/v4.6.5/MuseScore-Studio-4.6.5.253511702-x86_64.AppImage,,,,,,,,,,,Utility
+neampmod-the-tweed-vst3,NeAmpMod The Tweed,2.0.1,https://github.com/danielwray/neampmod-the-tweed/releases/download/v2.0.1/neampmod-the-tweed-linux-v2.0.1.vst3,vst3,neampmod-the-tweed-linux-v2.0.1,,,,,,,,,Guitar Amp
+neampmod-the-tweed-clap,NeAmpMod The Tweed,2.0.1,https://github.com/danielwray/neampmod-the-tweed/releases/download/v2.0.1/neampmod-the-tweed-linux-v2.0.1.clap,clap,neampmod-the-tweed-linux-v2.0.1,,,,,,,,,Guitar Amp
+looper-pedal,LooperPedal,0.1.0,https://github.com/rbmannchued/LooperPedal/releases/download/v0.1.0/looper.lv2.tar.gz,lv2,looper,,,,,,,,,Looper
+sas,SAS,2.0062.574,https://github.com/PJDude/sas/releases/download/v2.0062.574/sas.v2.0062.574.lin.zip,,,,,,,,,,,Tool
+del2,DEL2,0.2.0,https://github.com/magnetophon/DEL2/releases/download/V0.2.0/DEL2-V0.2.0-ubuntu-20.04.zip,"vst3,clap",DEL2,,,,,,,,,Delay
+panoramatone,Panoramatone,0.2.0,https://github.com/PilCAki/sunbunny/releases/download/v0.2.0/Panoramatone_Linux_VST3_v0.2.0.zip,vst3,Panoramatone,,,,,,,,,Vibrato
+aelapse,Aelapse,1.0.1,https://github.com/smiarx/aelapse/releases/download/v1.0.1/Aelapse-Linux.zip,"vst3,lv2",Aelapse,,,,,,,,,Reverb/Delay
+chord-analyzer,Chord Analyzer,1.1.1,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/chord-analyzer-v1.1.1/chord-analyzer-linux.zip,"lv2,vst3",chord-analyzer,,,,,,,,,Midi
+4k-eq,4K EQ,1.0.9,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/4k-eq-v1.0.9/4k-eq-linux.zip,"lv2,vst3",4k-eq,,,,,,,,,EQ
+multi-comp,Multi Comp,1.2.9,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/multi-comp-v1.2.9/multi-comp-linux.zip,"lv2,vst3",multi-comp,,,,,,,,,Compressor
+tapemachine,TapeMachine,1.0.6,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/tapemachine-v1.0.6/tapemachine-linux.zip,"lv2,vst3",tapemachine,,,,,,,,,Tape Delay
+multi-q,Multi Q,0.10.4,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/multi-q-v0.10.4/multi-q-linux.zip,"lv2,vst3",multi-q,,,,,,,,,EQ
+duskverb,DuskVerb,0.5.3,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/duskverb-v0.5.3/duskverb-linux.zip,"lv2,vst3",duskverb,,,,,,,,,Reverb
