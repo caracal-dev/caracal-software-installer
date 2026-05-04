@@ -78,12 +78,13 @@ jobs:
 
           mkdir -p "${srcroot}"
           rsync -a \
-            --exclude '.git' \
-            --exclude '.github/workflows' \
-            --exclude 'dist' \
-            --exclude 'rpmbuild' \
+            --exclude '/.git/' \
+            --exclude '/.github/workflows/' \
+            --exclude '/dist/' \
+            --exclude '/rpmbuild/' \
             ./ "${srcroot}/"
 
+          test -f "${srcroot}/frontend/dist/index.html"
           tar -C "${tempdir}" -czf "${sourcedir}/${name}-${VERSION}.tar.gz" "${name}-${VERSION}"
 
       - name: Build source RPM

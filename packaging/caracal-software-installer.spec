@@ -1,5 +1,5 @@
 %global debug_package %{nil}
-%global upstream_version %{?version_override}%{!?version_override:2.0}
+%global upstream_version %{?version_override}%{!?version_override:2.1}
 %global source_tag %{?source_tag_override}%{!?source_tag_override:v%{upstream_version}}
 
 Name:           caracal-software-installer
@@ -68,3 +68,7 @@ install -Dpm0644 packaging/caracal-software-installer.desktop %{buildroot}%{_dat
 %{_datadir}/caracal-software-installer/assets/images/*
 %{_datadir}/pixmaps/caracal-software-installer.png
 %{_datadir}/applications/caracal-software-installer.desktop
+
+%changelog
+* Mon May 05 2026 Atumia <atumia@users.noreply.github.com> - %{version}-%{release}
+- Include Wails frontend assets in RPM source archives.
