@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Caracal Software Installer</title>
+    <link rel="stylesheet" href="/main.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-card">
+          <img class="brand-mark" src="/assets/images/caracal.png" alt="Caracal logo" />
+          <div>
+            <p class="eyebrow">Caracal OS</p>
+            <h1>Software Installer</h1>
+          </div>
+        </div>
+        <div class="sidebar-block">
+          <p class="block-title">Library</p>
+          <div id="nav"></div>
+        </div>
+      </aside>
+
+      <main class="main-panel">
+        <section class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">Audio plugin software installer by Caracal OS</p>
+            <h2>Caracal OS Audio Software Centre</h2>
+            <p id="hero-summary">
+              Browse the catalog, queue installs and uninstalls, and run the same backend actions without living in the terminal.
+            </p>
+          </div>
+          <div class="hero-mark-pane" aria-hidden="true">
+            <img class="hero-mark" src="/assets/images/caracal-splash.svg" alt="" />
+            <p class="hero-mark-caption">Caracal Software Installer</p>
+          </div>
+        </section>
+
+        <section class="toolbar">
+          <div class="toolbar-copy">
+            <p id="location" class="toolbar-label">Loading catalog...</p>
+            <p id="location-description" class="toolbar-subtle"></p>
+          </div>
+          <div class="toolbar-filters">
+            <label class="filter-field">
+              <span>Search</span>
+              <input id="search-input" type="search" placeholder="Search plugins, vendors, categories..." />
+            </label>
+            <label class="filter-field">
+              <span>Brand</span>
+              <select id="vendor-filter">
+                <option value="">All brands</option>
+              </select>
+            </label>
+          </div>
+          <div class="toolbar-actions">
+            <button id="refresh-button" class="ghost-button" type="button">Refresh State</button>
+            <button id="clear-button" class="ghost-button" type="button">Clear Queue</button>
+            <button id="run-button" class="primary-button" type="button">Download Queue</button>
+          </div>
+        </section>
+
+        <section class="content-grid">
+          <section class="library-panel panel">
+            <div class="panel-header">
+              <div>
+                <p class="panel-eyebrow">Packages</p>
+                <h3 id="package-count">0 items</h3>
+              </div>
+              <div id="queue-pill" class="queue-pill">0 selected</div>
+            </div>
+            <div id="package-list" class="package-list"></div>
+          </section>
+
+          <section class="detail-column">
+            <section class="detail-panel panel">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-eyebrow">Sidebar</p>
+                  <h3 id="sidebar-title">Download Queue</h3>
+                </div>
+                <span id="sidebar-status" class="status-badge neutral">0 selected</span>
+              </div>
+              <div class="panel-tabs" role="tablist" aria-label="Sidebar views">
+                <button id="queue-tab" class="panel-tab is-active" type="button" role="tab" aria-selected="true">
+                  Queue
+                </button>
+                <button id="details-tab" class="panel-tab" type="button" role="tab" aria-selected="false">
+                  Details
+                </button>
+              </div>
+              <div id="queue-view" class="sidebar-view">
+                <div id="queue-body" class="queue-body"></div>
+                <div class="queue-log-block">
+                  <div class="queue-log-header">
+                    <div>
+                      <p class="panel-eyebrow">Run Log</p>
+                      <h4>Installer output</h4>
+                    </div>
+                    <span id="run-state" class="status-badge neutral">Idle</span>
+                  </div>
+                  <div id="log" class="log-output"></div>
+                </div>
+              </div>
+              <div id="details-view" class="sidebar-view is-hidden">
+                <div id="detail-body" class="detail-body"></div>
+              </div>
+            </section>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <template id="package-card-template">
+      <article class="package-card">
+        <div class="package-thumbnail">
+          <img class="package-thumbnail-image" alt="" />
+          <div class="package-thumbnail-fallback">
+            <span class="package-thumbnail-token"></span>
+          </div>
+        </div>
+        <div class="package-topline">
+          <div>
+            <p class="package-vendor"></p>
+            <h4 class="package-name"></h4>
+          </div>
+          <span class="status-badge"></span>
+        </div>
+        <p class="package-path"></p>
+        <p class="package-summary"></p>
+        <div class="package-actions">
+          <button class="ghost-button package-detail-button" type="button">Details</button>
+          <button class="primary-button package-queue-button" type="button"></button>
+        </div>
+      </article>
+    </template>
+
+    <script src="/main.js"></script>
+  </body>
+</html>

@@ -24,9 +24,17 @@ target_vst3_dir="${HOME}/.vst3"
 target_lv2_dir="${HOME}/.lv2"
 target_clap_dir="${HOME}/.clap"
 target_audio_assault_root="${HOME}/Audio Assault/PluginData/Audio Assault"
+manifest_root="${HOME}/.local/share/caracal-software-installer/manifests"
+manifest_path="${manifest_root}/${plugin_id}.txt"
+manifest_tmp="${workdir}/manifest.txt"
 
 cleanup() {
   rm -rf "${workdir}"
+}
+
+record_manifest_entry() {
+  local target="$1"
+  printf '%s\n' "${target}" >> "${manifest_tmp}"
 }
 
 has_format() {
@@ -160,10 +168,12 @@ copy_bundle_dir() {
   local destination_root="$2"
   local name
   name="$(basename "${source}")"
+  local target="${destination_root}/${name}"
 
   mkdir -p "${destination_root}"
-  rm -rf "${destination_root:?}/${name}"
+  rm -rf "${target}"
   cp -a "${source}" "${destination_root}/"
+  record_manifest_entry "${target}"
 }
 
 find_bundle_dirs() {
@@ -191,9 +201,11 @@ find_plugin_files() {
 copy_plugin_file() {
   local source="$1"
   local destination_root="$2"
+  local target="${destination_root}/$(basename "${source}")"
 
   mkdir -p "${destination_root}"
-  install -m755 "${source}" "${destination_root}/$(basename "${source}")"
+  install -m755 "${source}" "${target}"
+  record_manifest_entry "${target}"
 }
 
 clean_macos_metadata() {
@@ -212,6 +224,7 @@ copy_data_tree() {
   mkdir -p "${destination_root}"
   cp -a "${source}/." "${destination_root}/"
   clean_macos_metadata "${destination_root}"
+  record_manifest_entry "${destination_root}"
 }
 
 trap cleanup EXIT
@@ -219,6 +232,8 @@ trap cleanup EXIT
 echo "Downloading ${display_name}..."
 curl -fL --retry 3 --retry-delay 2 -o "${archive_path}" "${url}"
 extract_archive "${archive_path}" "${extract_dir}"
+mkdir -p "${manifest_root}"
+: > "${manifest_tmp}"
 
 if has_format "clap"; then
   mkdir -p "${target_clap_dir}"
@@ -293,3 +308,6 @@ if [[ -n "${data_dir_name}" ]]; then
     echo "Warning: expected data directory ${data_dir_name} was not found after install." >&2
   fi
 fi
+
+sort -u "${manifest_tmp}" > "${manifest_path}"
+echo "  ${manifest_path}"

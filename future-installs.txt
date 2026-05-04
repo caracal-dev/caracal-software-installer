@@ -1,0 +1,107 @@
+Name: Declick
+Link: https://home.snafu.de/wahlm/dl8hbs/declick-0.6.5.tar.gz
+Description: declick is a dynamic digital declicker for audio sample files.
+Installation Steps: 
+1) Unpack the .tgz archive.
+2) If you are not using Linux, edit the Makefile
+3) Type "make all"
+4) Type "make install" (this installs declick in /usr/local/bin )
+
+Name: Noise Repellent
+Link: https://github.com/lucianodato/noise-repellent/releases/download/v0.2.5/noise-repellent-linux64-v0.2.5.zip 
+Description: A suite of LV2 plugins for real-time spectral noise reduction, built on the libspecbleach library.
+Installation Steps: Standard plugin archive installation method
+
+Name: DPF plugins
+Link: https://github.com/DISTRHO/DPF-Plugins/releases/download/v1.7/DPF-Plugins-v1.7-linux-x86_64.tar.xz
+Description: Collection of DPF-based plugins.
+Installation: Standard plugin archive installation method. Contains lv2, vst3, and clap.
+
+Name: Dexed
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/dexed-linux64.tar.xz
+Description: Dexed is a plugin synth that is closely modeled on the Yamaha DX7.
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: Artican plugins
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/arctican-plugins-linux64.tar.xz
+Description: These are simple but useful plugins, "developed as there was nothing similar out there".
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: dRowAudio Plugins
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/drowaudio-plugins-linux64.tar.xz
+Description: Professional grade audio plugin suite from dRowAudio, now available for Linux.
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: EasySSP
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/easyssp-linux64.tar.xz
+Description: Easy Sound Space Perception is a small and lightweight audio visualization tool, which currently provides spectrometer and goniometer views.
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: JuceOPL
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/juce-opl-linux64.tar.xz
+Description: Classic game sounds in Plugin form, as heard in late 80s / early 90s sound cards.
+Powered by DOSBox emulation.
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: Juced Plugins
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/juced-plugins-linux64.tar.xz
+Description: We took DrumSynth and EQinox and made them work better and in LV2 format.
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: KlangFalter
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/klangfalter-linux64.tar.xz
+Description: KlangFalter is a convolution audio plugin.
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: LUFS Meter
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/lufsmeter-linux64.tar.xz
+Description: The LUFS Meter plugin measures loudness similar to the human perception of loudness.
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: Luftikus
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/luftikus-linux64.tar.xz
+Description: Luftikus is a digital adaptation of an analog EQ with fixed half-octave bands and additional high frequency boost.
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: MVerb
+Link: https://github.com/DISTRHO/DPF-Plugins/releases/download/v1.1/mverb-linux64.tar.xz
+Description: MVerb is a studio quality, open-source reverb.
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: NDC Plugins
+Link: https://github.com/DISTRHO/DPF-Plugins/releases/download/v1.1/ndc-plugins-linux64.tar.xz
+Description: This collection currently includes:
+- Amplitude Imposer
+- Cycle Shifter
+- Soul Force
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: Obxd
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/obxd-linux64.tar.xz
+Description: Obxd is emulation of famous ob-x, ob-xa and ob8 synths.
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: Pitched Delay
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/pitcheddelay-linux64.tar.xz
+Description: PitchedDelay is a delay that allows the pitching the delayed signal, within or outside the feedback loop.
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: Stereo Source Separator
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/stereosourceseparation-linux64.tar.xz
+Description: This is a plugin that uses the spatial information hidden in the stereo signal to accomplish source separation.
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: TAL PLugins
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/tal-plugins-linux64.tar.xz
+Description: n this pack you will find TAL Dub-3, Filter, NoiseMaker, Reverb and Vocoder.
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: Vex
+Link: https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/vex-linux64.tar.xz
+Description: Vex is a 3 oscillator subtractive waverom synth
+Installation: Standard plugin archive installation method. Contains lv2.
+
+Name: Wolpertinger
+Link:https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/wolpertinger-linux64.tar.xz
+Description: Wolpertinger is a subtractive, antialiased polyphonic software synthesizer,
+Installation: Standard plugin archive installation method. Contains lv2.

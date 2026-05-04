@@ -29,11 +29,15 @@ jobs:
             curl \
             gcc \
             git \
+            glib2-devel \
             golang \
+            gtk3-devel \
+            pkgconf-pkg-config \
             redhat-rpm-config \
             rpm-build \
             rsync \
             tar \
+            webkit2gtk4.1-devel \
             which
           dnf clean all
 

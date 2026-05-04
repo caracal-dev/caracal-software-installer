@@ -1,6 +1,11 @@
 # Caracal Software Installer
 
-`caracal-software-installer` is a Go TUI built with `tview` for guided post-install setup on Caracal OS. It presents optional DAWs, instruments, plugins, and audio utilities in browsable categories and lets the user queue multiple installs in one pass.
+`caracal-software-installer` is a Go installer app for guided post-install setup on Caracal OS. It presents optional DAWs, instruments, plugins, and audio utilities in browsable categories and lets the user queue multiple installs in one pass.
+
+The repo now includes:
+
+- a `tview` terminal UI at `cmd/caracal-software-installer`
+- a Wails desktop GUI at the repo root / `main.go`
 
 ## Current catalog
 
@@ -9,19 +14,18 @@
   - Renoise
   - Bitwig Studio
 - Virtual Instruments
-  - Warmplace: SunVox, Virtual ANS, Fractal Bits
-  - Open Synths: Cardinal, Surge XT, Wavetable, OB-Xf, Odin2, TAL-Noisemaker, Yoshimi, Ensoniq SD 1, KR106, TB4006, Suboctb, Floe (VST3), Floe (CLAP)
+  - Open Synths: SunVox, Virtual ANS, Cardinal, Surge XT, Wavetable, OB-Xf, Odin2, TAL-Noisemaker, Dexed, JuceOPL, OBXD, Vex, Wolpertinger, Yoshimi, Ensoniq SD 1, KR106, TB4006, Suboctb, Floe (VST3), Floe (CLAP)
   - Samplers & Players: Loopino, Decent Sampler
   - rncbc Instruments: Synthv1, Samplv1, Padhv1
   - Drums & Percussion: jDrummer, Drumkv1, Drum Locker, Drum Groove Pro, Black Widow Drums
 - Effects
   - Amp & Guitar: Amp Locker, BYOD, Neural Amp Modeler, AIDA-X
-  - Mixing & Channel Strip: Mix Locker, The Trick, Polarity, NineStrip
-  - Reverb & Spatial: Dragonfly Reverb, WetDelay, WetReverb
-  - Creative & Utility: INTERSECT, Spectrus, WarpCore, Zam Plugin Suite
+  - Mixing & Channel Strip: Mix Locker, The Trick, Polarity, NineStrip, LUFS Meter, Luftikus
+  - Reverb & Spatial: Dragonfly Reverb, KlangFalter, MVerb, Pitched Delay, WetDelay, WetReverb
+  - Creative & Utility: Noise Repellent, EasySSP, Stereo Source Separator, DPF Plugins, Arctican Plugins, dRowAudio Plugins, Juced Plugins, NDC Plugins, TAL Plugins, INTERSECT, Spectrus, WarpCore, Zam Plugin Suite
 - Utilities
-  - MuseScore Studio
-  - RTCQS
+  - Creative & Desktop: MuseScore Studio, Declick
+  - System Tuning: RTCQS
 
 The UI is catalog-driven, and download URLs plus related archive metadata now live in `data/download-index.csv`. The catalog and helper scripts resolve package metadata from that index so link updates stay spreadsheet-friendly.
 
@@ -44,6 +48,37 @@ scripts/download-index validate --check-urls
 go mod tidy
 go run ./cmd/caracal-software-installer
 ```
+
+Packaged command layout:
+
+- `caracal-software-installer` launches the terminal UI
+- `caracal-software-installer-gui` launches the Wails desktop frontend
+- the `.desktop` launcher targets the GUI build
+
+To run the Wails desktop frontend manually from Go:
+
+```bash
+go run -tags dev .
+```
+
+To use the normal Wails workflow:
+
+```bash
+go install github.com/wailsapp/wails/v2/cmd/wails@latest
+wails dev
+wails build
+```
+
+The repo-level `wails.json` points Wails at `frontend/` and `frontend/dist/`, and the frontend package uses a minimal `npm run build` check so the static GUI assets work with Wails without needing a separate SPA toolchain.
+
+On Fedora Atomic / Universal Blue style systems, these helper wrappers are the safer entrypoint because they add the `webkit2_41` tag automatically when the host exposes the newer WebKit package name:
+
+```bash
+./scripts/wails-dev.sh
+./scripts/wails-build.sh
+```
+
+On Linux, root-requiring installer actions are routed through `pkexec` so they can prompt graphically instead of assuming an interactive terminal.
 
 The app looks for installer scripts in:
 
