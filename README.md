@@ -7,6 +7,16 @@ The repo now includes:
 - a `tview` terminal UI at `cmd/caracal-software-installer`
 - a Wails desktop GUI at the repo root / `main.go`
 
+## Screenshots
+
+### Desktop GUI
+
+![Caracal Software Installer desktop GUI](assets/screenshots/gui.png)
+
+### Terminal UI
+
+![Caracal Software Installer terminal UI](assets/screenshots/tui.png)
+
 ## Current catalog
 
 - DAWs
