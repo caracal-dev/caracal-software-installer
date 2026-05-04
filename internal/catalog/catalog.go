@@ -85,15 +85,12 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 	archiveUninstall := func(id string) []string {
 		entry := mustEntry(id)
 		args := trimTrailingEmpty([]string{
+			id,
 			entry["primary_bundle_name"],
 			entry["formats"],
 			entry["data_target_name"],
 		})
 		return append([]string{"bash", filepath.Join(scriptDir, "uninstall-plugin-archive.sh")}, args...)
-	}
-	appImageInstall := func(id string) []string {
-		entry := mustEntry(id)
-		return script("install-appimage-with-gearlever.sh", id, entry["name"], entry["url"])
 	}
 	sourceInstall := func(id string, projectName string) []string {
 		return script("install-source-plugin.sh", id, mustEntry(id)["name"], projectName)
@@ -166,7 +163,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 		entry := mustEntry(id)
 		primaryBundleName := entry["primary_bundle_name"]
 		formats := splitFormats(entry["formats"])
-		markers := make([]string, 0, len(formats)+1)
+		markers := make([]string, 0, len(formats)+2)
+		markers = append(markers, ".local/share/caracal-software-installer/manifests/"+id+".txt")
 
 		for _, format := range formats {
 			switch format {
@@ -225,20 +223,6 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			},
 		}
 	}
-	linkOnlyPackage := func(id string, vendor string, summary string, description string, availabilityNote string) *Package {
-		entry := mustEntry(id)
-		return &Package{
-			ID:               id,
-			Name:             entry["name"],
-			Vendor:           vendor,
-			Summary:          summary,
-			Description:      description,
-			Notes:            []string{"Listed in the catalog with the upstream download link, but no unattended installer action is wired yet."},
-			Links:            linkForID(id),
-			AvailabilityNote: availabilityNote,
-		}
-	}
-
 	return []*Category{
 		{
 			ID:          "daws",
@@ -328,9 +312,9 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			Accent:      "#f59e0b",
 			Subcategories: []*Subcategory{
 				{
-					ID:          "warmplace",
-					Name:        "Warmplace",
-					Description: "Portable desktop synths and experimental tools from Alexander Zolotov.",
+					ID:          "open-synths",
+					Name:        "Open Synths",
+					Description: "Native instruments that fit well into the Caracal plugin path layout.",
 					Packages: []*Package{
 						{
 							ID:          "sunvox",
@@ -376,25 +360,6 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Virtual ANS", Exec: sudoScript("uninstall-virtual-ans.sh")},
 							},
 						},
-						{
-							ID:          "fractal-bits",
-							Name:        "Fractal Bits",
-							Vendor:      "Warmplace",
-							Summary:     "Fractal drum synth desktop build currently distributed through a paid upstream post.",
-							Description: "The desktop Linux build is listed by Warmplace, but the current upstream download is a purchase-gated Boosty post rather than a direct public ZIP archive.",
-							Notes: []string{
-								"Listed here so the Warmplace section reflects the broader lineup.",
-								"Once a stable public ZIP URL or a purchase flow is defined, this can be turned into a first-class installer entry.",
-							},
-							AvailabilityNote: "Current desktop download is purchase-gated upstream, so there is no unattended installer script yet.",
-						},
-					},
-				},
-				{
-					ID:          "open-synths",
-					Name:        "Open Synths",
-					Description: "Native instruments that fit well into the Caracal plugin path layout.",
-					Packages: []*Package{
 						{
 							ID:          "cardinal",
 							Name:        "Cardinal",
@@ -530,6 +495,11 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall TAL-Noisemaker", Exec: archiveUninstall("tal-noisemaker")},
 							},
 						},
+						genericArchivePackage("dexed", "DISTRHO Ports", "DX7-inspired synth distributed as a Linux LV2 bundle."),
+						genericArchivePackage("juce-opl", "DISTRHO Ports", "FM synth inspired by classic sound cards and packaged as a Linux LV2 bundle."),
+						genericArchivePackage("obxd", "DISTRHO Ports", "OB-inspired synth distributed as a Linux LV2 bundle."),
+						genericArchivePackage("vex", "DISTRHO Ports", "Three-oscillator subtractive synth distributed as a Linux LV2 bundle."),
+						genericArchivePackage("wolpertinger", "DISTRHO Ports", "Polyphonic subtractive synth distributed as a Linux LV2 bundle."),
 						{
 							ID:          "yoshimi",
 							Name:        "Yoshimi",
@@ -898,6 +868,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("the-trick", "Mouse Plugins", "Focused EQ processor distributed as a Linux VST3 archive."),
 						genericArchivePackage("polarity", "Polarity", "Spectral compressor plugin packaged with CLAP and VST3 targets."),
 						genericArchivePackage("nine-strip", "blablack", "Channel-strip processor distributed as Linux VST3 and LV2 bundles."),
+						genericArchivePackage("lufs-meter", "DISTRHO Ports", "Loudness metering plugin distributed as a Linux LV2 bundle."),
+						genericArchivePackage("luftikus", "DISTRHO Ports", "Analog-inspired EQ distributed as a Linux LV2 bundle."),
 						genericArchivePackage("4k-eq", "dusk audio", "EQ processor distributed as Linux LV2 and VST3 bundles."),
 						genericArchivePackage("multi-comp", "dusk audio", "Compressor distributed as Linux LV2 and VST3 bundles."),
 						genericArchivePackage("multi-q", "dusk audio", "Surgical EQ distributed as Linux LV2 and VST3 bundles."),
@@ -931,6 +903,9 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Dragonfly Reverb", Exec: script("uninstall-dragonfly.sh")},
 							},
 						},
+						genericArchivePackage("klangfalter", "DISTRHO Ports", "Convolution processor distributed as a Linux LV2 bundle."),
+						genericArchivePackage("mverb", "DISTRHO", "Studio reverb distributed as a Linux LV2 bundle."),
+						genericArchivePackage("pitched-delay", "DISTRHO Ports", "Pitch-shifting delay processor distributed as a Linux LV2 bundle."),
 						genericArchivePackage("del2", "magnetophon", "Delay processor distributed as Linux VST3 and CLAP bundles."),
 						genericArchivePackage("panoramatone", "PilCAki", "Vibrato processor distributed as a Linux VST3 bundle."),
 						genericArchivePackage("aelapse", "smiarx", "Delay and reverb processor distributed as Linux VST3 and LV2 bundles."),
@@ -945,6 +920,15 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 					Name:        "Creative & Utility",
 					Description: "Sound-design tools, utilities, and unusual processors.",
 					Packages: []*Package{
+						genericArchivePackage("noise-repellent", "lucianodato", "Noise-reduction LV2 suite distributed as a Linux archive."),
+						genericArchivePackage("easyssp", "DISTRHO Ports", "Visualization utility distributed as a Linux LV2 bundle."),
+						genericArchivePackage("stereo-source-separator", "DISTRHO Ports", "Stereo source-separation processor distributed as a Linux LV2 bundle."),
+						genericArchivePackage("dpf-plugins", "DISTRHO", "Multi-plugin bundle distributed as a Linux archive with CLAP, VST3, and LV2 targets."),
+						genericArchivePackage("arctican-plugins", "DISTRHO Ports", "Utility plugin suite distributed as a Linux LV2 archive."),
+						genericArchivePackage("drowaudio-plugins", "DISTRHO Ports", "Plugin suite distributed as a Linux LV2 archive."),
+						genericArchivePackage("juced-plugins", "DISTRHO Ports", "Legacy plugin suite distributed as a Linux LV2 archive."),
+						genericArchivePackage("ndc-plugins", "DISTRHO", "Creative effect suite distributed as a Linux LV2 archive."),
+						genericArchivePackage("tal-plugins", "DISTRHO Ports", "Legacy TAL bundle distributed as a Linux LV2 archive."),
 						{
 							ID:          "intersect",
 							Name:        "INTERSECT",
@@ -1013,7 +997,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 							Description: "Downloads the upstream MuseScore Studio AppImage into the current user's local Caracal appimage directory, then asks Gear Lever to integrate it into the desktop session.",
 							Notes: []string{
 								"Does not require sudo.",
-								"Requires the Gear Lever Flatpak because desktop integration is delegated to `flatpak run it.mijorus.gearlever --integrate`.",
+								"Uses Gear Lever for desktop integration.",
 							},
 							Links: linkForID("musescore-studio"),
 							InstalledMarkers: []string{
@@ -1022,16 +1006,33 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								".local/share/applications/*musescore*.desktop",
 							},
 							InstallActions: []Action{
-								{Title: "Install MuseScore Studio", Exec: appImageInstall("musescore-studio")},
+								{Title: "Install MuseScore Studio", Exec: script("install-appimage-with-gearlever.sh", "musescore-studio", "MuseScore Studio", mustEntry("musescore-studio")["url"])},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall MuseScore Studio", Exec: script("uninstall-appimage-with-gearlever.sh", "musescore-studio", "musescore")},
 							},
 						},
-						linkOnlyPackage(
-							"sas",
-							"PJDude",
-							"Standalone audio utility distributed as a Linux ZIP archive.",
-							"Links to the upstream SAS Linux ZIP so it is visible in the catalog even though the current installer flow does not yet manage this standalone desktop archive.",
-							"Standalone ZIP download is available, but there is no managed install or uninstall action for it yet.",
-						),
+						{
+							ID:          "declick",
+							Name:        "Declick",
+							Vendor:      "Michael Wahl",
+							Summary:     "Audio restoration utility built from the upstream source tarball into /usr/local/bin.",
+							Description: "Downloads the upstream Declick source tarball, builds it with make, and installs the resulting command-line utility into /usr/local/bin.",
+							Notes: []string{
+								"Requires sudo because upstream installs to /usr/local/bin.",
+								"Builds from source, so make and a working native build toolchain are required on the target system.",
+							},
+							Links: linkForID("declick"),
+							InstalledMarkers: []string{
+								"/usr/local/bin/declick",
+							},
+							InstallActions: []Action{
+								{Title: "Install Declick", Exec: sudoScript("install-declick.sh")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall Declick", Exec: sudoScript("uninstall-declick.sh")},
+							},
+						},
 					},
 				},
 				{
