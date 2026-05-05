@@ -55,6 +55,8 @@ type PackageView struct {
 	Links            []LinkView       `json:"links"`
 	SoftwareTypes     []string         `json:"softwareTypes"`
 	AvailabilityNote string           `json:"availabilityNote"`
+	OpenSource        bool             `json:"openSource"`    
+	HasFreeVersion    bool             `json:"hasFreeVersion"`
 	ExternalActionURL string          `json:"externalActionUrl"`
 	InstallActions   []ActionView     `json:"installActions"`
 	UninstallActions []ActionView     `json:"uninstallActions"`
@@ -374,6 +376,8 @@ func buildCategoryViews(categories []*catalog.Category) []CategoryView {
 					Notes:            append([]string(nil), pkg.Notes...),
 					Links:            buildLinks(pkg.Links),
 					SoftwareTypes:     append([]string(nil), pkg.SoftwareTypes...),
+					OpenSource:        pkg.OpenSource,
+					HasFreeVersion:    pkg.HasFreeVersion,
 					ExternalActionURL: pkg.ExternalActionURL,
 					AvailabilityNote: pkg.AvailabilityNote,
 					InstallActions:   buildActions(pkg.InstallActions),
@@ -424,10 +428,10 @@ func buildPackageStateView(pkg *catalog.Package, state installer.PackageState) P
 	switch {
 	case state.Installed && state.UninstallAvailable:
 		view.Actionable = true
-		view.ActionKind = "queue"
+		view.ActionKind = "uninstall"
 		view.Mode = string(installer.ModeUninstall)
 		view.StatusLabel = "Installed"
-		view.ActionLabel = "Queue uninstall"
+		view.ActionLabel = "Uninstall"
 	case state.Installed:
 		view.StatusLabel = "Installed"
 	case pkg.ExternalActionURL != "":
@@ -438,7 +442,7 @@ func buildPackageStateView(pkg *catalog.Package, state installer.PackageState) P
 		view.ActionLabel = "Get From Site"
 	case state.InstallAvailable:
 		view.Actionable = true
-		view.ActionKind = "queue"
+		view.ActionKind = "install"
 		view.Mode = string(installer.ModeInstall)
 		view.StatusLabel = "Available"
 		view.ActionLabel = "Queue install"

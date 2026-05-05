@@ -30,6 +30,9 @@ var knownFields = map[string]struct{}{
 	"category":            {},
 	"project_website":     {},
 	"dl_within_app":       {},
+	"open_source":         {},
+	"has_free_version":    {},
+
 }
 
 var requiredFields = []string{"id", "name"}

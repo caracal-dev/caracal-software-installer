@@ -28,6 +28,8 @@ type Package struct {
 	Links            []Link
 	ExternalActionURL string
 	SoftwareTypes     []string
+	OpenSource        bool
+	HasFreeVersion    bool
 	AvailabilityNote string
 	InstalledMarkers []string
 	InstallActions   []Action
@@ -228,6 +230,20 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			return entry["url"]
 		}
 		return entry["project_website"]
+	}
+		boolFieldForID := func(id string, field string, defaultValue bool) bool {
+		value := strings.TrimSpace(strings.ToLower(mustEntry(id)[field]))
+		if value == "" {
+			return defaultValue
+		}
+		switch value {
+		case "true", "1", "yes":
+			return true
+		case "false", "0", "no":
+			return false
+		default:
+			return defaultValue
+		}
 	}
 	softwareTypesForPackage := func(pkg *Package) []string {
 		entry := mustEntry(pkg.ID)
@@ -1173,6 +1189,9 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 		for _, subcategory := range category.Subcategories {
 			for _, pkg := range subcategory.Packages {
 				pkg.SoftwareTypes = softwareTypesForPackage(pkg)
+				pkg.OpenSource = boolFieldForID(pkg.ID, "open_source", false)
+				pkg.HasFreeVersion = boolFieldForID(pkg.ID, "has_free_version", true)
+
 			}
 		}
 	}

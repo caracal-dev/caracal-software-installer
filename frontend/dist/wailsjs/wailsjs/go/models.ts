@@ -8,6 +8,8 @@ export namespace guiapp {
 	    installAvailable: boolean;
 	    uninstallAvailable: boolean;
 	    actionable: boolean;
+	    actionKind: string;
+	    actionUrl: string;
 	    mode: string;
 	    statusLabel: string;
 	    actionLabel: string;
@@ -26,7 +28,11 @@ export namespace guiapp {
 	    description: string;
 	    notes: string[];
 	    links: LinkView[];
+	    softwareTypes: string[];
 	    availabilityNote: string;
+	    openSource: boolean;
+	    hasFreeVersion: boolean;
+	    externalActionUrl: string;
 	    installActions: ActionView[];
 	    uninstallActions: ActionView[];
 	    state: PackageStateView;
