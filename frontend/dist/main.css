@@ -567,6 +567,83 @@ button {
   margin: 12px 0 0;
 }
 
+.package-software-types {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.package-software-types.is-hidden {
+  display: none;
+}
+
+.package-software-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(17, 17, 27, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+}
+
+.package-software-type-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex: 0 0 18px;
+}
+
+.package-software-type-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.package-traits {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.package-traits.is-hidden {
+  display: none;
+}
+
+.package-trait {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.package-trait-open {
+  background: rgba(166, 218, 149, 0.12);
+  border-color: rgba(166, 218, 149, 0.28);
+  color: var(--success);
+}
+
+.package-trait-proprietary {
+  background: rgba(246, 193, 119, 0.12);
+  border-color: rgba(246, 193, 119, 0.28);
+  color: var(--accent-warm);
+}
+
+.package-trait-paid {
+  background: rgba(228, 104, 118, 0.12);
+  border-color: rgba(228, 104, 118, 0.28);
+  color: #f2a7b5;
+}
+
 .package-actions {
   display: flex;
   gap: 10px;
@@ -587,6 +664,21 @@ button {
   color: #11111b;
   border: none;
   font-weight: 700;
+}
+
+.primary-button.action-install {
+  background: linear-gradient(135deg, #7e9cd8, #8ea4a2);
+  color: #11111b;
+}
+
+.primary-button.action-uninstall {
+  background: linear-gradient(135deg, #e46876, #c4746e);
+  color: #fff;
+}
+
+.primary-button.action-link {
+  background: linear-gradient(135deg, #f6c177, #dca561);
+  color: #11111b;
 }
 
 .primary-button:hover {
@@ -633,6 +725,12 @@ button {
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 12px;
+}
+.detail-support-note {
+  margin: 10px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--muted);
 }
 
 .inline-link {

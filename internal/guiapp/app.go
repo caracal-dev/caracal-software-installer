@@ -53,7 +53,11 @@ type PackageView struct {
 	Description      string           `json:"description"`
 	Notes            []string         `json:"notes"`
 	Links            []LinkView       `json:"links"`
+	SoftwareTypes     []string         `json:"softwareTypes"`
 	AvailabilityNote string           `json:"availabilityNote"`
+	OpenSource        bool             `json:"openSource"`    
+	HasFreeVersion    bool             `json:"hasFreeVersion"`
+	ExternalActionURL string          `json:"externalActionUrl"`
 	InstallActions   []ActionView     `json:"installActions"`
 	UninstallActions []ActionView     `json:"uninstallActions"`
 	State            PackageStateView `json:"state"`
@@ -64,6 +68,8 @@ type PackageStateView struct {
 	InstallAvailable   bool   `json:"installAvailable"`
 	UninstallAvailable bool   `json:"uninstallAvailable"`
 	Actionable         bool   `json:"actionable"`
+	ActionKind         string `json:"actionKind"`
+	ActionURL          string `json:"actionUrl"` 
 	Mode               string `json:"mode"`
 	StatusLabel        string `json:"statusLabel"`
 	ActionLabel        string `json:"actionLabel"`
@@ -369,10 +375,14 @@ func buildCategoryViews(categories []*catalog.Category) []CategoryView {
 					Description:      pkg.Description,
 					Notes:            append([]string(nil), pkg.Notes...),
 					Links:            buildLinks(pkg.Links),
+					SoftwareTypes:     append([]string(nil), pkg.SoftwareTypes...),
+					OpenSource:        pkg.OpenSource,
+					HasFreeVersion:    pkg.HasFreeVersion,
+					ExternalActionURL: pkg.ExternalActionURL,
 					AvailabilityNote: pkg.AvailabilityNote,
 					InstallActions:   buildActions(pkg.InstallActions),
 					UninstallActions: buildActions(pkg.UninstallActions),
-					State:            buildPackageStateView(state),
+					State:            buildPackageStateView(pkg, state),
 				})
 			}
 
@@ -404,12 +414,13 @@ func buildActions(actions []catalog.Action) []ActionView {
 	return views
 }
 
-func buildPackageStateView(state installer.PackageState) PackageStateView {
+func buildPackageStateView(pkg *catalog.Package, state installer.PackageState) PackageStateView {
 	view := PackageStateView{
 		Installed:          state.Installed,
 		InstallAvailable:   state.InstallAvailable,
 		UninstallAvailable: state.UninstallAvailable,
 		Actionable:         false,
+		ActionKind:         "none",
 		StatusLabel:        "Catalog only",
 		ActionLabel:        "Unavailable",
 	}
@@ -417,13 +428,21 @@ func buildPackageStateView(state installer.PackageState) PackageStateView {
 	switch {
 	case state.Installed && state.UninstallAvailable:
 		view.Actionable = true
+		view.ActionKind = "uninstall"
 		view.Mode = string(installer.ModeUninstall)
 		view.StatusLabel = "Installed"
-		view.ActionLabel = "Queue uninstall"
+		view.ActionLabel = "Uninstall"
 	case state.Installed:
 		view.StatusLabel = "Installed"
+	case pkg.ExternalActionURL != "":
+		view.Actionable = true
+		view.ActionKind = "link"
+		view.ActionURL = pkg.ExternalActionURL
+		view.StatusLabel = "Available on site"
+		view.ActionLabel = "Get From Site"
 	case state.InstallAvailable:
 		view.Actionable = true
+		view.ActionKind = "install"
 		view.Mode = string(installer.ModeInstall)
 		view.StatusLabel = "Available"
 		view.ActionLabel = "Queue install"

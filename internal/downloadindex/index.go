@@ -28,6 +28,11 @@ var knownFields = map[string]struct{}{
 	"repo_url":            {},
 	"extract_dir":         {},
 	"category":            {},
+	"project_website":     {},
+	"dl_within_app":       {},
+	"open_source":         {},
+	"has_free_version":    {},
+
 }
 
 var requiredFields = []string{"id", "name"}

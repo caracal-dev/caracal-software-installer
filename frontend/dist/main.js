@@ -35,6 +35,25 @@ const elements = {
   packageCardTemplate: document.querySelector("#package-card-template"),
 };
 
+const softwareTypeMeta = {
+  standalone: {
+    label: "Standalone",
+    icon: "/assets/images/icons/standalone-logo.png",
+  },
+  clap: {
+    label: "CLAP",
+    icon: "/assets/images/icons/clap-logo.png",
+  },
+  vst: {
+    label: "VST",
+    icon: "/assets/images/icons/vst-logo.png",
+  },
+  lv2: {
+    label: "LV2",
+    icon: "/assets/images/icons/lv2-logo.svg",
+  },
+};
+
 function backend() {
   const bound = window.go?.guiapp?.App || window.go?.main?.App;
   if (!bound) {
@@ -308,6 +327,8 @@ function renderPackages() {
     card.querySelector(".package-name").textContent = pkg.name;
     card.querySelector(".package-path").textContent = `${pkg.categoryName} / ${pkg.subcategoryName}`;
     card.querySelector(".package-summary").textContent = pkg.summary;
+    renderSoftwareTypes(card.querySelector(".package-software-types"), pkg);
+    renderPackageTraits(card.querySelector(".package-traits"), pkg);
 
     const badge = card.querySelector(".status-badge");
     badge.textContent = pkg.state.statusLabel;
@@ -320,16 +341,123 @@ function renderPackages() {
     });
 
     const queueButton = card.querySelector(".package-queue-button");
-    queueButton.textContent = state.selectedIds.has(pkg.id) ? "Remove from queue" : pkg.state.actionLabel;
+    queueButton.textContent = state.selectedIds.has(pkg.id) && pkg.state.actionKind === "install" ? "Remove from queue" : pkg.state.actionLabel;
+    queueButton.classList.add(buttonVariantClass(pkg));
     queueButton.disabled = !pkg.state.actionable || state.running;
-    queueButton.addEventListener("click", () => {
+    queueButton.addEventListener("click", async () => {
       if (!pkg.state.actionable || state.running) {
         return;
       }
+      if (pkg.state.actionKind === "link") {
+        if (!pkg.state.actionUrl) {
+          appendLog("stderr", `No external URL configured for ${pkg.name}.`);
+          return;
+        }
+        try {
+          await backend().OpenLink(pkg.state.actionUrl);
+          appendLog("event", `Opened ${pkg.name} in the browser.`);
+        } catch (error) {
+          appendLog("stderr", error?.message || String(error));
+        }
+        return;
+      }
+
+      if (pkg.state.actionKind === "uninstall") {
+        if (!window.confirm(`Uninstall ${pkg.name}?`)) {
+          return;
+        }
+        try {
+          await backend().RunSelection([pkg.id]);
+          state.running = true;
+          updateRunState("Running", "running");
+          appendLog("event", `Starting uninstall for ${pkg.name}.`);
+          render();
+        } catch (error) {
+          appendLog("stderr", error?.message || String(error));
+          updateRunState("Error", "error");
+        }
+        return;
+      }
+
       toggleSelection(pkg.id);
     });
 
     elements.packageList.appendChild(card);
+  }
+}
+
+function renderSoftwareTypes(node, pkg) {
+  if (!node) {
+    return;
+  }
+ 
+  node.replaceChildren();
+ 
+  const types = (pkg.softwareTypes || []).map((kind) => softwareTypeMeta[kind]).filter(Boolean);
+  if (types.length === 0) {
+    node.classList.add("is-hidden");
+    return;
+  }
+ 
+  node.classList.remove("is-hidden");
+ 
+  for (const type of types) {
+    const item = document.createElement("div");
+    item.className = "package-software-type";
+    item.title = type.label;
+    item.setAttribute("aria-label", type.label);
+    item.innerHTML = `
+      <img class="package-software-type-icon" src="${type.icon}" alt="${type.label}" />
+      <span class="package-software-type-label">${escapeHtml(type.label)}</span>
+    `;
+    node.appendChild(item);
+  }
+}
+function renderPackageTraits(node, pkg) {
+  if (!node) {
+    return;
+  }
+ 
+  node.replaceChildren();
+
+  const traits = [
+    {
+      label: pkg.openSource ? "Open Source" : "Proprietary",
+      kind: pkg.openSource ? "open" : "proprietary",
+    },
+  ];
+
+  if (pkg.hasFreeVersion === false) {
+    traits.push({
+      label: "$$ No Free Version",
+      kind: "paid",
+    });
+  }
+
+  if (traits.length === 0) {
+    node.classList.add("is-hidden");
+    return;
+  }
+
+  node.classList.remove("is-hidden");
+
+  for (const trait of traits) {
+    const item = document.createElement("span");
+    item.className = `package-trait package-trait-${trait.kind}`;
+    item.textContent = trait.label;
+    node.appendChild(item);
+  }
+}
+
+function buttonVariantClass(pkg) {
+  switch (pkg.state.actionKind) {
+    case "uninstall":
+      return "action-uninstall";
+    case "link":
+      return "action-link";
+    case "install":
+    default:
+      return "action-install";
   }
 }
 
@@ -449,8 +577,10 @@ function renderDetails() {
   if (pkg.links?.length) {
     fragments.push("<h4>Links</h4>");
     fragments.push(`<div class="detail-links">${pkg.links.map((link, index) => `<button class="ghost-button detail-link-button" data-index="${index}" type="button">${escapeHtml(link.label)}</button>`).join("")}</div>`);
+   if (pkg.links.some((link) => link.label === "Site")) {
+      fragments.push('<p class="detail-support-note">Please visit and support the developers when you can. Many of these projects rely on web traffic and donations to keep building.</p>');
+    }
   }
-
   elements.detailBody.innerHTML = fragments.join("");
 
   attachThumbnail(
