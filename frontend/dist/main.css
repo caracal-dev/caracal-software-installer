@@ -567,6 +567,42 @@ button {
   margin: 12px 0 0;
 }
 
+.package-software-types {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.package-software-types.is-hidden {
+  display: none;
+}
+
+.package-software-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(17, 17, 27, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+}
+
+.package-software-type-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex: 0 0 18px;
+}
+
+.package-software-type-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .package-actions {
   display: flex;
   gap: 10px;
@@ -633,6 +669,12 @@ button {
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 12px;
+}
+.detail-support-note {
+  margin: 10px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--muted);
 }
 
 .inline-link {

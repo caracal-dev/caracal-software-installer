@@ -26,6 +26,8 @@ type Package struct {
 	Description      string
 	Notes            []string
 	Links            []Link
+	ExternalActionURL string
+	SoftwareTypes     []string
 	AvailabilityNote string
 	InstalledMarkers []string
 	InstallActions   []Action
@@ -128,6 +130,16 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			return strings.ToUpper(format)
 		}
 	}
+	addSoftwareType := func(seen map[string]struct{}, ordered *[]string, kind string) {
+		if kind == "" {
+			return
+		}
+		if _, ok := seen[kind]; ok {
+			return
+		}
+		seen[kind] = struct{}{}
+		*ordered = append(*ordered, kind)
+	}
 	joinLabels := func(values []string) string {
 		switch len(values) {
 		case 0:
@@ -192,6 +204,9 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 	linkForID := func(id string) []Link {
 		entry := mustEntry(id)
 		var links []Link
+		if entry["project_website"] != "" {
+			links = append(links, Link{Label: "Site", URL: entry["project_website"]})
+		}
 		if entry["url"] != "" {
 			links = append(links, Link{Label: "Download", URL: entry["url"]})
 		}
@@ -200,9 +215,94 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 		}
 		return links
 	}
+	downloadWithinApp := func(id string) bool {
+		value := strings.TrimSpace(mustEntry(id)["dl_within_app"])
+		if value == "" {
+			return true
+		}
+		return !strings.EqualFold(value, "false")
+	}
+	externalActionURLForID := func(id string) string {
+		entry := mustEntry(id)
+		if entry["url"] != "" {
+			return entry["url"]
+		}
+		return entry["project_website"]
+	}
+	softwareTypesForPackage := func(pkg *Package) []string {
+		entry := mustEntry(pkg.ID)
+		seen := make(map[string]struct{}, 4)
+		ordered := make([]string, 0, 4)
+
+		for _, format := range splitFormats(entry["formats"]) {
+			switch format {
+			case "clap":
+				addSoftwareType(seen, &ordered, "clap")
+			case "vst", "vst3":
+				addSoftwareType(seen, &ordered, "vst")
+			case "lv2":
+				addSoftwareType(seen, &ordered, "lv2")
+			}
+		}
+ 
+		for _, marker := range pkg.InstalledMarkers {
+			switch {
+			case strings.Contains(marker, ".clap") || strings.Contains(marker, "/clap/"):
+				addSoftwareType(seen, &ordered, "clap")
+			case strings.Contains(marker, ".vst3") || strings.Contains(marker, ".vst/") || strings.Contains(marker, "/vst/"):
+				addSoftwareType(seen, &ordered, "vst")
+			case strings.Contains(marker, ".lv2") || strings.Contains(marker, "/lv2/"):
+				addSoftwareType(seen, &ordered, "lv2")
+			}
+			if strings.Contains(marker, "/bin/") || strings.Contains(marker, ".desktop") {
+				addSoftwareType(seen, &ordered, "standalone")
+			}
+		}
+ 
+		switch pkg.ID {
+		case "cardinal", "surge-xt":
+			addSoftwareType(seen, &ordered, "clap")
+			addSoftwareType(seen, &ordered, "lv2")
+		case "yoshimi":
+			addSoftwareType(seen, &ordered, "lv2")
+		}
+ 
+		if len(ordered) == 0 && strings.TrimSpace(entry["formats"]) == "" {
+			addSoftwareType(seen, &ordered, "standalone")
+		}
+ 
+		preferredOrder := []string{"standalone", "clap", "vst", "lv2"}
+		reordered := make([]string, 0, len(ordered))
+		for _, kind := range preferredOrder {
+			if _, ok := seen[kind]; ok {
+				reordered = append(reordered, kind)
+			}
+		}
+		return reordered
+	}
 	genericArchivePackage := func(id string, vendor string, summary string) *Package {
 		entry := mustEntry(id)
 		name := entry["name"]
+	installedMarkers := archiveInstalledMarkers(id)
+	if !downloadWithinApp(id) {
+		return &Package{
+			ID:          id,
+			Name:        name,
+			Vendor:      vendor,
+			Summary:     summary,
+			Description: "Opens the upstream project page so you can download the current Linux build directly from the developer.",
+			Notes: []string{
+				"Download is handled on the developer website rather than inside the installer.",
+			},
+			Links:             linkForID(id),
+			ExternalActionURL: externalActionURLForID(id),
+			AvailabilityNote:  "Use Get From Site to open the upstream download page in your browser.",
+			InstalledMarkers:  installedMarkers,
+			UninstallActions: []Action{
+				{Title: fmt.Sprintf("Uninstall %s", name), Exec: archiveUninstall(id)},
+			},
+		}
+	}
 		return &Package{
 			ID:          id,
 			Name:        name,
@@ -214,7 +314,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 				"Installed as a user-local plugin so it works cleanly on immutable systems.",
 			},
 			Links:            linkForID(id),
-			InstalledMarkers: archiveInstalledMarkers(id),
+			InstalledMarkers: installedMarkers,
 			InstallActions: []Action{
 				{Title: fmt.Sprintf("Install %s", name), Exec: archiveInstall(id)},
 			},
@@ -223,7 +323,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			},
 		}
 	}
-	return []*Category{
+	categories := []*Category{
 		{
 			ID:          "daws",
 			Name:        "DAWs",
@@ -908,6 +1008,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("pitched-delay", "DISTRHO Ports", "Pitch-shifting delay processor distributed as a Linux LV2 bundle."),
 						genericArchivePackage("del2", "magnetophon", "Delay processor distributed as Linux VST3 and CLAP bundles."),
 						genericArchivePackage("panoramatone", "PilCAki", "Vibrato processor distributed as a Linux VST3 bundle."),
+						genericArchivePackage("tentacles", "PilCAki", "Tentacle-inspired vibrato processor available from the project site."),
 						genericArchivePackage("aelapse", "smiarx", "Delay and reverb processor distributed as Linux VST3 and LV2 bundles."),
 						genericArchivePackage("tapemachine", "dusk audio", "Tape delay processor distributed as Linux LV2 and VST3 bundles."),
 						genericArchivePackage("duskverb", "dusk audio", "Reverb processor distributed as Linux LV2 and VST3 bundles."),
@@ -1067,6 +1168,16 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			},
 		},
 	}
+	
+		for _, category := range categories {
+		for _, subcategory := range category.Subcategories {
+			for _, pkg := range subcategory.Packages {
+				pkg.SoftwareTypes = softwareTypesForPackage(pkg)
+			}
+		}
+	}
+
+	return categories
 }
 
 func CountPackages(categories []*Category) int {

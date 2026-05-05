@@ -1,79 +1,80 @@
-id,name,version,url,formats,primary_bundle_name,data_dir_name,data_target_name,warmplace_subdir,launcher_name,desktop_id,desktop_comment,repo_url,extract_dir,category
-reaper,REAPER,765,https://www.reaper.fm/files/7.x/reaper765_linux_x86_64.tar.xz,,,,,,,,,,
-renoise,Renoise,3.5.4,https://files.renoise.com/demo/Renoise_3_5_4_Demo_Linux_x86_64.tar.gz,,,,,,,,,,Renoise_3_5_4_Demo_Linux_x86_64
-bitwig-studio,Bitwig Studio,,https://www.bitwig.com/dl/?id=419&os=installer_linux,,,,,,,,,,
-sunvox,SunVox,2.1.4d,https://warmplace.ru/soft/sunvox/sunvox-2.1.4d.zip,,,,sunvox,sunvox,sunvox,Modular tracker and synthesizer,,,
-virtual-ans,Virtual ANS,3.0.4,https://warmplace.ru/soft/ans/virtual_ans-3.0.4.zip,,,,virtual_ans,virtual-ans,virtual-ans,Spectral drawing synthesizer,,,
-tal-noisemaker,TAL-Noisemaker,,https://tal-software.com/downloads/plugins/TAL-NoiseMaker_64_linux.zip,"clap,vst,vst3,lv2",TAL-NoiseMaker,,,,,,,,
-cardinal,Cardinal,26.02,https://github.com/DISTRHO/Cardinal/releases/download/26.02/Cardinal-linux-x86_64-26.02.tar.gz,,,,,,,,,,
-surge-xt,Surge XT,1.3.4,https://github.com/surge-synthesizer/releases-xt/releases/download/1.3.4/surge-xt-x86_64-1.3.4.rpm,,,,,,,,,,
-wavetable,Wavetable_Linux,,https://socalabs.com/files/get.php?id=Wavetable_Linux.zip,"vst,vst3,lv2",Wavetable,,,,,,,,
-ob-xf,OB-Xf,1.0.3,https://github.com/surge-synthesizer/OB-Xf/releases/download/v1.0.3/ob-xf-Linux-v1.0.3.zip,"vst3,lv2",OB-Xf,,,,,,,,
-odin2,Odin2,2.4.1,https://www.dropbox.com/scl/fi/eshk5a54xirgi4fshuyh5/Odin2.4.1Linux.zip?rlkey=e4d4eqqecep0cr98cfyso4ty7&st=00ebtald&dl=1,"clap,vst3",Odin2,,,,,,,,
-loopino,Loopino,,,,,,,,,,,https://github.com/brummer10/Loopino.git,
-decent-sampler,Decent Sampler,1.18.1,https://cdn.decentsamples.com/production/builds/ds/1.18.1/Decent_Sampler-1.18.1-Linux-Static-x86_64.tar.gz,,,,,,,,,,
-jdrummer,jDrummer,,https://github.com/jmantra/jdrummer/releases/download/Second/jdrummer_Linux_VST3.zip,vst3,jdrummer,,,,,,,,
-drumkv1,Drumkv1,,https://github.com/rncbc/drumkv1/archive/refs/heads/main.tar.gz,,,,,,,,,,
-synthv1,Synthv1,,https://github.com/rncbc/synthv1/archive/refs/heads/main.tar.gz,,,,,,,,,,
-samplv1,Samplv1,,https://github.com/rncbc/samplv1/archive/refs/heads/main.tar.gz,,,,,,,,,,
-padhv1,Padhv1,,https://github.com/rncbc/padthv1/archive/refs/heads/main.tar.gz,,,,,,,,,,
-amp-locker,Amp Locker,,https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/AmpLockerLinux.zip,"vst3,lv2",Amp Locker,AmpLockerData,AmpLockerData,,,,,,
-drum-locker,Drum Locker,,https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/DrumLockerLinux.zip,"vst3,lv2",Drum Locker,DrumLockerData,DrumLockerData,,,,,,
-mix-locker,Mix Locker,,https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/MixLockerLinux.zip,"vst3,lv2",Mix Locker,MixLockerData,MixLockerData,,,,,,
-intersect,INTERSECT,0.10.8,https://github.com/tucktuckg00se/INTERSECT/releases/download/v0.10.8/INTERSECT-v0.10.8-Linux-x64.zip,vst3,INTERSECT,,,,,,,,
-byod,BYOD,1.3.0,https://github.com/Chowdhury-DSP/BYOD/releases/download/v1.3.0/BYOD-Linux-x64-1.3.0.deb,"clap,vst3,lv2",BYOD,,,,,,,,
-neural-amp-model,Neural Amp Modeler,0.1.9,https://github.com/mikeoliphant/neural-amp-modeler-lv2/releases/download/v0.1.9/neural_amp_modeler_lv2_linux_x64.tgz,lv2,neural_amp_modeler,,,,,,,,
-aida-x,AIDA-X,1.1.0,https://github.com/AidaDSP/AIDA-X/releases/download/1.1.0/AIDA-X-1.1.0-linux-x86_64.tar.xz,"clap,vst3,lv2",AIDA-X,,,,,,,,
-dragonfly,Dragonfly Reverb,3.2.10,https://github.com/michaelwillis/dragonfly-reverb/releases/download/3.2.10/dragonfly-reverb-3.2.10-linux-x86_64.tar.xz,"clap,vst3,lv2",DragonflyHall,,,,,,,,
-rtcqs,RTCQS,,https://pypi.org/project/rtcqs/,,,,,,,,,,
-yoshimi,Yoshimi,2.3.6.1,https://github.com/Yoshimi/yoshimi/archive/2.3.6.1.zip,,,,,,,,,,,Synth
-zam-plugins,Zam Plugin Suite,4.5,https://github.com/zamaudio/zam-plugins/releases/download/4.5/zam-plugins-4.5-linux-x86_64.tar.xz,lv2,zam-plugins-4.5,,,,,,,,,Plugin Suite
-spectrus,Spectrus,1.1.1,https://downloads.morphulus.com/Spectrus-1.1.1-Linux.tar.gz,"vst3,lv2",Spectrus,,,,,,,,,Multi Effect
-the-trick,The Trick,1.0.0,https://mouseplugins.com/en/products/thetrick/download/1.0.0/linux/tar.gz,vst3,TheTrick,,,,,,,,,EQ
-polarity,Polarity,,https://polarity.me/go.php?c=p-sc-linux,"clap,vst3",Polarity-SC-Dark,,,,,,,,,Spectral Compressor
-nine-strip,NineStrip,0.1.1,https://github.com/blablack/nine-strip/releases/download/v0.1.1/NineStrip-Linux.tar.gz,"vst3,lv2",NineStrip,,,,,,,,,Channel Strip
-warp-core,WarpCore,0.0.11,https://github.com/ManasWolrd/WarpCore/releases/download/v0.0.11/WarpCore-linux-v0.0.11.zip,"lv2,vst3",WarpCore,,,,,,,,,Pitch
-wet-delay,WetDelay,1.1.4,https://github.com/yonie/WetDelay/releases/download/v1.1.4/WetDelay-v1.1.4.zip,vst3,WetDelay,,,,,,,,,Delay
-wet-reverb,WetReverb,1.0.1,https://github.com/yonie/WetReverb/releases/download/v1.0.1/WetReverb-v1.0.1.zip,vst3,WetReverb,,,,,,,,,Reverb
-drum-groove-pro,Drum Groove Pro,01.0.0,https://github.com/InToEtherion/DrumGroovePro/releases/download/V1.0.0_RC2/DrumGroovePro_v01.0.0_RC2_LINUX_x64.zip,vst3,Drum Groove Pro,,,,,,,,,Drum Midi
-black-widow-drums,Black Widow Drums,0.1,https://github.com/odoare/FxmeSampler/releases/download/0.1/BlackWidowDrums.0.1.LIN.x64.VST3.zip,vst3,BlackWidowDrums,,,,,,,,,Drums
-ensoniq,Ensoniq SD 1,0.9.9,https://github.com/sojusrecords/Ensoniq-SD-1-32-Voice-VST-emulation/releases/download/v0.9.9/EnsoniqSD1-v.0.9.9-LINUX-Generic.7z,vst3,ensoniq-sd-1,,,,,,,,,Synth
-kr106,KR106,,https://github.com/kayrockscreenprinting/ultramaster_kr106/releases/latest/download/KR106-Linux.zip,"vst3,lv2",kr106-linux,,,,,,,,,Synth
-tb4006,TB4006,,https://www.robotplanet.dk/audio_plugins/tb4006/TB4006_Linux_VST.7z,vst3,tb4006_linux,,,,,,,,,Synth
-suboctb,Suboctb,0.2.0,https://codeberg.org/yimrakhee/suboctb/releases/download/v0.2.0/suboctb_v0.2.0_Linux_x64.zip,"clap,vst3",suboctb,,,,,,,,,Synth
-floe-vst,Floe,1.1.2,https://github.com/floe-audio/Floe/releases/download/v1.1.2/Floe-VST3-v1.1.2-Linux.tar.gz,vst3,Floe,,,,,,,,,Synth
-floe-clap,Floe,1.1.2,https://github.com/floe-audio/Floe/releases/download/v1.1.2/Floe-CLAP-v1.1.2-Linux.tar.gz,clap,Floe,,,,,,,,,Synth
-musescore-studio,MuseScore Studio,4.6.5,https://cdn.jsdelivr.net/musescore/v4.6.5/MuseScore-Studio-4.6.5.253511702-x86_64.AppImage,,,,,,,,,,,Utility
-neampmod-the-tweed-vst3,NeAmpMod The Tweed,2.0.1,https://github.com/danielwray/neampmod-the-tweed/releases/download/v2.0.1/neampmod-the-tweed-linux-v2.0.1.vst3,vst3,neampmod-the-tweed-linux-v2.0.1,,,,,,,,,Guitar Amp
-neampmod-the-tweed-clap,NeAmpMod The Tweed,2.0.1,https://github.com/danielwray/neampmod-the-tweed/releases/download/v2.0.1/neampmod-the-tweed-linux-v2.0.1.clap,clap,neampmod-the-tweed-linux-v2.0.1,,,,,,,,,Guitar Amp
-looper-pedal,LooperPedal,0.1.0,https://github.com/rbmannchued/LooperPedal/releases/download/v0.1.0/looper.lv2.tar.gz,lv2,looper,,,,,,,,,Looper
-sas,SAS,2.0062.574,https://github.com/PJDude/sas/releases/download/v2.0062.574/sas.v2.0062.574.lin.zip,,,,,,,,,,,Tool
-del2,DEL2,0.2.0,https://github.com/magnetophon/DEL2/releases/download/V0.2.0/DEL2-V0.2.0-ubuntu-20.04.zip,"vst3,clap",DEL2,,,,,,,,,Delay
-panoramatone,Panoramatone,0.2.0,https://github.com/PilCAki/sunbunny/releases/download/v0.2.0/Panoramatone_Linux_VST3_v0.2.0.zip,vst3,Panoramatone,,,,,,,,,Vibrato
-aelapse,Aelapse,1.0.1,https://github.com/smiarx/aelapse/releases/download/v1.0.1/Aelapse-Linux.zip,"vst3,lv2",Aelapse,,,,,,,,,Reverb/Delay
-chord-analyzer,Chord Analyzer,1.1.1,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/chord-analyzer-v1.1.1/chord-analyzer-linux.zip,"lv2,vst3",chord-analyzer,,,,,,,,,Midi
-4k-eq,4K EQ,1.0.9,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/4k-eq-v1.0.9/4k-eq-linux.zip,"lv2,vst3",4k-eq,,,,,,,,,EQ
-multi-comp,Multi Comp,1.2.9,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/multi-comp-v1.2.9/multi-comp-linux.zip,"lv2,vst3",multi-comp,,,,,,,,,Compressor
-tapemachine,TapeMachine,1.0.6,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/tapemachine-v1.0.6/tapemachine-linux.zip,"lv2,vst3",tapemachine,,,,,,,,,Tape Delay
-multi-q,Multi Q,0.10.4,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/multi-q-v0.10.4/multi-q-linux.zip,"lv2,vst3",multi-q,,,,,,,,,EQ
-duskverb,DuskVerb,0.5.3,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/duskverb-v0.5.3/duskverb-linux.zip,"lv2,vst3",duskverb,,,,,,,,,Reverb
-declick,Declick,0.6.5,https://home.snafu.de/wahlm/dl8hbs/declick-0.6.5.tar.gz,,,,,,,,,,,Utility
-noise-repellent,Noise Repellent,0.2.5,https://github.com/lucianodato/noise-repellent/releases/download/v0.2.5/noise-repellent-linux64-v0.2.5.zip,lv2,noise-repellent,,,,,,,,,Noise Reduction
-dpf-plugins,DPF Plugins,1.7,https://github.com/DISTRHO/DPF-Plugins/releases/download/v1.7/DPF-Plugins-v1.7-linux-x86_64.tar.xz,"clap,vst3,lv2",DPF-Plugins,,,,,,,,,Plugin Suite
-dexed,Dexed,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/dexed-linux64.tar.xz,lv2,Dexed,,,,,,,,,Synth
-arctican-plugins,Arctican Plugins,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/arctican-plugins-linux64.tar.xz,lv2,Arctican,,,,,,,,,Plugin Suite
-drowaudio-plugins,dRowAudio Plugins,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/drowaudio-plugins-linux64.tar.xz,lv2,dRowAudio,,,,,,,,,Plugin Suite
-easyssp,EasySSP,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/easyssp-linux64.tar.xz,lv2,EasySSP,,,,,,,,,Utility
-juce-opl,JuceOPL,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/juce-opl-linux64.tar.xz,lv2,JuceOPL,,,,,,,,,Synth
-juced-plugins,Juced Plugins,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/juced-plugins-linux64.tar.xz,lv2,Juced,,,,,,,,,Plugin Suite
-klangfalter,KlangFalter,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/klangfalter-linux64.tar.xz,lv2,KlangFalter,,,,,,,,,Convolution
-lufs-meter,LUFS Meter,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/lufsmeter-linux64.tar.xz,lv2,LUFSMeter,,,,,,,,,Metering
-luftikus,Luftikus,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/luftikus-linux64.tar.xz,lv2,Luftikus,,,,,,,,,EQ
-mverb,MVerb,1.1,https://github.com/DISTRHO/DPF-Plugins/releases/download/v1.1/mverb-linux64.tar.xz,lv2,MVerb,,,,,,,,,Reverb
-ndc-plugins,NDC Plugins,1.1,https://github.com/DISTRHO/DPF-Plugins/releases/download/v1.1/ndc-plugins-linux64.tar.xz,lv2,NDC,,,,,,,,,Plugin Suite
-obxd,OBXD,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/obxd-linux64.tar.xz,lv2,Obxd,,,,,,,,,Synth
-pitched-delay,Pitched Delay,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/pitcheddelay-linux64.tar.xz,lv2,PitchedDelay,,,,,,,,,Delay
-stereo-source-separator,Stereo Source Separator,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/stereosourceseparation-linux64.tar.xz,lv2,StereoSourceSeparation,,,,,,,,,Utility
-tal-plugins,TAL Plugins,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/tal-plugins-linux64.tar.xz,lv2,TAL-Plugins,,,,,,,,,Plugin Suite
-vex,Vex,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/vex-linux64.tar.xz,lv2,Vex,,,,,,,,,Synth
-wolpertinger,Wolpertinger,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/wolpertinger-linux64.tar.xz,lv2,Wolpertinger,,,,,,,,,Synth
+id,name,version,url,formats,primary_bundle_name,data_dir_name,data_target_name,warmplace_subdir,launcher_name,desktop_id,desktop_comment,repo_url,extract_dir,category,project_website,dl_within_app,open_source,has_free_version
+reaper,REAPER,765,https://www.reaper.fm/files/7.x/reaper765_linux_x86_64.tar.xz,,,,,,,,,,,DAW,https://www.reaper.fm/,true,false,false
+renoise,Renoise,3.5.4,https://files.renoise.com/demo/Renoise_3_5_4_Demo_Linux_x86_64.tar.gz,,,,,,,,,,Renoise_3_5_4_Demo_Linux_x86_64,DAW,https://files.renoise.com/,true,false,false
+bitwig-studio,Bitwig Studio,,https://www.bitwig.com/dl/?id=419&os=installer_linux,,,,,,,,,,,DAW,https://www.bitwig.com/,true,false,false
+sunvox,SunVox,2.1.4d,https://warmplace.ru/soft/sunvox/sunvox-2.1.4d.zip,,,,sunvox,sunvox,sunvox,Modular tracker and synthesizer,,,,Synth,https://warmplace.ru/,true,true,true
+virtual-ans,Virtual ANS,3.0.4,https://warmplace.ru/soft/ans/virtual_ans-3.0.4.zip,,,,virtual_ans,virtual-ans,virtual-ans,Spectral drawing synthesizer,,,,Utility,https://warmplace.ru/,true,true,true
+tal-noisemaker,TAL-Noisemaker,,https://tal-software.com/downloads/plugins/TAL-NoiseMaker_64_linux.zip,"clap,vst,vst3,lv2",TAL-NoiseMaker,,,,,,,,,Synth,https://tal-software.com/,true,true,true
+cardinal,Cardinal,26.02,https://github.com/DISTRHO/Cardinal/releases/download/26.02/Cardinal-linux-x86_64-26.02.tar.gz,,,,,,,,,,,Synth,https://distrho.sourceforge.io/,true,true,true
+surge-xt,Surge XT,1.3.4,https://github.com/surge-synthesizer/releases-xt/releases/download/1.3.4/surge-xt-x86_64-1.3.4.rpm,,,,,,,,,,,Synth,https://surge-synthesizer.github.io/,true,true,true
+wavetable,Wavetable_Linux,,https://socalabs.com/files/get.php?id=Wavetable_Linux.zip,"vst,vst3,lv2",Wavetable,,,,,,,,,Synth,https://socalabs.com/,true,true,true
+ob-xf,OB-Xf,1.0.3,https://github.com/surge-synthesizer/OB-Xf/releases/download/v1.0.3/ob-xf-Linux-v1.0.3.zip,"vst3,lv2",OB-Xf,,,,,,,,,Synth,https://surge-synthesizer.github.io/,true,true,true
+odin2,Odin2,2.4.1,https://www.dropbox.com/scl/fi/eshk5a54xirgi4fshuyh5/Odin2.4.1Linux.zip?rlkey=e4d4eqqecep0cr98cfyso4ty7&st=00ebtald&dl=1,"clap,vst3",Odin2,,,,,,,,,Synth,https://thewavewarden.com/pages/odin-2,true,true,true
+loopino,Loopino,,,,,,,,,,,https://github.com/brummer10/Loopino.git,,Looper,https://github.com/brummer10/Loopino,true,true,true
+decent-sampler,Decent Sampler,1.18.1,https://cdn.decentsamples.com/production/builds/ds/1.18.1/Decent_Sampler-1.18.1-Linux-Static-x86_64.tar.gz,,,,,,,,,,,Sampler,https://cdn.decentsamples.com/,true,false,true
+jdrummer,jDrummer,,https://github.com/jmantra/jdrummer/releases/download/Second/jdrummer_Linux_VST3.zip,vst3,jdrummer,,,,,,,,,Drums,https://github.com/jmantra/jdrummer/,true,true,true
+drumkv1,Drumkv1,,https://github.com/rncbc/drumkv1/archive/refs/heads/main.tar.gz,,,,,,,,,,,Drums,https://github.com/rncbc/drumkv1/,true,true,true
+synthv1,Synthv1,,https://github.com/rncbc/synthv1/archive/refs/heads/main.tar.gz,,,,,,,,,,,Synth,https://github.com/rncbc/synthv1/,true,true,true
+samplv1,Samplv1,,https://github.com/rncbc/samplv1/archive/refs/heads/main.tar.gz,,,,,,,,,,,Sampler,https://github.com/rncbc/samplv1/,true,true,true
+padhv1,Padhv1,,https://github.com/rncbc/padthv1/archive/refs/heads/main.tar.gz,,,,,,,,,,,Synth,https://github.com/rncbc/padthv1/,true,true,true
+amp-locker,Amp Locker,,https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/AmpLockerLinux.zip,"vst3,lv2",Amp Locker,AmpLockerData,AmpLockerData,,,,,,,Guitar,https://audioassault.mx/,true,false,true
+drum-locker,Drum Locker,,https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/DrumLockerLinux.zip,"vst3,lv2",Drum Locker,DrumLockerData,DrumLockerData,,,,,,,Drums,https://audioassault.mx/,true,false,true
+mix-locker,Mix Locker,,https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/MixLockerLinux.zip,"vst3,lv2",Mix Locker,MixLockerData,MixLockerData,,,,,,,Mixing,https://audioassault.mx/,true,false,true
+intersect,INTERSECT,0.10.8,https://github.com/tucktuckg00se/INTERSECT/releases/download/v0.10.8/INTERSECT-v0.10.8-Linux-x64.zip,vst3,INTERSECT,,,,,,,,,Synth,https://github.com/tucktuckg00se/INTERSECT/,true,true,true
+byod,BYOD,1.3.0,https://github.com/Chowdhury-DSP/BYOD/releases/download/v1.3.0/BYOD-Linux-x64-1.3.0.deb,"clap,vst3,lv2",BYOD,,,,,,,,,,https://chowdsp.com/,true,true,true
+neural-amp-model,Neural Amp Modeler,0.1.9,https://github.com/mikeoliphant/neural-amp-modeler-lv2/releases/download/v0.1.9/neural_amp_modeler_lv2_linux_x64.tgz,lv2,neural_amp_modeler,,,,,,,,,,https://www.neuralampmodeler.com/,true,true,true
+aida-x,AIDA-X,1.1.0,https://github.com/AidaDSP/AIDA-X/releases/download/1.1.0/AIDA-X-1.1.0-linux-x86_64.tar.xz,"clap,vst3,lv2",AIDA-X,,,,,,,,,,https://aida-x.cc/,true,true,true
+dragonfly,Dragonfly Reverb,3.2.10,https://github.com/michaelwillis/dragonfly-reverb/releases/download/3.2.10/dragonfly-reverb-3.2.10-linux-x86_64.tar.xz,"clap,vst3,lv2",DragonflyHall,,,,,,,,,,https://github.com/michaelwillis/dragonfly-reverb,true,true,true
+rtcqs,RTCQS,,https://pypi.org/project/rtcqs/,,,,,,,,,,,,https://pypi.org/project/rtcqs/,true,true,true
+yoshimi,Yoshimi,2.3.6.1,https://github.com/Yoshimi/yoshimi/archive/2.3.6.1.zip,,,,,,,,,,,Synth,https://yoshimi.sourceforge.io/,true,true,true
+zam-plugins,Zam Plugin Suite,4.5,https://github.com/zamaudio/zam-plugins/releases/download/4.5/zam-plugins-4.5-linux-x86_64.tar.xz,lv2,zam-plugins-4.5,,,,,,,,,Plugin Suite,https://www.zamaudio.com/?p=976,true,true,true
+spectrus,Spectrus,1.1.1,https://downloads.morphulus.com/Spectrus-1.1.1-Linux.tar.gz,"vst3,lv2",Spectrus,,,,,,,,,Multi Effect,https://morphulus.com/,true,false,true
+the-trick,The Trick,1.0.0,https://mouseplugins.com/en/products/thetrick/download/1.0.0/linux/tar.gz,vst3,TheTrick,,,,,,,,,EQ,https://mouseplugins.com/,true,false,true
+polarity,Polarity,,https://polarity.me/go.php?c=p-sc-linux,"clap,vst3",Polarity-SC-Dark,,,,,,,,,Spectral Compressor,https://polarity.me/,true,false,true
+nine-strip,NineStrip,0.1.1,https://github.com/blablack/nine-strip/releases/download/v0.1.1/NineStrip-Linux.tar.gz,"vst3,lv2",NineStrip,,,,,,,,,Channel Strip,https://github.com/blablack/nine-strip/,true,true,true
+warp-core,WarpCore,0.0.11,https://github.com/ManasWolrd/WarpCore/releases/download/v0.0.11/WarpCore-linux-v0.0.11.zip,"lv2,vst3",WarpCore,,,,,,,,,Pitch,https://github.com/ManasWolrd/WarpCore/,true,true,true
+wet-delay,WetDelay,1.1.4,https://github.com/yonie/WetDelay/releases/download/v1.1.4/WetDelay-v1.1.4.zip,vst3,WetDelay,,,,,,,,,Delay,https://github.com/yonie/WetDelay/,true,true,true
+wet-reverb,WetReverb,1.0.1,https://github.com/yonie/WetReverb/releases/download/v1.0.1/WetReverb-v1.0.1.zip,vst3,WetReverb,,,,,,,,,Reverb,https://github.com/yonie/WetReverb/,true,true,true
+drum-groove-pro,Drum Groove Pro,01.0.0,https://github.com/InToEtherion/DrumGroovePro/releases/download/V1.0.0_RC2/DrumGroovePro_v01.0.0_RC2_LINUX_x64.zip,vst3,Drum Groove Pro,,,,,,,,,Drum Midi,https://github.com/InToEtherion/DrumGroovePro/,true,true,true
+black-widow-drums,Black Widow Drums,0.1,https://github.com/odoare/FxmeSampler/releases/download/0.1/BlackWidowDrums.0.1.LIN.x64.VST3.zip,vst3,BlackWidowDrums,,,,,,,,,Drums,https://fx-mechanics.com/,true,true,true
+ensoniq,Ensoniq SD 1,0.9.9,https://github.com/sojusrecords/Ensoniq-SD-1-32-Voice-VST-emulation/releases/download/v0.9.9/EnsoniqSD1-v.0.9.9-LINUX-Generic.7z,vst3,ensoniq-sd-1,,,,,,,,,Synth,https://github.com/sojusrecords/Ensoniq-SD-1-32-Voice-VST-emulation/,true,true,true
+kr106,KR106,,https://github.com/kayrockscreenprinting/ultramaster_kr106/releases/latest/download/KR106-Linux.zip,"vst3,lv2",kr106-linux,,,,,,,,,Synth,https://kayrock.org/kr106/,true,true,true
+tb4006,TB4006,,https://www.robotplanet.dk/audio_plugins/tb4006/TB4006_Linux_VST.7z,vst3,tb4006_linux,,,,,,,,,Synth,https://www.robotplanet.dk/,true,false,true
+suboctb,Suboctb,0.2.0,https://codeberg.org/yimrakhee/suboctb/releases/download/v0.2.0/suboctb_v0.2.0_Linux_x64.zip,"clap,vst3",suboctb,,,,,,,,,Synth,https://codeberg.org/yimrakhee/suboctb/,true,true,true
+floe-vst,Floe,1.1.2,https://github.com/floe-audio/Floe/releases/download/v1.1.2/Floe-VST3-v1.1.2-Linux.tar.gz,vst3,Floe,,,,,,,,,Synth,https://github.com/floe-audio/Floe/,true,true,true
+floe-clap,Floe,1.1.2,https://github.com/floe-audio/Floe/releases/download/v1.1.2/Floe-CLAP-v1.1.2-Linux.tar.gz,clap,Floe,,,,,,,,,Synth,https://github.com/floe-audio/Floe/,true,true,true
+musescore-studio,MuseScore Studio,4.6.5,https://cdn.jsdelivr.net/musescore/v4.6.5/MuseScore-Studio-4.6.5.253511702-x86_64.AppImage,,,,,,,,,,,Utility,https://cdn.jsdelivr.net/musescore/,true,true,true
+neampmod-the-tweed-vst3,NeAmpMod The Tweed,2.0.1,https://github.com/danielwray/neampmod-the-tweed/releases/download/v2.0.1/neampmod-the-tweed-linux-v2.0.1.vst3,vst3,neampmod-the-tweed-linux-v2.0.1,,,,,,,,,Guitar Amp,https://github.com/danielwray/neampmod-the-tweed/,true,true,true
+neampmod-the-tweed-clap,NeAmpMod The Tweed,2.0.1,https://github.com/danielwray/neampmod-the-tweed/releases/download/v2.0.1/neampmod-the-tweed-linux-v2.0.1.clap,clap,neampmod-the-tweed-linux-v2.0.1,,,,,,,,,Guitar Amp,https://github.com/danielwray/neampmod-the-tweed/,true,true,true
+looper-pedal,LooperPedal,0.1.0,https://github.com/rbmannchued/LooperPedal/releases/download/v0.1.0/looper.lv2.tar.gz,lv2,looper,,,,,,,,,Looper,https://github.com/rbmannchued/LooperPedal/,true,true,true
+sas,SAS,2.0062.574,https://github.com/PJDude/sas/releases/download/v2.0062.574/sas.v2.0062.574.lin.zip,,,,,,,,,,,Tool,https://github.com/PJDude/sas/,true,true,true
+del2,DEL2,0.2.0,https://github.com/magnetophon/DEL2/releases/download/V0.2.0/DEL2-V0.2.0-ubuntu-20.04.zip,"vst3,clap",DEL2,,,,,,,,,Delay,https://github.com/magnetophon/DEL2/,true,true,true
+panoramatone,Panoramatone,0.2.0,https://github.com/PilCAki/sunbunny/releases/download/v0.2.0/Panoramatone_Linux_VST3_v0.2.0.zip,vst3,Panoramatone,,,,,,,,,Vibrato,https://pilcaki.github.io/sunbunny/,true,false,true
+aelapse,Aelapse,1.0.1,https://github.com/smiarx/aelapse/releases/download/v1.0.1/Aelapse-Linux.zip,"vst3,lv2",Aelapse,,,,,,,,,Reverb/Delay,https://github.com/smiarx/aelapse/,true,true,true
+chord-analyzer,Chord Analyzer,1.1.1,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/chord-analyzer-v1.1.1/chord-analyzer-linux.zip,"lv2,vst3",chord-analyzer,,,,,,,,,Midi,https://dusk-audio.github.io/,true,true,true
+4k-eq,4K EQ,1.0.9,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/4k-eq-v1.0.9/4k-eq-linux.zip,"lv2,vst3",4k-eq,,,,,,,,,EQ,https://dusk-audio.github.io/,true,true,true
+multi-comp,Multi Comp,1.2.9,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/multi-comp-v1.2.9/multi-comp-linux.zip,"lv2,vst3",multi-comp,,,,,,,,,Compressor,https://dusk-audio.github.io/,true,true,true
+tapemachine,TapeMachine,1.0.6,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/tapemachine-v1.0.6/tapemachine-linux.zip,"lv2,vst3",tapemachine,,,,,,,,,Tape Delay,https://dusk-audio.github.io/,true,true,true
+multi-q,Multi Q,0.10.4,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/multi-q-v0.10.4/multi-q-linux.zip,"lv2,vst3",multi-q,,,,,,,,,EQ,https://dusk-audio.github.io/,true,true,true
+duskverb,DuskVerb,0.5.3,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/duskverb-v0.5.3/duskverb-linux.zip,"lv2,vst3",duskverb,,,,,,,,,Reverb,https://dusk-audio.github.io/,true,true,true
+declick,Declick,0.6.5,https://home.snafu.de/wahlm/dl8hbs/declick-0.6.5.tar.gz,,,,,,,,,,,Utility,https://home.snafu.de/,true,true,true
+noise-repellent,Noise Repellent,0.2.5,https://github.com/lucianodato/noise-repellent/releases/download/v0.2.5/noise-repellent-linux64-v0.2.5.zip,lv2,noise-repellent,,,,,,,,,Noise Reduction,https://github.com/lucianodato/noise-repellent/,true,true,true
+dpf-plugins,DPF Plugins,1.7,https://github.com/DISTRHO/DPF-Plugins/releases/download/v1.7/DPF-Plugins-v1.7-linux-x86_64.tar.xz,"clap,vst3,lv2",DPF-Plugins,,,,,,,,,Plugin Suite,https://distrho.sourceforge.io/,true,true,true
+dexed,Dexed,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/dexed-linux64.tar.xz,lv2,Dexed,,,,,,,,,Synth,https://distrho.sourceforge.io/,true,true,true
+arctican-plugins,Arctican Plugins,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/arctican-plugins-linux64.tar.xz,lv2,Arctican,,,,,,,,,Plugin Suite,https://distrho.sourceforge.io/,true,true,true
+drowaudio-plugins,dRowAudio Plugins,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/drowaudio-plugins-linux64.tar.xz,lv2,dRowAudio,,,,,,,,,Plugin Suite,https://distrho.sourceforge.io/,true,true,true
+easyssp,EasySSP,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/easyssp-linux64.tar.xz,lv2,EasySSP,,,,,,,,,Utility,https://distrho.sourceforge.io/,true,true,true
+juce-opl,JuceOPL,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/juce-opl-linux64.tar.xz,lv2,JuceOPL,,,,,,,,,Synth,https://distrho.sourceforge.io/,true,true,true
+juced-plugins,Juced Plugins,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/juced-plugins-linux64.tar.xz,lv2,Juced,,,,,,,,,Plugin Suite,https://distrho.sourceforge.io/,true,true,true
+klangfalter,KlangFalter,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/klangfalter-linux64.tar.xz,lv2,KlangFalter,,,,,,,,,Convolution,https://distrho.sourceforge.io/,true,true,true
+lufs-meter,LUFS Meter,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/lufsmeter-linux64.tar.xz,lv2,LUFSMeter,,,,,,,,,Metering,https://distrho.sourceforge.io/,true,true,true
+luftikus,Luftikus,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/luftikus-linux64.tar.xz,lv2,Luftikus,,,,,,,,,EQ,https://distrho.sourceforge.io/,true,true,true
+mverb,MVerb,1.1,https://github.com/DISTRHO/DPF-Plugins/releases/download/v1.1/mverb-linux64.tar.xz,lv2,MVerb,,,,,,,,,Reverb,https://distrho.sourceforge.io/,true,true,true
+ndc-plugins,NDC Plugins,1.1,https://github.com/DISTRHO/DPF-Plugins/releases/download/v1.1/ndc-plugins-linux64.tar.xz,lv2,NDC,,,,,,,,,Plugin Suite,https://distrho.sourceforge.io/,true,true,true
+obxd,OBXD,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/obxd-linux64.tar.xz,lv2,Obxd,,,,,,,,,Synth,https://distrho.sourceforge.io/,true,true,true
+pitched-delay,Pitched Delay,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/pitcheddelay-linux64.tar.xz,lv2,PitchedDelay,,,,,,,,,Delay,https://distrho.sourceforge.io/,true,true,true
+stereo-source-separator,Stereo Source Separator,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/stereosourceseparation-linux64.tar.xz,lv2,StereoSourceSeparation,,,,,,,,,Utility,https://distrho.sourceforge.io/,true,true,true
+tal-plugins,TAL Plugins,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/tal-plugins-linux64.tar.xz,lv2,TAL-Plugins,,,,,,,,,Plugin Suite,https://distrho.sourceforge.io/,true,true,true
+vex,Vex,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/vex-linux64.tar.xz,lv2,Vex,,,,,,,,,Synth,https://distrho.sourceforge.io/,true,true,true
+wolpertinger,Wolpertinger,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/wolpertinger-linux64.tar.xz,lv2,Wolpertinger,,,,,,,,,Synth,https://distrho.sourceforge.io/,true,true,true
+tentacles,Tentacles,,https://pilcaki.github.io/sunbunny/plugins/tentacles/,vst3,Tentacles,,,,,,,,,Vibrato,https://pilcaki.github.io/sunbunny/plugins/tentacles/,false,false,true

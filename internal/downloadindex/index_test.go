@@ -9,8 +9,8 @@ import (
 
 func TestGetReturnsFieldValue(t *testing.T) {
 	indexPath := writeTestIndex(t, strings.Join([]string{
-		"id,name,url,repo_url",
-		"reaper,REAPER,https://example.test/reaper,",
+		"id,name,url,repo_url,project_website",
+		"reaper,REAPER,https://example.test/reaper,,https://example.test/site",
 	}, "\n"))
 
 	value, err := Get(indexPath, "reaper", "url", false)
