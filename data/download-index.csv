@@ -57,3 +57,23 @@ multi-comp,Multi Comp,1.2.9,https://github.com/dusk-audio/dusk-audio-plugins/rel
 tapemachine,TapeMachine,1.0.6,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/tapemachine-v1.0.6/tapemachine-linux.zip,"lv2,vst3",tapemachine,,,,,,,,,Tape Delay
 multi-q,Multi Q,0.10.4,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/multi-q-v0.10.4/multi-q-linux.zip,"lv2,vst3",multi-q,,,,,,,,,EQ
 duskverb,DuskVerb,0.5.3,https://github.com/dusk-audio/dusk-audio-plugins/releases/download/duskverb-v0.5.3/duskverb-linux.zip,"lv2,vst3",duskverb,,,,,,,,,Reverb
+declick,Declick,0.6.5,https://home.snafu.de/wahlm/dl8hbs/declick-0.6.5.tar.gz,,,,,,,,,,,Utility
+noise-repellent,Noise Repellent,0.2.5,https://github.com/lucianodato/noise-repellent/releases/download/v0.2.5/noise-repellent-linux64-v0.2.5.zip,lv2,noise-repellent,,,,,,,,,Noise Reduction
+dpf-plugins,DPF Plugins,1.7,https://github.com/DISTRHO/DPF-Plugins/releases/download/v1.7/DPF-Plugins-v1.7-linux-x86_64.tar.xz,"clap,vst3,lv2",DPF-Plugins,,,,,,,,,Plugin Suite
+dexed,Dexed,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/dexed-linux64.tar.xz,lv2,Dexed,,,,,,,,,Synth
+arctican-plugins,Arctican Plugins,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/arctican-plugins-linux64.tar.xz,lv2,Arctican,,,,,,,,,Plugin Suite
+drowaudio-plugins,dRowAudio Plugins,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/drowaudio-plugins-linux64.tar.xz,lv2,dRowAudio,,,,,,,,,Plugin Suite
+easyssp,EasySSP,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/easyssp-linux64.tar.xz,lv2,EasySSP,,,,,,,,,Utility
+juce-opl,JuceOPL,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/juce-opl-linux64.tar.xz,lv2,JuceOPL,,,,,,,,,Synth
+juced-plugins,Juced Plugins,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/juced-plugins-linux64.tar.xz,lv2,Juced,,,,,,,,,Plugin Suite
+klangfalter,KlangFalter,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/klangfalter-linux64.tar.xz,lv2,KlangFalter,,,,,,,,,Convolution
+lufs-meter,LUFS Meter,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/lufsmeter-linux64.tar.xz,lv2,LUFSMeter,,,,,,,,,Metering
+luftikus,Luftikus,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/luftikus-linux64.tar.xz,lv2,Luftikus,,,,,,,,,EQ
+mverb,MVerb,1.1,https://github.com/DISTRHO/DPF-Plugins/releases/download/v1.1/mverb-linux64.tar.xz,lv2,MVerb,,,,,,,,,Reverb
+ndc-plugins,NDC Plugins,1.1,https://github.com/DISTRHO/DPF-Plugins/releases/download/v1.1/ndc-plugins-linux64.tar.xz,lv2,NDC,,,,,,,,,Plugin Suite
+obxd,OBXD,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/obxd-linux64.tar.xz,lv2,Obxd,,,,,,,,,Synth
+pitched-delay,Pitched Delay,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/pitcheddelay-linux64.tar.xz,lv2,PitchedDelay,,,,,,,,,Delay
+stereo-source-separator,Stereo Source Separator,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/stereosourceseparation-linux64.tar.xz,lv2,StereoSourceSeparation,,,,,,,,,Utility
+tal-plugins,TAL Plugins,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/tal-plugins-linux64.tar.xz,lv2,TAL-Plugins,,,,,,,,,Plugin Suite
+vex,Vex,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/vex-linux64.tar.xz,lv2,Vex,,,,,,,,,Synth
+wolpertinger,Wolpertinger,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/wolpertinger-linux64.tar.xz,lv2,Wolpertinger,,,,,,,,,Synth

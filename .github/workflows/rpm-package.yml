@@ -29,11 +29,15 @@ jobs:
             curl \
             gcc \
             git \
+            glib2-devel \
             golang \
+            gtk3-devel \
+            pkgconf-pkg-config \
             redhat-rpm-config \
             rpm-build \
             rsync \
             tar \
+            webkit2gtk4.1-devel \
             which
           dnf clean all
 
@@ -74,12 +78,13 @@ jobs:
 
           mkdir -p "${srcroot}"
           rsync -a \
-            --exclude '.git' \
-            --exclude '.github/workflows' \
-            --exclude 'dist' \
-            --exclude 'rpmbuild' \
+            --exclude '/.git/' \
+            --exclude '/.github/workflows/' \
+            --exclude '/dist/' \
+            --exclude '/rpmbuild/' \
             ./ "${srcroot}/"
 
+          test -f "${srcroot}/frontend/dist/index.html"
           tar -C "${tempdir}" -czf "${sourcedir}/${name}-${VERSION}.tar.gz" "${name}-${VERSION}"
 
       - name: Build source RPM

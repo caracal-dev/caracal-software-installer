@@ -52,13 +52,13 @@ set_reaper_ini_value() {
 }
 
 configure_reaper_plugin_paths() {
-    local target_user="${SUDO_USER:-}"
+    local target_user="${CARACAL_INSTALLER_TARGET_USER:-${SUDO_USER:-}}"
     local target_home=""
     local config_dir=""
     local ini_file=""
 
     if [[ -z "${target_user}" || "${target_user}" == "root" ]]; then
-        echo "Skipping REAPER user config seeding because SUDO_USER is not set."
+        echo "Skipping REAPER user config seeding because neither CARACAL_INSTALLER_TARGET_USER nor SUDO_USER is set."
         return
     fi
 

@@ -1,11 +1,14 @@
 package installer
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/caracal-os/caracal-software-installer/internal/catalog"
 )
@@ -36,6 +39,14 @@ type Result struct {
 	Error       error
 }
 
+type RunOptions struct {
+	Interactive         bool
+	TransformActionExec func(job Job, action catalog.Action, execArgs []string) ([]string, error)
+	OnJobStart          func(index int, total int, job Job)
+	OnActionStart       func(job Job, action catalog.Action)
+	OnActionOutput      func(job Job, action catalog.Action, stream string, text string)
+}
+
 func Detect(pkg *catalog.Package) PackageState {
 	state := PackageState{}
 
@@ -53,15 +64,26 @@ func Detect(pkg *catalog.Package) PackageState {
 }
 
 func Run(jobs []Job) []Result {
+	return RunWithOptions(jobs, RunOptions{Interactive: true})
+}
+
+func RunWithOptions(jobs []Job, opts RunOptions) []Result {
 	results := make([]Result, 0, len(jobs))
 
-	fmt.Println("Caracal Software Installer")
-	fmt.Println("==========================")
-	fmt.Println()
+	if opts.Interactive {
+		fmt.Println("Caracal Software Installer")
+		fmt.Println("==========================")
+		fmt.Println()
+	}
 
 	for index, job := range jobs {
 		pkg := job.Package
-		fmt.Printf("[%d/%d] %s (%s)\n", index+1, len(jobs), pkg.Name, strings.ToUpper(string(job.Mode)))
+		if opts.Interactive {
+			fmt.Printf("[%d/%d] %s (%s)\n", index+1, len(jobs), pkg.Name, strings.ToUpper(string(job.Mode)))
+		}
+		if opts.OnJobStart != nil {
+			opts.OnJobStart(index+1, len(jobs), job)
+		}
 
 		actions := pkg.InstallActions
 		if job.Mode == ModeUninstall {
@@ -70,8 +92,13 @@ func Run(jobs []Job) []Result {
 
 		var runErr error
 		for _, action := range actions {
-			fmt.Printf("  -> %s\n", action.Title)
-			if err := runAction(action); err != nil {
+			if opts.Interactive {
+				fmt.Printf("  -> %s\n", action.Title)
+			}
+			if opts.OnActionStart != nil {
+				opts.OnActionStart(job, action)
+			}
+			if err := runAction(job, action, opts); err != nil {
 				runErr = err
 				break
 			}
@@ -87,28 +114,91 @@ func Run(jobs []Job) []Result {
 		results = append(results, result)
 
 		if runErr != nil {
-			fmt.Printf("  !! %v\n", runErr)
-		} else {
+			if opts.Interactive {
+				fmt.Printf("  !! %v\n", runErr)
+			}
+		} else if opts.Interactive {
 			fmt.Println("  OK")
 		}
 
-		fmt.Println()
+		if opts.Interactive {
+			fmt.Println()
+		}
 	}
 
 	return results
 }
 
-func runAction(action catalog.Action) error {
-	cmd := exec.Command(action.Exec[0], action.Exec[1:]...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+func runAction(job Job, action catalog.Action, opts RunOptions) error {
+	execArgs := append([]string(nil), action.Exec...)
+	if len(execArgs) == 0 {
+		return fmt.Errorf("%s has no command configured", action.Title)
+	}
+
+	if opts.TransformActionExec != nil {
+		transformed, err := opts.TransformActionExec(job, action, execArgs)
+		if err != nil {
+			return fmt.Errorf("%s failed: %w", action.Title, err)
+		}
+		execArgs = transformed
+		if len(execArgs) == 0 {
+			return fmt.Errorf("%s failed: transformed command was empty", action.Title)
+		}
+	}
+
+	cmd := exec.Command(execArgs[0], execArgs[1:]...)
+
+	if opts.Interactive {
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	} else {
+		stdout, err := cmd.StdoutPipe()
+		if err != nil {
+			return fmt.Errorf("%s failed: %w", action.Title, err)
+		}
+		stderr, err := cmd.StderrPipe()
+		if err != nil {
+			return fmt.Errorf("%s failed: %w", action.Title, err)
+		}
+
+		if err := cmd.Start(); err != nil {
+			return fmt.Errorf("%s failed: %w", action.Title, err)
+		}
+
+		var wg sync.WaitGroup
+		wg.Add(2)
+		go streamOutput(&wg, stdout, "stdout", job, action, opts.OnActionOutput)
+		go streamOutput(&wg, stderr, "stderr", job, action, opts.OnActionOutput)
+		wg.Wait()
+
+		if err := cmd.Wait(); err != nil {
+			return fmt.Errorf("%s failed: %w", action.Title, err)
+		}
+		return nil
+	}
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("%s failed: %w", action.Title, err)
 	}
 
 	return nil
+}
+
+func streamOutput(wg *sync.WaitGroup, reader io.Reader, stream string, job Job, action catalog.Action, emit func(job Job, action catalog.Action, stream string, text string)) {
+	defer wg.Done()
+
+	if emit == nil {
+		_, _ = io.Copy(io.Discard, reader)
+		return
+	}
+
+	scanner := bufio.NewScanner(reader)
+	buffer := make([]byte, 0, 64*1024)
+	scanner.Buffer(buffer, 1024*1024)
+	for scanner.Scan() {
+		emit(job, action, stream, scanner.Text())
+	}
 }
 
 func actionsAvailable(actions []catalog.Action) bool {

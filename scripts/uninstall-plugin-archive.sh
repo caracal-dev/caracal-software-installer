@@ -2,18 +2,45 @@
 set -euo pipefail
 
 if [[ $# -lt 2 ]]; then
-    echo "Usage: $0 <primary-bundle-name> <formats> [data-target-name]" >&2
+    echo "Usage: $0 [<plugin-id>] <primary-bundle-name> <formats> [data-target-name]" >&2
     exit 1
 fi
 
-primary_bundle_name="$1"
-formats="$2"
-data_target_name="${3:-}"
+plugin_id=""
+primary_bundle_name=""
+formats=""
+data_target_name=""
+
+if [[ $# -ge 3 && "$2" != *","* ]]; then
+    plugin_id="$1"
+    primary_bundle_name="$2"
+    formats="$3"
+    data_target_name="${4:-}"
+else
+    primary_bundle_name="$1"
+    formats="$2"
+    data_target_name="${3:-}"
+fi
+
+manifest_path=""
+if [[ -n "${plugin_id}" ]]; then
+    manifest_path="${HOME}/.local/share/caracal-software-installer/manifests/${plugin_id}.txt"
+fi
 
 has_format() {
     local format="$1"
     [[ ",${formats}," == *",${format},"* ]]
 }
+
+if [[ -n "${manifest_path}" && -f "${manifest_path}" ]]; then
+    while IFS= read -r target; do
+        [[ -z "${target}" ]] && continue
+        rm -rf "${target}"
+    done < "${manifest_path}"
+    rm -f "${manifest_path}"
+    echo "${primary_bundle_name} removed using recorded manifest."
+    exit 0
+fi
 
 if has_format "clap"; then
     rm -f "${HOME}/.clap/${primary_bundle_name}.clap"
