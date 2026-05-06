@@ -69,9 +69,10 @@ install -Dpm0644 packaging/caracal-software-installer.desktop %{buildroot}%{_dat
 %{_prefix}/lib/caracal-software-installer/data/*
 %{_datadir}/caracal-software-installer/logo.txt
 %{_datadir}/caracal-software-installer/assets/images/*
+%{_datadir}/caracal-software-installer/assets/screenshots/*
 %{_datadir}/pixmaps/caracal-software-installer.png
 %{_datadir}/applications/caracal-software-installer.desktop
 
 %changelog
-* Mon May 05 2026 Atumia <atumia@users.noreply.github.com> - %{version}-%{release}
+* Tue May 05 2026 Atumia <atumia@users.noreply.github.com> - %{version}-%{release}
 - Include Wails frontend assets in RPM source archives.
