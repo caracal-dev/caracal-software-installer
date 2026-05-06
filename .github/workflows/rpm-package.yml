@@ -41,28 +41,52 @@ jobs:
             which
           dnf clean all
 
-      - name: Resolve package version
-        id: version
+      - name: Resolve packaging metadata
+        id: meta
         run: |
           set -euo pipefail
 
-          if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" == v* ]]; then
+          latest_tag="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+          repo_owner="${GITHUB_REPOSITORY_OWNER:-${GITHUB_REPOSITORY%%/*}}"
+          repo_name="${GITHUB_REPOSITORY#*/}"
+
+          if [[ -n "${latest_tag}" ]]; then
+            echo "LATEST_TAG=${latest_tag}" >> "${GITHUB_ENV}"
+          fi
+
+          if [[ "${GITHUB_REF_TYPE:-}" == "tag" && "${GITHUB_REF_NAME:-}" == v* ]]; then
             version="${GITHUB_REF_NAME#v}"
+            source_tag="${GITHUB_REF_NAME}"
             release="1"
+          elif [[ -n "${latest_tag}" ]]; then
+            version="${latest_tag#v}"
+            source_tag="${latest_tag}"
+            release="0.$(date -u +%Y%m%d%H%M%S)"
           else
             version="0.0.0"
+            source_tag="v${version}"
             release="0.$(date -u +%Y%m%d%H%M%S)"
           fi
 
+          echo "PACKAGE_VERSION=${version}" >> "${GITHUB_ENV}"
+          echo "SOURCE_TAG=${source_tag}" >> "${GITHUB_ENV}"
+          echo "RPM_RELEASE=${release}" >> "${GITHUB_ENV}"
+          echo "GITHUB_REPO_OWNER=${repo_owner}" >> "${GITHUB_ENV}"
+          echo "GITHUB_REPO_NAME=${repo_name}" >> "${GITHUB_ENV}"
+
           echo "version=${version}" >> "${GITHUB_OUTPUT}"
+          echo "source_tag=${source_tag}" >> "${GITHUB_OUTPUT}"
           echo "release=${release}" >> "${GITHUB_OUTPUT}"
+          echo "repo_owner=${repo_owner}" >> "${GITHUB_OUTPUT}"
+          echo "repo_name=${repo_name}" >> "${GITHUB_OUTPUT}"
 
       - name: Vendor Go modules
         run: go mod vendor
 
       - name: Create source archive
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          REPO_NAME: ${{ steps.meta.outputs.repo_name }}
         run: |
           set -euo pipefail
 
@@ -71,7 +95,7 @@ jobs:
           sourcedir="${topdir}/SOURCES"
           specdir="${topdir}/SPECS"
           tempdir="$(mktemp -d)"
-          srcroot="${tempdir}/${name}-${VERSION}"
+          srcroot="${tempdir}/${REPO_NAME}-${VERSION}"
 
           install -d "${sourcedir}" "${specdir}" "${topdir}/SRPMS" "${topdir}/RPMS"
           cp packaging/caracal-software-installer.spec "${specdir}/"
@@ -85,29 +109,42 @@ jobs:
             ./ "${srcroot}/"
 
           test -f "${srcroot}/frontend/dist/index.html"
-          tar -C "${tempdir}" -czf "${sourcedir}/${name}-${VERSION}.tar.gz" "${name}-${VERSION}"
+          test -d "${srcroot}/vendor"
+          tar -C "${tempdir}" -czf "${sourcedir}/${name}-${VERSION}.tar.gz" "${REPO_NAME}-${VERSION}"
 
       - name: Build source RPM
         env:
-          VERSION: ${{ steps.version.outputs.version }}
-          RELEASE: ${{ steps.version.outputs.release }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          RELEASE: ${{ steps.meta.outputs.release }}
+          SOURCE_TAG: ${{ steps.meta.outputs.source_tag }}
+          REPO_OWNER: ${{ steps.meta.outputs.repo_owner }}
+          REPO_NAME: ${{ steps.meta.outputs.repo_name }}
         run: |
           set -euo pipefail
 
           rpmbuild -bs rpmbuild/SPECS/caracal-software-installer.spec \
             --define "_topdir ${PWD}/rpmbuild" \
+            --define "github_owner_override ${REPO_OWNER}" \
+            --define "github_repo_override ${REPO_NAME}" \
+            --define "source_tag_override ${SOURCE_TAG}" \
             --define "version_override ${VERSION}" \
             --define "release_override ${RELEASE}"
 
       - name: Build binary RPM
         env:
-          VERSION: ${{ steps.version.outputs.version }}
-          RELEASE: ${{ steps.version.outputs.release }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          RELEASE: ${{ steps.meta.outputs.release }}
+          SOURCE_TAG: ${{ steps.meta.outputs.source_tag }}
+          REPO_OWNER: ${{ steps.meta.outputs.repo_owner }}
+          REPO_NAME: ${{ steps.meta.outputs.repo_name }}
         run: |
           set -euo pipefail
 
           rpmbuild -ba rpmbuild/SPECS/caracal-software-installer.spec \
             --define "_topdir ${PWD}/rpmbuild" \
+            --define "github_owner_override ${REPO_OWNER}" \
+            --define "github_repo_override ${REPO_NAME}" \
+            --define "source_tag_override ${SOURCE_TAG}" \
             --define "version_override ${VERSION}" \
             --define "release_override ${RELEASE}"
 

@@ -13,15 +13,52 @@ jobs:
   release:
     name: Build and Release
     runs-on: ubuntu-latest
+    container:
+      image: fedora:43
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
         with:
-          go-version-file: go.mod
+          fetch-depth: 0
+
+      - name: Install release dependencies
+        run: |
+          set -euo pipefail
+          dnf -y install \
+            gcc \
+            git \
+            glib2-devel \
+            golang \
+            gtk3-devel \
+            pkgconf-pkg-config \
+            tar \
+            webkit2gtk4.1-devel
+          dnf clean all
+
+      - name: Resolve release metadata
+        id: meta
+        run: |
+          set -euo pipefail
+
+          latest_tag="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+          if [[ -n "${latest_tag}" ]]; then
+            echo "LATEST_TAG=${latest_tag}" >> "${GITHUB_ENV}"
+          fi
+
+          if [[ "${GITHUB_REF_TYPE:-}" == "tag" && "${GITHUB_REF_NAME:-}" == v* ]]; then
+            version="${GITHUB_REF_NAME}"
+          elif [[ -n "${latest_tag}" ]]; then
+            version="${latest_tag}"
+          else
+            version="manual"
+          fi
+
+          echo "RELEASE_VERSION=${version}" >> "${GITHUB_ENV}"
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+
+      - name: Vendor Go modules
+        run: go mod vendor
 
       - name: Run tests
         run: go test ./...
@@ -33,10 +70,10 @@ jobs:
         env:
           GOOS: linux
           GOARCH: amd64
+          VERSION: ${{ steps.meta.outputs.version }}
         run: |
           set -euo pipefail
 
-          VERSION="${GITHUB_REF_NAME:-manual}"
           APP_NAME="caracal-software-installer"
           STAGING_DIR="dist/${APP_NAME}-${VERSION}-linux-amd64"
           ARCHIVE_PATH="dist/${APP_NAME}-${VERSION}-linux-amd64.tar.gz"
@@ -45,13 +82,21 @@ jobs:
           install -d \
             "${STAGING_DIR}/usr/bin" \
             "${STAGING_DIR}/usr/lib/caracal-software-installer/bin" \
-            "${STAGING_DIR}/usr/share/caracal-software-installer"
+            "${STAGING_DIR}/usr/share/caracal-software-installer" \
+            "${STAGING_DIR}/usr/share/applications" \
+            "${STAGING_DIR}/usr/share/pixmaps"
 
-          go build -trimpath -ldflags="-s -w" -o "${STAGING_DIR}/usr/bin/${APP_NAME}" ./cmd/caracal-software-installer
-          go build -trimpath -ldflags="-s -w" -o "${STAGING_DIR}/usr/lib/caracal-software-installer/bin/caracal-download-index" ./cmd/caracal-download-index
+          go build -trimpath -mod=vendor -tags="desktop,production,webkit2_41" -ldflags="-s -w" \
+            -o "${STAGING_DIR}/usr/bin/${APP_NAME}-gui" .
+          go build -trimpath -mod=vendor -ldflags="-s -w" \
+            -o "${STAGING_DIR}/usr/bin/${APP_NAME}" ./cmd/caracal-software-installer
+          go build -trimpath -mod=vendor -ldflags="-s -w" \
+            -o "${STAGING_DIR}/usr/lib/caracal-software-installer/bin/caracal-download-index" ./cmd/caracal-download-index
 
           cp -R scripts data "${STAGING_DIR}/usr/lib/caracal-software-installer/"
           cp -R assets "${STAGING_DIR}/usr/share/caracal-software-installer/"
+          cp packaging/caracal-software-installer.desktop "${STAGING_DIR}/usr/share/applications/"
+          cp assets/images/caracal.png "${STAGING_DIR}/usr/share/pixmaps/caracal-software-installer.png"
           cp logo.txt "${STAGING_DIR}/usr/share/caracal-software-installer/"
           cp README.md LICENSE "${STAGING_DIR}/"
 

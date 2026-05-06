@@ -1,13 +1,16 @@
 %global debug_package %{nil}
 %global upstream_version %{?version_override}%{!?version_override:2.1}
+%global github_owner %{?github_owner_override}%{!?github_owner_override:caracal-os}
+%global github_repo %{?github_repo_override}%{!?github_repo_override:caracal-software-installer}
 %global source_tag %{?source_tag_override}%{!?source_tag_override:v%{upstream_version}}
+%global source_dir_name %{github_repo}-%{upstream_version}
 
 Name:           caracal-software-installer
 Version:        %{upstream_version}
 Release:        %{?release_override}%{!?release_override:1}%{?dist}
 Summary:        Catalog-driven installer for optional audio software
 License:        MIT
-URL:            https://github.com/tumillanino/caracal-software-installer
+URL:            https://github.com/%{github_owner}/%{github_repo}
 Source0:        %{url}/archive/refs/tags/%{source_tag}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
@@ -23,7 +26,7 @@ terminal UI for browsing and installing optional DAWs, instruments,
 plugins, and audio utilities from a curated catalog.
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -n %{source_dir_name}
 
 %build
 mkdir -p build
