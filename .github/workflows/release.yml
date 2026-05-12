@@ -96,7 +96,7 @@ jobs:
           cp -R scripts data "${STAGING_DIR}/usr/lib/caracal-software-installer/"
           cp -R assets "${STAGING_DIR}/usr/share/caracal-software-installer/"
           cp packaging/caracal-software-installer.desktop "${STAGING_DIR}/usr/share/applications/"
-          cp assets/images/caracal.png "${STAGING_DIR}/usr/share/pixmaps/caracal-software-installer.png"
+          cp build/appicon.png "${STAGING_DIR}/usr/share/pixmaps/caracal-software-installer.png"
           cp logo.txt "${STAGING_DIR}/usr/share/caracal-software-installer/"
           cp README.md LICENSE "${STAGING_DIR}/"
 

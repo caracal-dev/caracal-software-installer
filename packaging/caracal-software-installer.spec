@@ -57,7 +57,7 @@ cp -a data %{buildroot}%{_prefix}/lib/caracal-software-installer/
 cp -a assets %{buildroot}%{_datadir}/caracal-software-installer/
 
 install -pm0644 logo.txt %{buildroot}%{_datadir}/caracal-software-installer/logo.txt
-install -pm0644 assets/images/caracal.png %{buildroot}%{_datadir}/pixmaps/caracal-software-installer.png
+install -pm0644 build/appicon.png %{buildroot}%{_datadir}/pixmaps/caracal-software-installer.png
 install -Dpm0644 packaging/caracal-software-installer.desktop %{buildroot}%{_datadir}/applications/caracal-software-installer.desktop
 
 %files

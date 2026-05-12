@@ -88,6 +88,13 @@ On Fedora Atomic / Universal Blue style systems, these helper wrappers are the s
 ./scripts/wails-build.sh
 ```
 
+Switch the packaged desktop icon by copying one of the PNGs in `build/icons/` to `build/appicon.png`:
+
+```bash
+./scripts/switch-app-icon
+./scripts/switch-app-icon caracal-lakers.png
+```
+
 On Linux, root-requiring installer actions are routed through `pkexec` so they can prompt graphically instead of assuming an interactive terminal.
 
 The app looks for installer scripts in:
