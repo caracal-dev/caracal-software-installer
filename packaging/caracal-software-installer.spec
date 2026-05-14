@@ -33,6 +33,7 @@ plugins, and audio utilities from a curated catalog.
 mkdir -p build
 export GOFLAGS="-buildmode=pie -trimpath -mod=vendor"
 go build -tags="desktop,production,webkit2_41" -ldflags="-s -w" -o build/caracal-software-installer-gui .
+go build -ldflags="-s -w" -o build/caracal ./cmd/caracal
 go build -ldflags="-s -w" -o build/caracal-software-installer ./cmd/caracal-software-installer
 go build -ldflags="-s -w" -o build/caracal-download-index ./cmd/caracal-download-index
 
@@ -50,6 +51,7 @@ install -d %{buildroot}%{_datadir}/pixmaps
 
 install -pm0755 build/caracal-software-installer %{buildroot}%{_bindir}/caracal-software-installer
 install -pm0755 build/caracal-software-installer-gui %{buildroot}%{_bindir}/caracal-software-installer-gui
+install -pm0755 build/caracal %{buildroot}%{_bindir}/caracal
 install -pm0755 build/caracal-download-index %{buildroot}%{_prefix}/lib/caracal-software-installer/bin/caracal-download-index
 
 cp -a scripts %{buildroot}%{_prefix}/lib/caracal-software-installer/
@@ -65,6 +67,7 @@ install -Dpm0644 packaging/caracal-software-installer.desktop %{buildroot}%{_dat
 %doc README.md
 %{_bindir}/caracal-software-installer
 %{_bindir}/caracal-software-installer-gui
+%{_bindir}/caracal
 %{_prefix}/lib/caracal-software-installer/bin/caracal-download-index
 %{_prefix}/lib/caracal-software-installer/scripts/*
 %{_prefix}/lib/caracal-software-installer/data/*

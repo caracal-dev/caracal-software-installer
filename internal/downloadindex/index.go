@@ -32,7 +32,6 @@ var knownFields = map[string]struct{}{
 	"dl_within_app":       {},
 	"open_source":         {},
 	"has_free_version":    {},
-
 }
 
 var requiredFields = []string{"id", "name"}
@@ -41,6 +40,7 @@ type Entry map[string]string
 
 type URLFailure struct {
 	PackageID string
+	Field     string
 	URL       string
 	Err       error
 }
@@ -129,21 +129,19 @@ func CheckURLs(indexPath string, timeout time.Duration, progress io.Writer) ([]U
 
 	for _, packageID := range sortedIDs(lookup) {
 		entry := lookup[packageID]
-		url := entry["url"]
-		if url == "" {
-			url = entry["repo_url"]
-		}
+		for _, candidate := range urlCandidates(entry) {
+			if progress != nil {
+				fmt.Fprintf(progress, "[check] %s %s: %s\n", packageID, candidate.Field, candidate.URL)
+			}
 
-		if progress != nil {
-			fmt.Fprintf(progress, "[check] %s: %s\n", packageID, url)
-		}
-
-		if err := probeURL(client, url); err != nil {
-			failures = append(failures, URLFailure{
-				PackageID: packageID,
-				URL:       url,
-				Err:       err,
-			})
+			if err := probeURL(client, candidate.URL); err != nil {
+				failures = append(failures, URLFailure{
+					PackageID: packageID,
+					Field:     candidate.Field,
+					URL:       candidate.URL,
+					Err:       err,
+				})
+			}
 		}
 	}
 
@@ -185,6 +183,31 @@ func probeURL(client *http.Client, url string) error {
 	}
 
 	return headErr
+}
+
+type urlCandidate struct {
+	Field string
+	URL   string
+}
+
+func urlCandidates(entry Entry) []urlCandidate {
+	fields := []string{"url", "repo_url", "project_website"}
+	candidates := make([]urlCandidate, 0, len(fields))
+	seen := make(map[string]struct{}, len(fields))
+
+	for _, field := range fields {
+		url := strings.TrimSpace(entry[field])
+		if url == "" {
+			continue
+		}
+		if _, ok := seen[url]; ok {
+			continue
+		}
+		seen[url] = struct{}{}
+		candidates = append(candidates, urlCandidate{Field: field, URL: url})
+	}
+
+	return candidates
 }
 
 func loadRows(indexPath string) ([]Entry, error) {

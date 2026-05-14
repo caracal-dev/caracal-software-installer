@@ -4,6 +4,7 @@
 
 The repo now includes:
 
+- a command-line frontend at `cmd/caracal`
 - a `tview` terminal UI at `cmd/caracal-software-installer`
 - a Wails desktop GUI at the repo root / `main.go`
 
@@ -56,11 +57,16 @@ scripts/download-index validate --check-urls
 
 ```bash
 go mod tidy
+go run ./cmd/caracal help
 go run ./cmd/caracal-software-installer
 ```
 
 Packaged command layout:
 
+- `caracal install <id>` installs software by catalog id
+- `caracal scan` checks the download index for broken links
+- `caracal launch` starts the Wails desktop frontend
+- `caracal list` lists available software ids, with filters such as `--daws`, `--effects`, `--synths`, `--format vst`, `--open-source`, and `--installed`
 - `caracal-software-installer` launches the terminal UI
 - `caracal-software-installer-gui` launches the Wails desktop frontend
 - the `.desktop` launcher targets the GUI build

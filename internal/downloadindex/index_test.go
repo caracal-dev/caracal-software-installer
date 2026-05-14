@@ -66,6 +66,25 @@ func TestValidateAcceptsVariableLengthRows(t *testing.T) {
 	}
 }
 
+func TestURLCandidatesIncludeEveryDistinctURLField(t *testing.T) {
+	candidates := urlCandidates(Entry{
+		"url":             "https://example.test/download",
+		"repo_url":        "https://example.test/repo",
+		"project_website": "https://example.test/download",
+	})
+
+	if len(candidates) != 2 {
+		t.Fatalf("unexpected candidate count %d: %#v", len(candidates), candidates)
+	}
+
+	if candidates[0].Field != "url" || candidates[0].URL != "https://example.test/download" {
+		t.Fatalf("unexpected first candidate: %#v", candidates[0])
+	}
+	if candidates[1].Field != "repo_url" || candidates[1].URL != "https://example.test/repo" {
+		t.Fatalf("unexpected second candidate: %#v", candidates[1])
+	}
+}
+
 func writeTestIndex(t *testing.T, contents string) string {
 	t.Helper()
 

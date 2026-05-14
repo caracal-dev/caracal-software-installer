@@ -94,7 +94,7 @@ func runValidate(indexPath string, args []string) int {
 
 	if len(failures) > 0 {
 		for _, failure := range failures {
-			fmt.Fprintf(os.Stderr, "[broken] %s: %s\n", failure.PackageID, failure.URL)
+			fmt.Fprintf(os.Stderr, "[broken] %s %s: %s\n", failure.PackageID, failure.Field, failure.URL)
 			fmt.Fprintln(os.Stderr, failure.Err)
 		}
 		fmt.Fprintf(os.Stderr, "Found %d broken link(s).\n", len(failures))
