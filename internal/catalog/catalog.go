@@ -616,6 +616,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("obxd", "DISTRHO Ports", "OB-inspired synth distributed as a Linux LV2 bundle."),
 						genericArchivePackage("vex", "DISTRHO Ports", "Three-oscillator subtractive synth distributed as a Linux LV2 bundle."),
 						genericArchivePackage("wolpertinger", "DISTRHO Ports", "Polyphonic subtractive synth distributed as a Linux LV2 bundle."),
+						genericArchivePackage("ripplerx", "tiagolr", "Physical modeling synth distributed as Linux VST3 and LV2 bundles."),
 						{
 							ID:          "yoshimi",
 							Name:        "Yoshimi",
@@ -951,6 +952,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						},
 						genericArchivePackage("neampmod-the-tweed-vst3", "danielwray", "Tweed-style amp sim distributed as a direct Linux VST3 download."),
 						genericArchivePackage("neampmod-the-tweed-clap", "danielwray", "Tweed-style amp sim distributed as a direct Linux CLAP download."),
+						genericArchivePackage("chow-centaur", "Chowdhury DSP", "Klon-style overdrive pedal distributed as Linux VST3 and LV2 bundles."),
+						genericArchivePackage("ratatouille", "brummer10", "Neural model and impulse response mixer distributed as a Linux LV2 bundle."),
 					},
 				},
 				{
@@ -1022,6 +1025,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("klangfalter", "DISTRHO Ports", "Convolution processor distributed as a Linux LV2 bundle."),
 						genericArchivePackage("mverb", "DISTRHO", "Studio reverb distributed as a Linux LV2 bundle."),
 						genericArchivePackage("pitched-delay", "DISTRHO Ports", "Pitch-shifting delay processor distributed as a Linux LV2 bundle."),
+						genericArchivePackage("chow-phaser", "Chowdhury DSP", "Phaser effect distributed as Linux VST3 and LV2 bundles."),
 						genericArchivePackage("del2", "magnetophon", "Delay processor distributed as Linux VST3 and CLAP bundles."),
 						genericArchivePackage("panoramatone", "PilCAki", "Vibrato processor distributed as a Linux VST3 bundle."),
 						genericArchivePackage("tentacles", "PilCAki", "Tentacle-inspired vibrato processor available from the project site."),
@@ -1046,6 +1050,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("juced-plugins", "DISTRHO Ports", "Legacy plugin suite distributed as a Linux LV2 archive."),
 						genericArchivePackage("ndc-plugins", "DISTRHO", "Creative effect suite distributed as a Linux LV2 archive."),
 						genericArchivePackage("tal-plugins", "DISTRHO Ports", "Legacy TAL bundle distributed as a Linux LV2 archive."),
+						genericArchivePackage("chow-tape-model", "Chowdhury DSP", "Analog tape model distributed as Linux CLAP, VST3, and LV2 bundles."),
 						{
 							ID:          "intersect",
 							Name:        "INTERSECT",

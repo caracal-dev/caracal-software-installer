@@ -34,7 +34,7 @@ cleanup() {
 
 record_manifest_entry() {
   local target="$1"
-  printf '%s\n' "${target}" >> "${manifest_tmp}"
+  printf '%s\n' "${target}" >>"${manifest_tmp}"
 }
 
 has_format() {
@@ -130,36 +130,36 @@ extract_archive() {
   lower_archive="$(printf '%s' "${archive}" | tr '[:upper:]' '[:lower:]')"
 
   case "${lower_archive}" in
-    *.zip)
-      extract_zip "${archive}" "${destination}"
-      ;;
-    *.7z)
-      extract_with_7z_or_bsdtar "${archive}" "${destination}" "7z"
-      ;;
-    *.deb)
-      extract_deb "${archive}" "${destination}"
-      ;;
-    *.tar|*.tar.gz|*.tgz|*.tar.xz|*.txz|*.tar.bz2|*.tbz2|*.tar.zst)
-      mkdir -p "${destination}"
-      if command -v tar >/dev/null 2>&1; then
-        tar -xf "${archive}" -C "${destination}"
-        return
-      fi
-      if command -v bsdtar >/dev/null 2>&1; then
-        bsdtar -xf "${archive}" -C "${destination}"
-        return
-      fi
-      echo "Need tar or bsdtar to unpack ${archive_name}." >&2
-      exit 1
-      ;;
-    *.clap|*.vst3|*.so)
-      mkdir -p "${destination}"
-      cp -a "${archive}" "${destination}/"
-      ;;
-    *)
-      echo "Unsupported archive format for ${archive_name}." >&2
-      exit 1
-      ;;
+  *.zip)
+    extract_zip "${archive}" "${destination}"
+    ;;
+  *.7z)
+    extract_with_7z_or_bsdtar "${archive}" "${destination}" "7z"
+    ;;
+  *.deb)
+    extract_deb "${archive}" "${destination}"
+    ;;
+  *.tar | *.tar.gz | *.tgz | *.tar.xz | *.txz | *.tar.bz2 | *.tbz2 | *.tar.zst)
+    mkdir -p "${destination}"
+    if command -v tar >/dev/null 2>&1; then
+      tar -xf "${archive}" -C "${destination}"
+      return
+    fi
+    if command -v bsdtar >/dev/null 2>&1; then
+      bsdtar -xf "${archive}" -C "${destination}"
+      return
+    fi
+    echo "Need tar or bsdtar to unpack ${archive_name}." >&2
+    exit 1
+    ;;
+  *.clap | *.vst3 | *.so)
+    mkdir -p "${destination}"
+    cp -a "${archive}" "${destination}/"
+    ;;
+  *)
+    echo "Unsupported archive format for ${archive_name}." >&2
+    exit 1
+    ;;
   esac
 }
 
@@ -233,7 +233,7 @@ echo "Downloading ${display_name}..."
 curl -fL --retry 3 --retry-delay 2 -o "${archive_path}" "${url}"
 extract_archive "${archive_path}" "${extract_dir}"
 mkdir -p "${manifest_root}"
-: > "${manifest_tmp}"
+: >"${manifest_tmp}"
 
 if has_format "clap"; then
   mkdir -p "${target_clap_dir}"
@@ -309,5 +309,5 @@ if [[ -n "${data_dir_name}" ]]; then
   fi
 fi
 
-sort -u "${manifest_tmp}" > "${manifest_path}"
+sort -u "${manifest_tmp}" >"${manifest_path}"
 echo "  ${manifest_path}"
