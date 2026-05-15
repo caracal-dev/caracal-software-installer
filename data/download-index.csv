@@ -83,3 +83,13 @@ tal-plugins,TAL Plugins,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/rele
 vex,Vex,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/vex-linux64.tar.xz,lv2,Vex,,,,,,,,,Synth,https://distrho.sourceforge.io/,true,true,true
 wolpertinger,Wolpertinger,2018-04-16,https://github.com/DISTRHO/DISTRHO-Ports/releases/download/2018-04-16/wolpertinger-linux64.tar.xz,lv2,Wolpertinger,,,,,,,,,Synth,https://distrho.sourceforge.io/,true,true,true
 tentacles,Tentacles,,https://pilcaki.github.io/sunbunny/plugins/tentacles/,vst3,Tentacles,,,,,,,,,Vibrato,https://pilcaki.github.io/sunbunny/plugins/tentacles/,false,false,true
+mixbus,Mixbus,11.3.0,https://eu1.download.solidstatelogic.com/Mixbus%2011/Mixbus%2011.3/Mixbus-11.3.0-x86_64.tar,,,,,,,,,,,DAW,https://www.solidstatelogic.com/products/harrison-mixbus,true,false,false
+helio,Helio,3.17,https://ci.helio.fm/helio-3.17-x64.AppImage,,,,,,,,,,,DAW,https://helio.fm/,true,true,true
+ossia-score,Ossia Score,3.8.2,https://github.com/ossia/score/releases/download/v3.8.2/ossia.score-3.8.2-linux-x86_64.AppImage,,,,,,,,,,,Utility,https://ossia.io/,true,true,true
+vcv-rack-2,VCV Rack 2,2.6.6,https://vcvrack.com/downloads/RackFree-2.6.6-lin-x64.zip,,,,,,,,,,,Synth,https://vcvrack.com/,true,true,true
+stargate,Stargate,24.02.2,https://github.com/stargatedaw/stargate/releases/download/release-24.02.2/StargateDAW-24.02.2-linux-x86_64.AppImage,,,,,,,,,,,DAW,https://github.com/stargatedaw/stargate,true,true,true
+zrythm,Zrythm,1.0.0,https://github.com/zrythm/zrythm/releases/download/v1.0.0/zrythm-trial-1.0.0-installer.zip,,,,,,,,,,,DAW,https://www.zrythm.org/,true,true,true
+bambootracker,BambooTracker,0.6.5,https://github.com/BambooTracker/BambooTracker/releases/download/v0.6.5/BambooTracker-v0.6.5-linux-64bit.zip,,,,,,,,,,,Tracker,https://bambootracker.github.io/BambooTracker/,true,true,true
+milkytracker,MilkyTracker,1.05.01,https://github.com/milkytracker/MilkyTracker/releases/download/v1.05.01/Milkytracker-x86_64.AppImage,,,,,,,,,,,Tracker,https://milkytracker.org/,true,true,true
+avl-drumkits,AVL Drumkits,0.7.4,https://x42-plugins.com/x42/linux/x42-avldrums-v0.7.4-x86_64.tar.gz,lv2,avldrums,,,,,,,,,Drums,https://x42-plugins.com/x42/x42-avldrums,true,true,true
+drumlabooh,Drumlabooh,12.2.0,https://github.com/psemiletov/drumlabooh/releases/download/12.2.0/drumlabooh-net-installer-script.sh,"lv2,vst3",drumlabooh,,,,,,,,,Drums,https://github.com/psemiletov/drumlabooh,true,true,true

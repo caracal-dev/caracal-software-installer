@@ -19,21 +19,21 @@ type Link struct {
 }
 
 type Package struct {
-	ID               string
-	Name             string
-	Vendor           string
-	Summary          string
-	Description      string
-	Notes            []string
-	Links            []Link
+	ID                string
+	Name              string
+	Vendor            string
+	Summary           string
+	Description       string
+	Notes             []string
+	Links             []Link
 	ExternalActionURL string
 	SoftwareTypes     []string
 	OpenSource        bool
 	HasFreeVersion    bool
-	AvailabilityNote string
-	InstalledMarkers []string
-	InstallActions   []Action
-	UninstallActions []Action
+	AvailabilityNote  string
+	InstalledMarkers  []string
+	InstallActions    []Action
+	UninstallActions  []Action
 }
 
 type Subcategory struct {
@@ -231,7 +231,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 		}
 		return entry["project_website"]
 	}
-		boolFieldForID := func(id string, field string, defaultValue bool) bool {
+	boolFieldForID := func(id string, field string, defaultValue bool) bool {
 		value := strings.TrimSpace(strings.ToLower(mustEntry(id)[field]))
 		if value == "" {
 			return defaultValue
@@ -260,7 +260,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 				addSoftwareType(seen, &ordered, "lv2")
 			}
 		}
- 
+
 		for _, marker := range pkg.InstalledMarkers {
 			switch {
 			case strings.Contains(marker, ".clap") || strings.Contains(marker, "/clap/"):
@@ -274,7 +274,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 				addSoftwareType(seen, &ordered, "standalone")
 			}
 		}
- 
+
 		switch pkg.ID {
 		case "cardinal", "surge-xt":
 			addSoftwareType(seen, &ordered, "clap")
@@ -282,11 +282,11 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 		case "yoshimi":
 			addSoftwareType(seen, &ordered, "lv2")
 		}
- 
+
 		if len(ordered) == 0 && strings.TrimSpace(entry["formats"]) == "" {
 			addSoftwareType(seen, &ordered, "standalone")
 		}
- 
+
 		preferredOrder := []string{"standalone", "clap", "vst", "lv2"}
 		reordered := make([]string, 0, len(ordered))
 		for _, kind := range preferredOrder {
@@ -299,26 +299,26 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 	genericArchivePackage := func(id string, vendor string, summary string) *Package {
 		entry := mustEntry(id)
 		name := entry["name"]
-	installedMarkers := archiveInstalledMarkers(id)
-	if !downloadWithinApp(id) {
-		return &Package{
-			ID:          id,
-			Name:        name,
-			Vendor:      vendor,
-			Summary:     summary,
-			Description: "Opens the upstream project page so you can download the current Linux build directly from the developer.",
-			Notes: []string{
-				"Download is handled on the developer website rather than inside the installer.",
-			},
-			Links:             linkForID(id),
-			ExternalActionURL: externalActionURLForID(id),
-			AvailabilityNote:  "Use Get From Site to open the upstream download page in your browser.",
-			InstalledMarkers:  installedMarkers,
-			UninstallActions: []Action{
-				{Title: fmt.Sprintf("Uninstall %s", name), Exec: archiveUninstall(id)},
-			},
+		installedMarkers := archiveInstalledMarkers(id)
+		if !downloadWithinApp(id) {
+			return &Package{
+				ID:          id,
+				Name:        name,
+				Vendor:      vendor,
+				Summary:     summary,
+				Description: "Opens the upstream project page so you can download the current Linux build directly from the developer.",
+				Notes: []string{
+					"Download is handled on the developer website rather than inside the installer.",
+				},
+				Links:             linkForID(id),
+				ExternalActionURL: externalActionURLForID(id),
+				AvailabilityNote:  "Use Get From Site to open the upstream download page in your browser.",
+				InstalledMarkers:  installedMarkers,
+				UninstallActions: []Action{
+					{Title: fmt.Sprintf("Uninstall %s", name), Exec: archiveUninstall(id)},
+				},
+			}
 		}
-	}
 		return &Package{
 			ID:          id,
 			Name:        name,
@@ -339,18 +339,77 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			},
 		}
 	}
+	appImagePackage := func(id string, vendor string, summary string, searchToken string) *Package {
+		entry := mustEntry(id)
+		name := entry["name"]
+		return &Package{
+			ID:          id,
+			Name:        name,
+			Vendor:      vendor,
+			Summary:     summary,
+			Description: "Downloads the upstream AppImage, then uses AppImageLauncher's ail-cli to integrate it into the desktop session without GUI interaction.",
+			Notes: []string{
+				"Does not require sudo.",
+				"Uses ail-cli for desktop integration.",
+			},
+			Links: linkForID(id),
+			InstalledMarkers: []string{
+				"Applications/" + id + ".appimage",
+				"Applications/*" + searchToken + "*.appimage",
+				"AppImages/" + id + ".appimage",
+				"AppImages/*" + searchToken + "*.appimage",
+				".local/share/applications/*" + searchToken + "*.desktop",
+			},
+			InstallActions: []Action{
+				{Title: fmt.Sprintf("Install %s", name), Exec: script("install-appimage-with-ail-cli.sh", id, name, entry["url"])},
+			},
+			UninstallActions: []Action{
+				{Title: fmt.Sprintf("Uninstall %s", name), Exec: script("uninstall-appimage-with-ail-cli.sh", id, searchToken)},
+			},
+		}
+	}
+	portableZipInstall := func(id string, executableName string, wrapperName string, desktopID string, comment string) []string {
+		entry := mustEntry(id)
+		return script("install-portable-zip-app.sh", id, entry["name"], entry["version"], entry["url"], executableName, wrapperName, desktopID, comment)
+	}
+	portableZipUninstall := func(id string, wrapperName string, desktopID string) []string {
+		return script("uninstall-portable-zip-app.sh", id, wrapperName, desktopID)
+	}
 	categories := []*Category{
 		{
 			ID:          "daws",
 			Name:        "DAWs",
-			Description: "Commercial workstation installs that complement the default Caracal toolset.",
+			Description: "Workstation and sequencer installs that complement the default Caracal toolset.",
 			Accent:      "#7dd3fc",
 			Subcategories: []*Subcategory{
 				{
 					ID:          "commercial-daws",
 					Name:        "Commercial DAWs",
-					Description: "Optional workstation installs that currently live in Caracal's post-install flow.",
+					Description: "Optional commercial workstation installs that currently live in Caracal's post-install flow.",
 					Packages: []*Package{
+						{
+							ID:          "mixbus",
+							Name:        "Mixbus",
+							Vendor:      "Solid State Logic",
+							Summary:     "Full-featured DAW with analog-style mixing workflow.",
+							Description: "Downloads the upstream Mixbus tarball, extracts the bundled .run installer, and executes it as a system installer.",
+							Notes: []string{
+								"Requires sudo because the upstream installer writes system paths.",
+								"The upstream .run installer may still present its own prompts.",
+							},
+							Links: linkForID("mixbus"),
+							InstalledMarkers: []string{
+								"/opt/Mixbus*",
+								"/usr/local/share/applications/*mixbus*.desktop",
+								"/usr/share/applications/*mixbus*.desktop",
+							},
+							InstallActions: []Action{
+								{Title: "Install Mixbus", Exec: sudoScript("install-mixbus.sh")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall Mixbus", Exec: sudoScript("uninstall-mixbus.sh")},
+							},
+						},
 						{
 							ID:          "reaper",
 							Name:        "REAPER",
@@ -415,6 +474,38 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 							},
 							UninstallActions: []Action{
 								{Title: "Uninstall Bitwig Studio", Exec: sudoScript("uninstall-bitwig.sh")},
+							},
+						},
+					},
+				},
+				{
+					ID:          "open-and-free-daws",
+					Name:        "Open & Free DAWs",
+					Description: "Sequencers and workstation-style tools available as free or open-source Linux builds.",
+					Packages: []*Package{
+						appImagePackage("helio", "Helio", "Open-source music sequencer for desktop and mobile platforms.", "helio"),
+						appImagePackage("stargate", "Stargate", "Cross-platform all-in-one DAW and plugin suite distributed as an AppImage.", "stargate"),
+						{
+							ID:          "zrythm",
+							Name:        "Zrythm",
+							Vendor:      "Zrythm",
+							Summary:     "Highly automated and intuitive digital audio workstation.",
+							Description: "Downloads the upstream Zrythm trial installer ZIP and installs its payload into /opt with desktop integration in /usr/local.",
+							Notes: []string{
+								"Requires sudo because it writes to /opt and /usr/local.",
+								"Runs a non-interactive Caracal wrapper instead of the upstream install.sh prompt flow.",
+							},
+							Links: linkForID("zrythm"),
+							InstalledMarkers: []string{
+								"/opt/zrythm",
+								"/opt/zrythm-trial-1.0.0/bin/zrythm_launch",
+								"/usr/local/share/applications/org.zrythm.Zrythm-installer.desktop",
+							},
+							InstallActions: []Action{
+								{Title: "Install Zrythm", Exec: sudoScript("install-zrythm.sh")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall Zrythm", Exec: sudoScript("uninstall-zrythm.sh")},
 							},
 						},
 					},
@@ -496,6 +587,29 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 							},
 							UninstallActions: []Action{
 								{Title: "Uninstall Cardinal", Exec: sudoScript("uninstall-cardinal.sh")},
+							},
+						},
+						{
+							ID:          "vcv-rack-2",
+							Name:        "VCV Rack 2",
+							Vendor:      "VCV",
+							Summary:     "Open-source virtual Eurorack environment distributed as a portable ZIP archive.",
+							Description: "Downloads the upstream VCV Rack Free ZIP into the current user's local Caracal app directory, then creates a user-local wrapper and desktop entry.",
+							Notes: []string{
+								"Does not require sudo.",
+								"Runs from a user-local portable app directory so it works cleanly on immutable systems.",
+							},
+							Links: linkForID("vcv-rack-2"),
+							InstalledMarkers: []string{
+								".local/share/caracal-software-installer/apps/vcv-rack-2/current/Rack",
+								".local/bin/vcv-rack-2",
+								".local/share/applications/vcv-rack-2.desktop",
+							},
+							InstallActions: []Action{
+								{Title: "Install VCV Rack 2", Exec: portableZipInstall("vcv-rack-2", "Rack", "vcv-rack-2", "vcv-rack-2", "Open-source virtual Eurorack DAW")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall VCV Rack 2", Exec: portableZipUninstall("vcv-rack-2", "vcv-rack-2", "vcv-rack-2")},
 							},
 						},
 						{
@@ -843,6 +957,32 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Drum Locker", Exec: archiveUninstall("drum-locker")},
 							},
 						},
+						genericArchivePackage("avl-drumkits", "x42", "AVL Drumkits sample-player plugin distributed as a Linux LV2 bundle."),
+						{
+							ID:          "drumlabooh",
+							Name:        "Drumlabooh",
+							Vendor:      "Petr Semiletov",
+							Summary:     "Drum instrument with Hydrogen, Drumlabooh/Drumrox, and SFZ kit support.",
+							Description: "Downloads the pinned Drumlabooh LV2 and VST3 plugin ZIPs plus drum_sklad kits, then installs them into the current user's plugin and kit directories.",
+							Notes: []string{
+								"Does not require sudo.",
+								"Uses a Caracal wrapper around the upstream net-installer flow so it avoids root and records uninstall paths.",
+							},
+							Links: linkForID("drumlabooh"),
+							InstalledMarkers: []string{
+								".lv2/drumlabooh.lv2",
+								".lv2/drumlabooh-multi.lv2",
+								".vst3/drumlabooh.vst3",
+								".vst3/drumlabooh-multi.vst3",
+								"drum_sklad",
+							},
+							InstallActions: []Action{
+								{Title: "Install Drumlabooh", Exec: script("install-drumlabooh.sh")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall Drumlabooh", Exec: script("uninstall-drumlabooh.sh")},
+							},
+						},
 						genericArchivePackage("drum-groove-pro", "InToEtherion", "Drum performance plugin distributed as a Linux VST3 archive."),
 						genericArchivePackage("black-widow-drums", "odoare", "Drum instrument packaged as a Linux VST3 bundle."),
 					},
@@ -1111,27 +1251,54 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 					Name:        "Creative & Desktop",
 					Description: "Standalone composition and utility apps that complement the plugin catalog.",
 					Packages: []*Package{
+						appImagePackage("ossia-score", "ossia", "Free, open-source intermedia sequencer for scripting interactive scenarios.", "ossia"),
+						{
+							ID:          "bambootracker",
+							Name:        "BambooTracker",
+							Vendor:      "BambooTracker",
+							Summary:     "Music tracker for the Yamaha YM2608 sound chip.",
+							Description: "Downloads the upstream BambooTracker ZIP into the current user's local Caracal app directory, then creates a user-local wrapper and desktop entry.",
+							Notes: []string{
+								"Does not require sudo.",
+								"Runs from a user-local portable app directory so it works cleanly on immutable systems.",
+							},
+							Links: linkForID("bambootracker"),
+							InstalledMarkers: []string{
+								".local/share/caracal-software-installer/apps/bambootracker/current/bin/BambooTracker",
+								".local/bin/bambootracker",
+								".local/share/applications/bambootracker.desktop",
+							},
+							InstallActions: []Action{
+								{Title: "Install BambooTracker", Exec: portableZipInstall("bambootracker", "BambooTracker", "bambootracker", "bambootracker", "Cross-platform music tracker for the Yamaha YM2608 sound chip")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall BambooTracker", Exec: portableZipUninstall("bambootracker", "bambootracker", "bambootracker")},
+							},
+						},
+						appImagePackage("milkytracker", "MilkyTracker", "Music creation tool inspired by Fast Tracker 2.", "milky"),
 						{
 							ID:          "musescore-studio",
 							Name:        "MuseScore Studio",
 							Vendor:      "MuseScore",
 							Summary:     "Standalone notation and scoring app distributed as a Linux AppImage.",
-							Description: "Downloads the upstream MuseScore Studio AppImage into the current user's local Caracal appimage directory, then asks Gear Lever to integrate it into the desktop session.",
+							Description: "Downloads the upstream MuseScore Studio AppImage, then uses AppImageLauncher's ail-cli to integrate it into the desktop session without GUI interaction.",
 							Notes: []string{
 								"Does not require sudo.",
-								"Uses Gear Lever for desktop integration.",
+								"Uses ail-cli for desktop integration.",
 							},
 							Links: linkForID("musescore-studio"),
 							InstalledMarkers: []string{
+								"Applications/musescore-studio.appimage",
+								"Applications/*musescore*.appimage",
 								"AppImages/musescore-studio.appimage",
 								"AppImages/*musescore*.appimage",
 								".local/share/applications/*musescore*.desktop",
 							},
 							InstallActions: []Action{
-								{Title: "Install MuseScore Studio", Exec: script("install-appimage-with-gearlever.sh", "musescore-studio", "MuseScore Studio", mustEntry("musescore-studio")["url"])},
+								{Title: "Install MuseScore Studio", Exec: script("install-appimage-with-ail-cli.sh", "musescore-studio", "MuseScore Studio", mustEntry("musescore-studio")["url"])},
 							},
 							UninstallActions: []Action{
-								{Title: "Uninstall MuseScore Studio", Exec: script("uninstall-appimage-with-gearlever.sh", "musescore-studio", "musescore")},
+								{Title: "Uninstall MuseScore Studio", Exec: script("uninstall-appimage-with-ail-cli.sh", "musescore-studio", "musescore")},
 							},
 						},
 						{
@@ -1189,8 +1356,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			},
 		},
 	}
-	
-		for _, category := range categories {
+
+	for _, category := range categories {
 		for _, subcategory := range category.Subcategories {
 			for _, pkg := range subcategory.Packages {
 				pkg.SoftwareTypes = softwareTypesForPackage(pkg)
