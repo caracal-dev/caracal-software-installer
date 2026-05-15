@@ -484,6 +484,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 					Description: "Sequencers and workstation-style tools available as free or open-source Linux builds.",
 					Packages: []*Package{
 						appImagePackage("helio", "Helio", "Open-source music sequencer for desktop and mobile platforms.", "helio"),
+						appImagePackage("shoopdaloop", "Sander Vocke", "Live looping application with DAW elements distributed as an AppImage.", "shoopdaloop"),
 						appImagePackage("stargate", "Stargate", "Cross-platform all-in-one DAW and plugin suite distributed as an AppImage.", "stargate"),
 						{
 							ID:          "zrythm",
@@ -761,6 +762,19 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 					},
 				},
 				{
+					ID:          "commercial-instruments",
+					Name:        "Commercial Instruments",
+					Description: "Commercial Linux instrument plugins installed into user-local plugin paths.",
+					Packages: []*Package{
+						genericArchivePackage("tal-j8x", "TAL Software", "Jupiter-8-inspired synth plugin distributed as Linux CLAP, VST3, and VST2 targets."),
+						genericArchivePackage("tal-pha", "TAL Software", "Alpha Juno-inspired synth plugin distributed as Linux CLAP, VST3, and VST2 targets."),
+						genericArchivePackage("tal-j-8", "TAL Software", "Jupiter-8 emulation distributed as Linux CLAP, VST3, and VST2 targets."),
+						genericArchivePackage("tal-u-no-lx-v2", "TAL Software", "Juno-60-inspired synth plugin distributed as Linux CLAP, VST3, and VST2 targets."),
+						genericArchivePackage("tal-bassline-101", "TAL Software", "SH-101-inspired bass synth distributed as Linux CLAP, VST3, and VST2 targets."),
+						genericArchivePackage("tal-mod", "TAL Software", "Virtual analog synth distributed as Linux CLAP, VST3, and VST2 targets."),
+					},
+				},
+				{
 					ID:          "samplers-and-players",
 					Name:        "Samplers & Players",
 					Description: "Sample playback tools that round out the base system.",
@@ -811,6 +825,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 							},
 						},
 						genericArchivePackage("looper-pedal", "rbmannchued", "Looper plugin distributed as a Linux LV2 bundle."),
+						genericArchivePackage("tal-sampler", "TAL Software", "Analog-modeled sampler instrument distributed as Linux CLAP, VST3, and VST2 targets."),
 					},
 				},
 				{
@@ -958,6 +973,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 							},
 						},
 						genericArchivePackage("avl-drumkits", "x42", "AVL Drumkits sample-player plugin distributed as a Linux LV2 bundle."),
+						genericArchivePackage("tal-drum", "TAL Software", "Drum instrument distributed as Linux CLAP, VST3, and VST2 targets."),
 						{
 							ID:          "drumlabooh",
 							Name:        "Drumlabooh",
@@ -1124,14 +1140,18 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Mix Locker", Exec: archiveUninstall("mix-locker")},
 							},
 						},
+						genericArchivePackage("acmt-plugin-suite", "ACMT", "Commercial analogue-modeled plugin suite available from the upstream Linux download page."),
 						genericArchivePackage("the-trick", "Mouse Plugins", "Focused EQ processor distributed as a Linux VST3 archive."),
 						genericArchivePackage("polarity", "Polarity", "Spectral compressor plugin packaged with CLAP and VST3 targets."),
 						genericArchivePackage("nine-strip", "blablack", "Channel-strip processor distributed as Linux VST3 and LV2 bundles."),
 						genericArchivePackage("lufs-meter", "DISTRHO Ports", "Loudness metering plugin distributed as a Linux LV2 bundle."),
 						genericArchivePackage("luftikus", "DISTRHO Ports", "Analog-inspired EQ distributed as a Linux LV2 bundle."),
+						genericArchivePackage("zl-compressor", "ZL Audio", "Open-source compressor plugin distributed as Linux VST3 and LV2 bundles."),
+						genericArchivePackage("zl-equalizer", "ZL Audio", "Open-source equalizer plugin distributed as Linux VST3 and LV2 bundles."),
 						genericArchivePackage("4k-eq", "dusk audio", "EQ processor distributed as Linux LV2 and VST3 bundles."),
 						genericArchivePackage("multi-comp", "dusk audio", "Compressor distributed as Linux LV2 and VST3 bundles."),
 						genericArchivePackage("multi-q", "dusk audio", "Surgical EQ distributed as Linux LV2 and VST3 bundles."),
+						genericArchivePackage("tal-eq", "TAL Software", "Commercial equalizer plugin distributed as Linux CLAP, VST3, and VST2 targets."),
 					},
 				},
 				{
@@ -1174,6 +1194,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("duskverb", "dusk audio", "Reverb processor distributed as Linux LV2 and VST3 bundles."),
 						genericArchivePackage("wet-delay", "yonie", "Delay plugin distributed as a Linux VST3 archive."),
 						genericArchivePackage("wet-reverb", "yonie", "Reverb plugin distributed as a Linux VST3 archive."),
+						genericArchivePackage("tal-g-verb", "TAL Software", "Commercial reverb plugin distributed as Linux CLAP, VST3, and VST2 targets."),
+						genericArchivePackage("tal-dub-x", "TAL Software", "Commercial delay plugin distributed as Linux CLAP, VST3, and VST2 targets."),
 					},
 				},
 				{
@@ -1191,6 +1213,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("ndc-plugins", "DISTRHO", "Creative effect suite distributed as a Linux LV2 archive."),
 						genericArchivePackage("tal-plugins", "DISTRHO Ports", "Legacy TAL bundle distributed as a Linux LV2 archive."),
 						genericArchivePackage("chow-tape-model", "Chowdhury DSP", "Analog tape model distributed as Linux CLAP, VST3, and LV2 bundles."),
+						genericArchivePackage("zl-splitter", "ZL Audio", "Open-source splitter plugin distributed as Linux VST3 and LV2 bundles."),
+						genericArchivePackage("tal-dac", "TAL Software", "Commercial lo-fi converter plugin distributed as Linux CLAP, VST3, and VST2 targets."),
 						{
 							ID:          "intersect",
 							Name:        "INTERSECT",
