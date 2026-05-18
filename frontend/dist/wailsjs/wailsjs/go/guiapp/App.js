@@ -6,6 +6,10 @@ export function GetCatalog() {
   return window['go']['guiapp']['App']['GetCatalog']();
 }
 
+export function GetIconSettings() {
+  return window['go']['guiapp']['App']['GetIconSettings']();
+}
+
 export function OpenLink(arg1) {
   return window['go']['guiapp']['App']['OpenLink'](arg1);
 }
@@ -16,4 +20,8 @@ export function RefreshCatalog() {
 
 export function RunSelection(arg1) {
   return window['go']['guiapp']['App']['RunSelection'](arg1);
+}
+
+export function SetDesktopIcon(arg1) {
+  return window['go']['guiapp']['App']['SetDesktopIcon'](arg1);
 }
