@@ -1,3 +1,5 @@
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/59615cb4f27f4332b067abca3ca7c12f)](https://app.codacy.com/gh/caracal-dev/caracal-software-installer/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+
 # Caracal Software Installer
 
 `caracal-software-installer` is a Go installer app for guided post-install setup on Caracal OS. It presents optional DAWs, instruments, plugins, and audio utilities in browsable categories and lets the user queue multiple installs in one pass.
