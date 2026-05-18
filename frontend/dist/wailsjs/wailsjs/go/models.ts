@@ -3,6 +3,12 @@ export namespace guiapp {
 	export interface ActionView {
 	    title: string;
 	}
+	export interface AppIconView {
+	    id: string;
+	    label: string;
+	    default: boolean;
+	    active: boolean;
+	}
 	export interface PackageStateView {
 	    installed: boolean;
 	    installAvailable: boolean;
@@ -55,6 +61,10 @@ export namespace guiapp {
 	    categories: CategoryView[];
 	}
 	
+	export interface IconSettingsPayload {
+	    icons: AppIconView[];
+	    activeId: string;
+	}
 	
 	
 	

@@ -8,9 +8,11 @@ const state = {
   searchQuery: "",
   vendorFilter: "",
   running: false,
+  settingsOpen: false,
 };
 
 const elements = {
+  mainPanel: document.querySelector(".main-panel"),
   nav: document.querySelector("#nav"),
   location: document.querySelector("#location"),
   locationDescription: document.querySelector("#location-description"),
@@ -29,9 +31,17 @@ const elements = {
   runState: document.querySelector("#run-state"),
   searchInput: document.querySelector("#search-input"),
   vendorFilter: document.querySelector("#vendor-filter"),
+  settingsButton: document.querySelector("#settings-button"),
+  settingsOverlay: document.querySelector("#settings-overlay"),
+  settingsCloseButton: document.querySelector("#settings-close-button"),
+  settingsCancelButton: document.querySelector("#settings-cancel-button"),
+  settingsApplyButton: document.querySelector("#settings-apply-button"),
+  desktopIconSelect: document.querySelector("#desktop-icon-select"),
+  settingsStatus: document.querySelector("#settings-status"),
   refreshButton: document.querySelector("#refresh-button"),
   clearButton: document.querySelector("#clear-button"),
   runButton: document.querySelector("#run-button"),
+  backToTopButton: document.querySelector("#back-to-top-button"),
   packageCardTemplate: document.querySelector("#package-card-template"),
 };
 
@@ -68,6 +78,19 @@ async function boot() {
 }
 
 function bindEvents() {
+  window.addEventListener("scroll", updateBackToTopVisibility, { passive: true });
+  elements.mainPanel.addEventListener("scroll", updateBackToTopVisibility, { passive: true });
+  elements.backToTopButton.addEventListener("click", () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+    elements.mainPanel.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  });
+
   elements.queueTab.addEventListener("click", () => {
     setActiveSidebarTab("queue");
   });
@@ -88,6 +111,34 @@ function bindEvents() {
     syncSelectionWithVisiblePackages();
     ensureActiveLocation();
     render();
+  });
+
+  elements.settingsButton.addEventListener("click", () => {
+    openSettings();
+  });
+
+  elements.settingsCloseButton.addEventListener("click", () => {
+    closeSettings();
+  });
+
+  elements.settingsCancelButton.addEventListener("click", () => {
+    closeSettings();
+  });
+
+  elements.settingsOverlay.addEventListener("click", (event) => {
+    if (event.target === elements.settingsOverlay) {
+      closeSettings();
+    }
+  });
+
+  elements.settingsApplyButton.addEventListener("click", async () => {
+    await applyDesktopIcon();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && state.settingsOpen) {
+      closeSettings();
+    }
   });
 
   elements.refreshButton.addEventListener("click", async () => {
@@ -247,9 +298,74 @@ function render() {
   renderNav();
   renderPackages();
   renderSidebar();
+  renderSettingsOverlay();
   elements.queuePill.textContent = `${state.selectedIds.size} selected`;
   elements.runButton.disabled = state.selectedIds.size === 0 || state.running;
   elements.clearButton.disabled = state.selectedIds.size === 0 || state.running;
+  updateBackToTopVisibility();
+}
+
+async function openSettings() {
+  state.settingsOpen = true;
+  renderSettingsOverlay();
+  await loadIconSettings();
+  elements.desktopIconSelect.focus();
+}
+
+function closeSettings() {
+  state.settingsOpen = false;
+  renderSettingsOverlay();
+}
+
+function renderSettingsOverlay() {
+  elements.settingsOverlay.classList.toggle("is-hidden", !state.settingsOpen);
+}
+
+async function loadIconSettings() {
+  elements.settingsStatus.textContent = "Loading icon options...";
+  elements.settingsApplyButton.disabled = true;
+
+  try {
+    const payload = await backend().GetIconSettings();
+    renderIconOptions(payload);
+    elements.settingsStatus.textContent = "Ready.";
+  } catch (error) {
+    elements.settingsStatus.textContent = error?.message || String(error);
+  } finally {
+    elements.settingsApplyButton.disabled = false;
+  }
+}
+
+function renderIconOptions(payload) {
+  elements.desktopIconSelect.replaceChildren();
+  const icons = payload?.icons || [];
+
+  for (const icon of icons) {
+    const option = document.createElement("option");
+    option.value = icon.id;
+    option.textContent = icon.label;
+    elements.desktopIconSelect.appendChild(option);
+  }
+
+  elements.desktopIconSelect.value = payload?.activeId || "appicon.png";
+}
+
+async function applyDesktopIcon() {
+  const iconID = elements.desktopIconSelect.value || "appicon.png";
+  elements.settingsApplyButton.disabled = true;
+  elements.settingsStatus.textContent = "Applying desktop icon...";
+
+  try {
+    const payload = await backend().SetDesktopIcon(iconID);
+    renderIconOptions(payload);
+    elements.settingsStatus.textContent = `Desktop icon set to ${payload.activeId || iconID}.`;
+    appendLog("event", `Desktop icon set to ${payload.activeId || iconID}.`);
+  } catch (error) {
+    elements.settingsStatus.textContent = error?.message || String(error);
+    appendLog("stderr", error?.message || String(error));
+  } finally {
+    elements.settingsApplyButton.disabled = false;
+  }
 }
 
 function renderNav() {
@@ -725,6 +841,11 @@ function buildBugReportURL(pkg) {
 function updateRunState(label, kind) {
   elements.runState.textContent = label;
   elements.runState.className = `status-badge ${kind}`;
+}
+
+function updateBackToTopVisibility() {
+  const scrollTop = Math.max(window.scrollY, elements.mainPanel.scrollTop);
+  elements.backToTopButton.classList.toggle("is-visible", scrollTop > 420);
 }
 
 function activeCategory() {

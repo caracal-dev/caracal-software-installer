@@ -4,8 +4,12 @@ import {guiapp} from '../models';
 
 export function GetCatalog():Promise<guiapp.CatalogPayload>;
 
+export function GetIconSettings():Promise<guiapp.IconSettingsPayload>;
+
 export function OpenLink(arg1:string):Promise<void>;
 
 export function RefreshCatalog():Promise<guiapp.CatalogPayload>;
 
 export function RunSelection(arg1:Array<string>):Promise<void>;
+
+export function SetDesktopIcon(arg1:string):Promise<guiapp.IconSettingsPayload>;

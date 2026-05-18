@@ -47,6 +47,7 @@ install -d %{buildroot}%{_bindir}
 install -d %{buildroot}%{_prefix}/lib/caracal-software-installer/bin
 install -d %{buildroot}%{_prefix}/lib/caracal-software-installer
 install -d %{buildroot}%{_datadir}/caracal-software-installer
+install -d %{buildroot}%{_datadir}/caracal-software-installer/build/icons
 install -d %{buildroot}%{_datadir}/pixmaps
 
 install -pm0755 build/caracal-software-installer %{buildroot}%{_bindir}/caracal-software-installer
@@ -57,6 +58,7 @@ install -pm0755 build/caracal-download-index %{buildroot}%{_prefix}/lib/caracal-
 cp -a scripts %{buildroot}%{_prefix}/lib/caracal-software-installer/
 cp -a data %{buildroot}%{_prefix}/lib/caracal-software-installer/
 cp -a assets %{buildroot}%{_datadir}/caracal-software-installer/
+install -pm0644 build/icons/*.png %{buildroot}%{_datadir}/caracal-software-installer/build/icons/
 
 install -pm0644 logo.txt %{buildroot}%{_datadir}/caracal-software-installer/logo.txt
 install -pm0644 build/appicon.png %{buildroot}%{_datadir}/pixmaps/caracal-software-installer.png
@@ -74,6 +76,7 @@ install -Dpm0644 packaging/caracal-software-installer.desktop %{buildroot}%{_dat
 %{_datadir}/caracal-software-installer/logo.txt
 %{_datadir}/caracal-software-installer/assets/images/*
 %{_datadir}/caracal-software-installer/assets/screenshots/*
+%{_datadir}/caracal-software-installer/build/icons/*
 %{_datadir}/pixmaps/caracal-software-installer.png
 %{_datadir}/applications/caracal-software-installer.desktop
 

@@ -2,10 +2,14 @@ package guiapp
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"os/user"
+	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 
@@ -28,6 +32,18 @@ type CatalogPayload struct {
 	Categories []CategoryView `json:"categories"`
 }
 
+type IconSettingsPayload struct {
+	Icons    []AppIconView `json:"icons"`
+	ActiveID string        `json:"activeId"`
+}
+
+type AppIconView struct {
+	ID      string `json:"id"`
+	Label   string `json:"label"`
+	Default bool   `json:"default"`
+	Active  bool   `json:"active"`
+}
+
 type CategoryView struct {
 	ID            string            `json:"id"`
 	Name          string            `json:"name"`
@@ -44,23 +60,23 @@ type SubcategoryView struct {
 }
 
 type PackageView struct {
-	ID               string           `json:"id"`
-	Name             string           `json:"name"`
-	Vendor           string           `json:"vendor"`
-	CategoryName     string           `json:"categoryName"`
-	SubcategoryName  string           `json:"subcategoryName"`
-	Summary          string           `json:"summary"`
-	Description      string           `json:"description"`
-	Notes            []string         `json:"notes"`
-	Links            []LinkView       `json:"links"`
+	ID                string           `json:"id"`
+	Name              string           `json:"name"`
+	Vendor            string           `json:"vendor"`
+	CategoryName      string           `json:"categoryName"`
+	SubcategoryName   string           `json:"subcategoryName"`
+	Summary           string           `json:"summary"`
+	Description       string           `json:"description"`
+	Notes             []string         `json:"notes"`
+	Links             []LinkView       `json:"links"`
 	SoftwareTypes     []string         `json:"softwareTypes"`
-	AvailabilityNote string           `json:"availabilityNote"`
-	OpenSource        bool             `json:"openSource"`    
+	AvailabilityNote  string           `json:"availabilityNote"`
+	OpenSource        bool             `json:"openSource"`
 	HasFreeVersion    bool             `json:"hasFreeVersion"`
-	ExternalActionURL string          `json:"externalActionUrl"`
-	InstallActions   []ActionView     `json:"installActions"`
-	UninstallActions []ActionView     `json:"uninstallActions"`
-	State            PackageStateView `json:"state"`
+	ExternalActionURL string           `json:"externalActionUrl"`
+	InstallActions    []ActionView     `json:"installActions"`
+	UninstallActions  []ActionView     `json:"uninstallActions"`
+	State             PackageStateView `json:"state"`
 }
 
 type PackageStateView struct {
@@ -69,7 +85,7 @@ type PackageStateView struct {
 	UninstallAvailable bool   `json:"uninstallAvailable"`
 	Actionable         bool   `json:"actionable"`
 	ActionKind         string `json:"actionKind"`
-	ActionURL          string `json:"actionUrl"` 
+	ActionURL          string `json:"actionUrl"`
 	Mode               string `json:"mode"`
 	StatusLabel        string `json:"statusLabel"`
 	ActionLabel        string `json:"actionLabel"`
@@ -140,6 +156,41 @@ func (a *App) GetCatalog() CatalogPayload {
 
 func (a *App) RefreshCatalog() CatalogPayload {
 	return a.catalogPayload()
+}
+
+func (a *App) GetIconSettings() (IconSettingsPayload, error) {
+	return loadIconSettings()
+}
+
+func (a *App) SetDesktopIcon(iconID string) (IconSettingsPayload, error) {
+	requested := strings.TrimSpace(iconID)
+	if requested == "" {
+		requested = "appicon.png"
+	}
+	iconID = filepath.Base(requested)
+	if iconID != requested || filepath.Ext(iconID) != ".png" {
+		return IconSettingsPayload{}, fmt.Errorf("invalid icon selection: %s", requested)
+	}
+
+	paths, err := resolveAppIconPaths()
+	if err != nil {
+		return IconSettingsPayload{}, err
+	}
+
+	source := filepath.Join(paths.iconDir, iconID)
+	if !isPathInside(paths.iconDir, source) {
+		return IconSettingsPayload{}, fmt.Errorf("invalid icon selection: %s", iconID)
+	}
+	if _, err := os.Stat(source); err != nil {
+		return IconSettingsPayload{}, fmt.Errorf("icon not found: %s", iconID)
+	}
+
+	if err := copyFile(source, paths.target); err != nil {
+		return IconSettingsPayload{}, fmt.Errorf("could not apply desktop icon: %w", err)
+	}
+	refreshDesktopIconCache(paths.target)
+
+	return loadIconSettings()
 }
 
 func (a *App) OpenLink(url string) error {
@@ -307,11 +358,32 @@ func (a *App) transformActionExec(job installer.Job, _ catalog.Action, execArgs 
 	}
 
 	transformed := []string{pkexecPath, envPath}
+	transformed = append(transformed, "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin")
+	transformed = append(transformed, desktopEnvironmentAssignments()...)
 	if targetUser := currentDesktopUser(); targetUser != "" {
 		transformed = append(transformed, "CARACAL_INSTALLER_TARGET_USER="+targetUser)
 	}
 	transformed = append(transformed, execArgs[1:]...)
 	return transformed, nil
+}
+
+func desktopEnvironmentAssignments() []string {
+	keys := []string{
+		"DISPLAY",
+		"WAYLAND_DISPLAY",
+		"XAUTHORITY",
+		"XDG_RUNTIME_DIR",
+		"DBUS_SESSION_BUS_ADDRESS",
+		"DESKTOP_SESSION",
+		"XDG_CURRENT_DESKTOP",
+	}
+	assignments := make([]string, 0, len(keys))
+	for _, key := range keys {
+		if value := strings.TrimSpace(os.Getenv(key)); value != "" {
+			assignments = append(assignments, key+"="+value)
+		}
+	}
+	return assignments
 }
 
 func currentDesktopUser() string {
@@ -330,6 +402,217 @@ func currentDesktopUser() string {
 	}
 
 	return ""
+}
+
+type appIconPaths struct {
+	iconDir string
+	target  string
+}
+
+func loadIconSettings() (IconSettingsPayload, error) {
+	paths, err := resolveAppIconPaths()
+	if err != nil {
+		return IconSettingsPayload{}, err
+	}
+
+	entries, err := os.ReadDir(paths.iconDir)
+	if err != nil {
+		return IconSettingsPayload{}, fmt.Errorf("could not read icon directory: %w", err)
+	}
+
+	ids := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		if entry.IsDir() || filepath.Ext(entry.Name()) != ".png" {
+			continue
+		}
+		ids = append(ids, entry.Name())
+	}
+	sort.Strings(ids)
+	ids = prioritizeDefaultIcon(ids)
+	if len(ids) == 0 {
+		return IconSettingsPayload{}, fmt.Errorf("no PNG icons found in %s", paths.iconDir)
+	}
+
+	activeID := activeIconID(paths, ids)
+	icons := make([]AppIconView, 0, len(ids))
+	for _, id := range ids {
+		icons = append(icons, AppIconView{
+			ID:      id,
+			Label:   iconLabel(id),
+			Default: id == "appicon.png",
+			Active:  id == activeID,
+		})
+	}
+
+	return IconSettingsPayload{Icons: icons, ActiveID: activeID}, nil
+}
+
+func resolveAppIconPaths() (appIconPaths, error) {
+	if envDir := strings.TrimSpace(os.Getenv("CARACAL_INSTALLER_ICON_DIR")); envDir != "" {
+		iconDir := filepath.Clean(envDir)
+		return appIconPaths{
+			iconDir: iconDir,
+			target:  resolveAppIconTarget(iconDir),
+		}, nil
+	}
+
+	var candidates []string
+	if wd, err := os.Getwd(); err == nil {
+		candidates = append(candidates, candidateBuildIconDirs(wd)...)
+	}
+	if exe, err := os.Executable(); err == nil {
+		candidates = append(candidates, candidateBuildIconDirs(filepath.Dir(exe))...)
+	}
+	candidates = append(candidates, "/usr/share/caracal-software-installer/build/icons")
+
+	seen := make(map[string]struct{})
+	for _, candidate := range candidates {
+		iconDir := filepath.Clean(candidate)
+		if _, ok := seen[iconDir]; ok {
+			continue
+		}
+		seen[iconDir] = struct{}{}
+
+		if info, err := os.Stat(iconDir); err == nil && info.IsDir() {
+			return appIconPaths{
+				iconDir: iconDir,
+				target:  resolveAppIconTarget(iconDir),
+			}, nil
+		}
+	}
+
+	return appIconPaths{}, fmt.Errorf("could not find build/icons; set CARACAL_INSTALLER_ICON_DIR or run from the source tree")
+}
+
+func resolveAppIconTarget(iconDir string) string {
+	if envTarget := strings.TrimSpace(os.Getenv("CARACAL_INSTALLER_ICON_TARGET")); envTarget != "" {
+		return filepath.Clean(envTarget)
+	}
+
+	if strings.HasPrefix(filepath.Clean(iconDir), "/usr/share/") {
+		if home, err := os.UserHomeDir(); err == nil && home != "" {
+			return filepath.Join(home, ".local", "share", "icons", "hicolor", "256x256", "apps", "caracal-software-installer.png")
+		}
+	}
+
+	return filepath.Join(filepath.Dir(iconDir), "appicon.png")
+}
+
+func candidateBuildIconDirs(start string) []string {
+	var dirs []string
+	for dir := filepath.Clean(start); ; dir = filepath.Dir(dir) {
+		dirs = append(dirs, filepath.Join(dir, "build", "icons"))
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+	}
+	return dirs
+}
+
+func prioritizeDefaultIcon(ids []string) []string {
+	result := make([]string, 0, len(ids))
+	for _, id := range ids {
+		if id == "appicon.png" {
+			result = append(result, id)
+			break
+		}
+	}
+	for _, id := range ids {
+		if id != "appicon.png" {
+			result = append(result, id)
+		}
+	}
+	return result
+}
+
+func activeIconID(paths appIconPaths, ids []string) string {
+	targetHash, err := fileSHA256(paths.target)
+	if err != nil {
+		return "appicon.png"
+	}
+	for _, id := range ids {
+		iconHash, err := fileSHA256(filepath.Join(paths.iconDir, id))
+		if err == nil && iconHash == targetHash {
+			return id
+		}
+	}
+	return "appicon.png"
+}
+
+func iconLabel(id string) string {
+	if id == "appicon.png" {
+		return "Default (appicon.png)"
+	}
+	name := strings.TrimSuffix(id, filepath.Ext(id))
+	name = strings.TrimPrefix(name, "caracal-")
+	words := strings.Fields(strings.ReplaceAll(name, "-", " "))
+	for index, word := range words {
+		if word == "" {
+			continue
+		}
+		words[index] = strings.ToUpper(word[:1]) + word[1:]
+	}
+	return strings.Join(words, " ") + " (" + id + ")"
+}
+
+func fileSHA256(path string) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	hash := sha256.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+}
+
+func copyFile(source string, target string) error {
+	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+		return err
+	}
+
+	sourceFile, err := os.Open(source)
+	if err != nil {
+		return err
+	}
+	defer sourceFile.Close()
+
+	targetFile, err := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
+	if err != nil {
+		return err
+	}
+	defer targetFile.Close()
+
+	_, err = io.Copy(targetFile, sourceFile)
+	return err
+}
+
+func refreshDesktopIconCache(target string) {
+	hicolorRoot := filepath.Clean(filepath.Join(filepath.Dir(target), "..", "..", ".."))
+	if filepath.Base(hicolorRoot) != "hicolor" {
+		return
+	}
+
+	if gtkUpdateIconCache, err := exec.LookPath("gtk-update-icon-cache"); err == nil {
+		_ = exec.Command(gtkUpdateIconCache, "-q", "-t", "-f", hicolorRoot).Run()
+	}
+}
+
+func isPathInside(parent string, child string) bool {
+	parent, err := filepath.Abs(parent)
+	if err != nil {
+		return false
+	}
+	child, err = filepath.Abs(child)
+	if err != nil {
+		return false
+	}
+	relative, err := filepath.Rel(parent, child)
+	return err == nil && relative != ".." && !strings.HasPrefix(relative, ".."+string(filepath.Separator))
 }
 
 func packageLookup(categories []*catalog.Category) map[string]*catalog.Package {
@@ -366,23 +649,23 @@ func buildCategoryViews(categories []*catalog.Category) []CategoryView {
 			for _, pkg := range subcategory.Packages {
 				state := installer.Detect(pkg)
 				subView.Packages = append(subView.Packages, PackageView{
-					ID:               pkg.ID,
-					Name:             pkg.Name,
-					Vendor:           pkg.Vendor,
-					CategoryName:     category.Name,
-					SubcategoryName:  subcategory.Name,
-					Summary:          pkg.Summary,
-					Description:      pkg.Description,
-					Notes:            append([]string(nil), pkg.Notes...),
-					Links:            buildLinks(pkg.Links),
+					ID:                pkg.ID,
+					Name:              pkg.Name,
+					Vendor:            pkg.Vendor,
+					CategoryName:      category.Name,
+					SubcategoryName:   subcategory.Name,
+					Summary:           pkg.Summary,
+					Description:       pkg.Description,
+					Notes:             append([]string(nil), pkg.Notes...),
+					Links:             buildLinks(pkg.Links),
 					SoftwareTypes:     append([]string(nil), pkg.SoftwareTypes...),
 					OpenSource:        pkg.OpenSource,
 					HasFreeVersion:    pkg.HasFreeVersion,
 					ExternalActionURL: pkg.ExternalActionURL,
-					AvailabilityNote: pkg.AvailabilityNote,
-					InstallActions:   buildActions(pkg.InstallActions),
-					UninstallActions: buildActions(pkg.UninstallActions),
-					State:            buildPackageStateView(pkg, state),
+					AvailabilityNote:  pkg.AvailabilityNote,
+					InstallActions:    buildActions(pkg.InstallActions),
+					UninstallActions:  buildActions(pkg.UninstallActions),
+					State:             buildPackageStateView(pkg, state),
 				})
 			}
 
