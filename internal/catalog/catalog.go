@@ -96,6 +96,14 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 		})
 		return append([]string{"bash", filepath.Join(scriptDir, "uninstall-plugin-archive.sh")}, args...)
 	}
+	alienInstall := func(id string) []string {
+		entry := mustEntry(id)
+		return []string{"sudo", "bash", filepath.Join(scriptDir, "install-alien-deb.sh"), id, entry["name"], entry["url"]}
+	}
+	alienUninstall := func(id string) []string {
+		entry := mustEntry(id)
+		return []string{"sudo", "bash", filepath.Join(scriptDir, "uninstall-alien-deb.sh"), id, entry["name"]}
+	}
 	sourceInstall := func(id string, projectName string) []string {
 		return script("install-source-plugin.sh", id, mustEntry(id)["name"], projectName)
 	}
@@ -336,6 +344,31 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			},
 			UninstallActions: []Action{
 				{Title: fmt.Sprintf("Uninstall %s", name), Exec: archiveUninstall(id)},
+			},
+		}
+	}
+	alienDebPackage := func(id string, vendor string, summary string) *Package {
+		entry := mustEntry(id)
+		name := entry["name"]
+		return &Package{
+			ID:          id,
+			Name:        name,
+			Vendor:      vendor,
+			Summary:     summary,
+			Description: "Downloads the upstream Debian package, converts it to an RPM with alien, installs it as a system package, and refreshes Caracal plugin routing with ujust route-plugins.",
+			Notes: []string{
+				"Requires sudo because the converted RPM installs system package payloads.",
+				"On atomic Caracal systems, rpm-ostree may stage the install for the next boot if a live apply is not possible.",
+			},
+			Links: linkForID(id),
+			InstalledMarkers: []string{
+				"/var/lib/caracal-software-installer/alien/" + id + ".package",
+			},
+			InstallActions: []Action{
+				{Title: fmt.Sprintf("Install %s", name), Exec: alienInstall(id)},
+			},
+			UninstallActions: []Action{
+				{Title: fmt.Sprintf("Uninstall %s", name), Exec: alienUninstall(id)},
 			},
 		}
 	}
@@ -1039,29 +1072,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Amp Locker", Exec: archiveUninstall("amp-locker")},
 							},
 						},
-						{
-							ID:          "byod",
-							Name:        "BYOD",
-							Vendor:      "Chowdhury DSP",
-							Summary:     "Modular pedalboard and amp chain plugin distributed as a Linux archive.",
-							Description: "Downloads the upstream Linux package and installs the contained CLAP, VST3, and LV2 bundles into the current user's plugin directories.",
-							Notes: []string{
-								"Does not require sudo.",
-								"Installed as a user-local plugin so it works cleanly on immutable systems.",
-							},
-							Links: linkForID("byod"),
-							InstalledMarkers: []string{
-								".clap/BYOD.clap",
-								".vst3/BYOD.vst3",
-								".lv2/BYOD.lv2",
-							},
-							InstallActions: []Action{
-								{Title: "Install BYOD", Exec: archiveInstall("byod")},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall BYOD", Exec: archiveUninstall("byod")},
-							},
-						},
+						alienDebPackage("byod", "Chowdhury DSP", "Modular pedalboard and amp chain plugin distributed as a Linux Debian package."),
 						{
 							ID:          "neural-amp-model",
 							Name:        "Neural Amp Modeler",
@@ -1110,6 +1121,14 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("neampmod-the-tweed-clap", "danielwray", "Tweed-style amp sim distributed as a direct Linux CLAP download."),
 						genericArchivePackage("chow-centaur", "Chowdhury DSP", "Klon-style overdrive pedal distributed as Linux VST3 and LV2 bundles."),
 						genericArchivePackage("ratatouille", "brummer10", "Neural model and impulse response mixer distributed as a Linux LV2 bundle."),
+						alienDebPackage("ts-m1n3", "GuitarML", "TS-9 Tubescreamer-style overdrive plugin distributed as a Linux Debian package."),
+						alienDebPackage("chameleon", "GuitarML", "Neural vintage amp-head plugin with three distinct sounds."),
+						alienDebPackage("smartamp", "GuitarML", "Machine-learning guitar amp plugin for tube amplifier tones."),
+						alienDebPackage("smartpedal", "GuitarML", "Neural guitar pedal plugin compatible with PedalNetRT models."),
+						alienDebPackage("proteus", "GuitarML", "GuitarML capture plugin focused on lower CPU use while preserving capture quality."),
+						alienDebPackage("epochamp", "GuitarML", "Amp-modeling plugin for realistic guitar tones."),
+						alienDebPackage("neuralpi", "GuitarML", "Neural amp and pedal emulation plugin based on the NeuralPi project."),
+						alienDebPackage("the-prince", "GuitarML", "Transparent-overdrive-style pedal plugin cloned with neural networks."),
 					},
 				},
 				{
@@ -1185,7 +1204,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("klangfalter", "DISTRHO Ports", "Convolution processor distributed as a Linux LV2 bundle."),
 						genericArchivePackage("mverb", "DISTRHO", "Studio reverb distributed as a Linux LV2 bundle."),
 						genericArchivePackage("pitched-delay", "DISTRHO Ports", "Pitch-shifting delay processor distributed as a Linux LV2 bundle."),
-						genericArchivePackage("chow-phaser", "Chowdhury DSP", "Phaser effect distributed as Linux VST3 and LV2 bundles."),
+						alienDebPackage("chow-phaser", "Chowdhury DSP", "Phaser effect distributed as a Linux Debian package."),
+						genericArchivePackage("room-reverb", "ElephantDSP", "Room reverb plugin distributed as Linux CLAP, LV2, and VST3 bundles."),
 						genericArchivePackage("del2", "magnetophon", "Delay processor distributed as Linux VST3 and CLAP bundles."),
 						genericArchivePackage("panoramatone", "PilCAki", "Vibrato processor distributed as a Linux VST3 bundle."),
 						genericArchivePackage("tentacles", "PilCAki", "Tentacle-inspired vibrato processor available from the project site."),
@@ -1212,7 +1232,9 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("juced-plugins", "DISTRHO Ports", "Legacy plugin suite distributed as a Linux LV2 archive."),
 						genericArchivePackage("ndc-plugins", "DISTRHO", "Creative effect suite distributed as a Linux LV2 archive."),
 						genericArchivePackage("tal-plugins", "DISTRHO Ports", "Legacy TAL bundle distributed as a Linux LV2 archive."),
-						genericArchivePackage("chow-tape-model", "Chowdhury DSP", "Analog tape model distributed as Linux CLAP, VST3, and LV2 bundles."),
+						alienDebPackage("chow-tape-model", "Chowdhury DSP", "Analog tape model distributed as a Linux Debian package."),
+						alienDebPackage("chow-multitool", "Chowdhury DSP", "Utility plugin collection distributed as a Linux Debian package."),
+						genericArchivePackage("mpe-emulator", "Attila M. Magyar", "MIDI processor for adding MPE-style expression mappings to ordinary controllers."),
 						genericArchivePackage("zl-splitter", "ZL Audio", "Open-source splitter plugin distributed as Linux VST3 and LV2 bundles."),
 						genericArchivePackage("tal-dac", "TAL Software", "Commercial lo-fi converter plugin distributed as Linux CLAP, VST3, and VST2 targets."),
 						{

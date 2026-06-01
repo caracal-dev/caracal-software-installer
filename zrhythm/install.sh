@@ -1,0 +1,171 @@
+#!/usr/bin/env sh
+#
+# Copyright (C) 2019-2020, 2022-2024 Alexandros Theodotou <alex at zrythm dot org>
+#
+#  This file is part of Zrythm
+#
+#  Zrythm is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU Affero General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  Zrythm is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU Affero General Public License for more details.
+#
+#  You should have received a copy of the GNU Affero General Public License
+#  along with Zrythm.  If not, see <https://www.gnu.org/licenses/>.
+
+set -eu
+
+uninstall=0
+uninstall_prefix_txt=""
+if [ "${1:-}" = "-u" ]; then
+  uninstall=1
+  uninstall_prefix_txt="un"
+fi
+
+zrythm_ver="1.0.0"
+trial="-trial"
+
+zenity_width=360
+have_zenity=0
+# shellcheck disable=SC2015
+command -v zenity >/dev/null && have_zenity=1 || true
+command -v xdg-desktop-menu >/dev/null && have_xdg_desktop_menu=1 || true
+
+if [ -z "${XDG_DATA_HOME:-}" ]; then
+  XDG_DATA_HOME="$HOME/.local/share"
+fi
+trash_dir="$XDG_DATA_HOME/Trash"
+trash_dir="$trash_dir/zrythm-installer-deleted-files-$(date +"%Y_%m_%d_%H_%M")"
+mkdir -p "$trash_dir"
+
+pkgname="zrythm$trial-$zrythm_ver"
+prefix="opt/$pkgname"
+installed_prefix="/opt/$pkgname"
+symlink="/opt/zrythm"
+
+# ---- Helper funcs ----
+
+show_error() {
+  if [ $have_zenity -ne 0 ]; then
+    zenity --error --text="$1" --width $zenity_width
+  else
+    echo "$1"
+  fi
+}
+
+show_info() {
+  if [ $have_zenity -ne 0 ]; then
+    zenity --info --text="$1" --width $zenity_width
+  else
+    echo "$1"
+  fi
+}
+
+ask_for_root_pw() {
+  ask_for_root_pw_text="Please enter your root password in the terminal to continue (if asked)"
+  show_info "$ask_for_root_pw_text"
+}
+
+print_install_success() {
+  if [ $uninstall -eq 0 ]; then
+    show_info "Install successful! You can find Zrythm in your list of installed programs, or you can run $symlink/bin/zrythm_launch from a terminal to launch Zrythm."
+  else
+    show_info "Uninstall successful!"
+  fi
+}
+
+# ---- Install ----
+
+proceed=0
+proceed_txt="Proceed with the ${uninstall_prefix_txt}installation of Zrythm$trial v$zrythm_ver?"
+if [ $have_zenity -ne 0 ]; then
+  if zenity --question --text="$proceed_txt" --width $zenity_width; then
+    proceed=1
+  fi
+else
+  echo "$proceed_txt (type Y or y): " | tr -d '\n' &&
+    read REPLY
+  if [ "$REPLY" = "y" ] || [ "$REPLY" = "Y" ]; then
+    proceed=1
+  fi
+fi
+
+sudo_copy_file() {
+  src_path="$1"
+  dest_path="$2"
+  sudo mkdir -p "$(dirname "$dest_path")"
+  sudo cp "$src_path" "$dest_path"
+}
+
+# install packages
+if [ $proceed -ne 0 ]; then
+  if [ -d "$installed_prefix" ]; then
+    sudo mv "$installed_prefix" "$trash_dir/" || true
+  fi
+  if [ $uninstall -eq 0 ]; then
+    sudo mkdir /opt >/dev/null 2>&1 || true
+    sudo cp -r "$prefix" "$installed_prefix"
+  fi
+
+  # application
+  application_path_in_zip="share/applications/org.zrythm.Zrythm.desktop"
+  application_path_installed="/usr/local/share/applications/org.zrythm.Zrythm-installer.desktop"
+  sudo mv "$application_path_installed" "$trash_dir/" || true
+  if [ $uninstall -eq 0 ]; then
+    sudo_copy_file "$prefix/$application_path_in_zip" "$application_path_installed"
+  fi
+  if [ $have_xdg_desktop_menu -ne 0 ]; then
+    xdg-desktop-menu forceupdate --mode system
+  fi
+
+  # app icon
+  appicon_path_in_zip="share/icons/hicolor/scalable/apps/org.zrythm.Zrythm.svg"
+  appicon_path_installed="/usr/local/share/icons/hicolor/scalable/apps/org.zrythm.Zrythm.svg"
+  sudo mv "$appicon_path_installed" "$trash_dir/" || true
+  if [ $uninstall -eq 0 ]; then
+    sudo_copy_file "$prefix/$appicon_path_in_zip" "$appicon_path_installed"
+  fi
+
+  # manpage
+  manpage_path_in_zip="share/man/man1/zrythm.1"
+  manpage_path_installed="/usr/local/share/man/man1/zrythm.1"
+  sudo mv "$manpage_path_installed" "$trash_dir/" || true
+  if [ $uninstall -eq 0 ]; then
+    sudo_copy_file "$prefix/$manpage_path_in_zip" "$manpage_path_installed"
+  fi
+
+  # metainfo
+  metainfo_path_in_zip="share/metainfo/org.zrythm.Zrythm.appdata.xml"
+  metainfo_path_installed="/usr/local/share/metainfo/org.zrythm.Zrythm-installer.appdata.xml"
+  sudo mv "$metainfo_path_installed" "$trash_dir/" || true
+  if [ $uninstall -eq 0 ]; then
+    sudo_copy_file "$prefix/$metainfo_path_in_zip" "$metainfo_path_installed"
+  fi
+
+  # mime type
+  mimetype_path_in_zip="share/mime/packages/org.zrythm.Zrythm-mime.xml"
+  mimetype_path_installed="/usr/local/share/mime/packages/org.zrythm.Zrythm-mime.xml"
+  sudo mv "$mimetype_path_installed" "$trash_dir/" || true
+  if [ $uninstall -eq 0 ]; then
+    sudo_copy_file "$prefix/$mimetype_path_in_zip" "$mimetype_path_installed"
+  fi
+
+  # workaround for missing libcrypt.so.1 (version 2) on arch based systems
+  #if [ $uninstall -eq 0 ]; then
+  #sudo ln -s /usr/lib/libcrypt.so.2 "$installed_prefix/lib/x86_64-linux-gnu/libcrypt.so.1" || true
+  #fi
+
+  # template fix
+  sudo chmod -R +rx "$installed_prefix/share/zrythm/templates"
+
+  # manage symlink
+  [ -L "$symlink" ] && sudo rm -f "$symlink"
+  [ $uninstall -eq 0 ] && sudo ln -s "$installed_prefix" "$symlink"
+
+  print_install_success
+fi
+# vim: ft=sh ts=2 sw=2
