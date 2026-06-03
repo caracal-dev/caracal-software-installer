@@ -5,8 +5,8 @@ import (
 	"io/fs"
 	"log"
 
-	"github.com/caracal-os/caracal-software-installer/internal/bootstrap"
-	"github.com/caracal-os/caracal-software-installer/internal/guiapp"
+	"github.com/caracal-dev/caracal-software-installer/internal/bootstrap"
+	"github.com/caracal-dev/caracal-software-installer/internal/guiapp"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"

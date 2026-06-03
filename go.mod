@@ -1,4 +1,4 @@
-module github.com/caracal-os/caracal-software-installer
+module github.com/caracal-dev/caracal-software-installer
 
 go 1.25
 

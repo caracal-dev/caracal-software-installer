@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/caracal-os/caracal-software-installer/internal/bootstrap"
-	"github.com/caracal-os/caracal-software-installer/internal/ui"
+	"github.com/caracal-dev/caracal-software-installer/internal/bootstrap"
+	"github.com/caracal-dev/caracal-software-installer/internal/ui"
 )
 
 func main() {

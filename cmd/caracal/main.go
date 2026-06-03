@@ -10,10 +10,10 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/caracal-os/caracal-software-installer/internal/bootstrap"
-	"github.com/caracal-os/caracal-software-installer/internal/catalog"
-	"github.com/caracal-os/caracal-software-installer/internal/downloadindex"
-	"github.com/caracal-os/caracal-software-installer/internal/installer"
+	"github.com/caracal-dev/caracal-software-installer/internal/bootstrap"
+	"github.com/caracal-dev/caracal-software-installer/internal/catalog"
+	"github.com/caracal-dev/caracal-software-installer/internal/downloadindex"
+	"github.com/caracal-dev/caracal-software-installer/internal/installer"
 )
 
 type catalogRecord struct {

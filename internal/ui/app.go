@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/caracal-os/caracal-software-installer/internal/catalog"
-	"github.com/caracal-os/caracal-software-installer/internal/installer"
+	"github.com/caracal-dev/caracal-software-installer/internal/catalog"
+	"github.com/caracal-dev/caracal-software-installer/internal/installer"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
