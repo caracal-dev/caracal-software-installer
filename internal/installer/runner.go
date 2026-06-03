@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/caracal-os/caracal-software-installer/internal/catalog"
+	"github.com/caracal-dev/caracal-software-installer/internal/catalog"
 )
 
 type PackageState struct {
