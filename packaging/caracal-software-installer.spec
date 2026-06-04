@@ -15,7 +15,7 @@ URL:            https://github.com/%{github_owner}/%{github_repo}
 Source0:        %{url}/archive/refs/tags/%{source_tag}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
-BuildRequires:  golang >= 1.26.3
+BuildRequires:  golang >= 1.21
 BuildRequires:  glib2-devel
 BuildRequires:  gtk3-devel
 BuildRequires:  pkgconf-pkg-config
@@ -31,6 +31,7 @@ plugins, and audio utilities from a curated catalog.
 
 %build
 mkdir -p build
+export GOTOOLCHAIN=auto
 export GOFLAGS="-buildmode=pie -trimpath -mod=vendor"
 go build -tags="desktop,production,webkit2_41" -ldflags="-s -w" -o build/caracal-software-installer-gui .
 go build -ldflags="-s -w" -o build/caracal ./cmd/caracal
@@ -38,6 +39,7 @@ go build -ldflags="-s -w" -o build/caracal-software-installer ./cmd/caracal-soft
 go build -ldflags="-s -w" -o build/caracal-download-index ./cmd/caracal-download-index
 
 %check
+export GOTOOLCHAIN=auto
 export GOFLAGS="-mod=vendor"
 go test ./...
 scripts/download-index validate
