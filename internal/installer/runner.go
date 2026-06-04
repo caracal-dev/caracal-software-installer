@@ -146,6 +146,11 @@ func runAction(job Job, action catalog.Action, opts RunOptions) error {
 		}
 	}
 
+	if err := validateActionExec(execArgs); err != nil {
+		return fmt.Errorf("%s failed: %w", action.Title, err)
+	}
+
+	// #nosec G204 -- validateActionExec allow-lists the executable shape before spawning.
 	cmd := exec.Command(execArgs[0], execArgs[1:]...)
 
 	if opts.Interactive {
@@ -182,6 +187,55 @@ func runAction(job Job, action catalog.Action, opts RunOptions) error {
 		return fmt.Errorf("%s failed: %w", action.Title, err)
 	}
 
+	return nil
+}
+
+func validateActionExec(execArgs []string) error {
+	if len(execArgs) == 0 {
+		return fmt.Errorf("command is empty")
+	}
+
+	switch filepath.Base(execArgs[0]) {
+	case "bash":
+		return validateBashScriptExec(execArgs)
+	case "sudo":
+		if len(execArgs) < 3 || filepath.Base(execArgs[1]) != "bash" {
+			return fmt.Errorf("sudo actions must execute a bash script directly")
+		}
+		return validateBashScriptExec(execArgs[1:])
+	case "pkexec":
+		return validatePkexecEnvScriptExec(execArgs)
+	default:
+		return fmt.Errorf("unsupported action executable: %s", execArgs[0])
+	}
+}
+
+func validatePkexecEnvScriptExec(execArgs []string) error {
+	if len(execArgs) < 4 || filepath.Base(execArgs[1]) != "env" {
+		return fmt.Errorf("pkexec actions must use env before the script command")
+	}
+
+	commandStart := 2
+	for commandStart < len(execArgs) && strings.Contains(execArgs[commandStart], "=") {
+		commandStart++
+	}
+	if commandStart >= len(execArgs) || filepath.Base(execArgs[commandStart]) != "bash" {
+		return fmt.Errorf("pkexec actions must execute a bash script directly")
+	}
+	return validateBashScriptExec(execArgs[commandStart:])
+}
+
+func validateBashScriptExec(execArgs []string) error {
+	if len(execArgs) < 2 {
+		return fmt.Errorf("bash actions must include a script path")
+	}
+	scriptPath := filepath.Clean(execArgs[1])
+	if filepath.Base(scriptPath) == "." || filepath.Ext(scriptPath) != ".sh" || !looksLikePath(scriptPath) {
+		return fmt.Errorf("invalid action script path: %s", execArgs[1])
+	}
+	if strings.ContainsAny(scriptPath, "\x00\r\n") {
+		return fmt.Errorf("invalid action script path: %s", execArgs[1])
+	}
 	return nil
 }
 

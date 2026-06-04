@@ -6,17 +6,23 @@ readonly CARDINAL_ARCHIVE="Cardinal-linux-x86_64-${CARDINAL_VERSION}.tar.gz"
 readonly CARDINAL_URL="https://github.com/DISTRHO/Cardinal/releases/download/${CARDINAL_VERSION}/${CARDINAL_ARCHIVE}"
 
 workdir="$(mktemp -d)"
-trap 'rm -rf "${workdir}"' EXIT
+trap 'rm -rf "${workdir:?}"' EXIT
 
 install_dir_bundle() {
     local source_dir="$1"
     local dest_root="$2"
     local bundle_name
+    local target
     bundle_name="$(basename "${source_dir}")"
+    target="${dest_root:?}/${bundle_name:?}"
 
-    mkdir -p "${dest_root}"
-    rm -rf "${dest_root}/${bundle_name}"
-    cp -a "${source_dir}" "${dest_root}/"
+    mkdir -p "${dest_root:?}"
+    if [[ "${target}" == "/" || "${target}" == "${dest_root}" ]]; then
+        echo "Refusing unsafe Cardinal install target: ${target}" >&2
+        exit 1
+    fi
+    rm -rf -- "${target}"
+    cp -a "${source_dir}" "${dest_root:?}/"
 }
 
 curl -fL --retry 3 --retry-delay 2 -o "${workdir}/${CARDINAL_ARCHIVE}" "${CARDINAL_URL}"

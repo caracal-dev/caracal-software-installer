@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"os/exec"
 	"os/user"
@@ -557,7 +558,7 @@ func iconLabel(id string) string {
 }
 
 func fileSHA256(path string) (string, error) {
-	file, err := os.Open(path)
+	file, err := openRegularFile(path)
 	if err != nil {
 		return "", err
 	}
@@ -571,17 +572,23 @@ func fileSHA256(path string) (string, error) {
 }
 
 func copyFile(source string, target string) error {
-	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+	cleanTarget, err := cleanWritablePNGPath(target)
+	if err != nil {
 		return err
 	}
 
-	sourceFile, err := os.Open(source)
+	if err := os.MkdirAll(filepath.Dir(cleanTarget), 0o755); err != nil {
+		return err
+	}
+
+	sourceFile, err := openRegularFile(source)
 	if err != nil {
 		return err
 	}
 	defer sourceFile.Close()
 
-	targetFile, err := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
+	// #nosec G304 -- cleanWritablePNGPath rejects root/current-dir paths and requires a PNG target.
+	targetFile, err := os.OpenFile(cleanTarget, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
 	if err != nil {
 		return err
 	}
@@ -591,14 +598,47 @@ func copyFile(source string, target string) error {
 	return err
 }
 
+func openRegularFile(path string) (*os.File, error) {
+	clean, err := cleanExistingRegularFilePath(path)
+	if err != nil {
+		return nil, err
+	}
+	// #nosec G304 -- cleanExistingRegularFilePath rejects unsafe paths and requires an existing regular file.
+	return os.Open(clean)
+}
+
+func cleanExistingRegularFilePath(path string) (string, error) {
+	clean := filepath.Clean(strings.TrimSpace(path))
+	if clean == "." || clean == string(filepath.Separator) {
+		return "", fmt.Errorf("refusing to open unsafe path %q", path)
+	}
+
+	info, err := os.Stat(clean)
+	if err != nil {
+		return "", err
+	}
+	if !info.Mode().IsRegular() {
+		return "", &fs.PathError{Op: "open", Path: clean, Err: fs.ErrInvalid}
+	}
+	return clean, nil
+}
+
+func cleanWritablePNGPath(path string) (string, error) {
+	clean := filepath.Clean(strings.TrimSpace(path))
+	if clean == "." || clean == string(filepath.Separator) || filepath.Ext(clean) != ".png" {
+		return "", fmt.Errorf("refusing to write unsafe icon path %q", path)
+	}
+	return clean, nil
+}
+
 func refreshDesktopIconCache(target string) {
 	hicolorRoot := filepath.Clean(filepath.Join(filepath.Dir(target), "..", "..", ".."))
 	if filepath.Base(hicolorRoot) != "hicolor" {
 		return
 	}
 
-	if gtkUpdateIconCache, err := exec.LookPath("gtk-update-icon-cache"); err == nil {
-		_ = exec.Command(gtkUpdateIconCache, "-q", "-t", "-f", hicolorRoot).Run()
+	if _, err := exec.LookPath("gtk-update-icon-cache"); err == nil {
+		_ = exec.Command("gtk-update-icon-cache", "-q", "-t", "-f", hicolorRoot).Run()
 	}
 }
 

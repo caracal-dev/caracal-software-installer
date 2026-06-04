@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -80,7 +81,7 @@ func ResolveScriptDir() (string, error) {
 
 func ResolveLogo() string {
 	if envPath := os.Getenv("CARACAL_INSTALLER_LOGO"); envPath != "" {
-		if data, err := os.ReadFile(envPath); err == nil {
+		if data, err := readRegularFile(envPath); err == nil {
 			return strings.TrimRight(string(data), "\n")
 		}
 	}
@@ -109,13 +110,38 @@ func ResolveLogo() string {
 		}
 		seen[clean] = struct{}{}
 
-		data, err := os.ReadFile(clean)
+		data, err := readRegularFile(clean)
 		if err == nil {
 			return strings.TrimRight(string(data), "\n")
 		}
 	}
 
 	return ""
+}
+
+func readRegularFile(path string) ([]byte, error) {
+	clean, err := cleanReadablePath(path)
+	if err != nil {
+		return nil, err
+	}
+	// #nosec G304 -- cleanReadablePath rejects root/current-dir paths and requires an existing regular file.
+	return os.ReadFile(clean)
+}
+
+func cleanReadablePath(path string) (string, error) {
+	clean := filepath.Clean(strings.TrimSpace(path))
+	if clean == "." || clean == string(filepath.Separator) {
+		return "", fmt.Errorf("refusing to read unsafe path %q", path)
+	}
+
+	info, err := os.Stat(clean)
+	if err != nil {
+		return "", err
+	}
+	if !info.Mode().IsRegular() {
+		return "", &fs.PathError{Op: "read", Path: clean, Err: fs.ErrInvalid}
+	}
+	return clean, nil
 }
 
 func ResolveDownloadIndexPath(scriptDir string) (string, error) {

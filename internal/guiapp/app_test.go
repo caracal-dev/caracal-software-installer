@@ -1,6 +1,8 @@
 package guiapp
 
 import (
+	"crypto/sha256"
+	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
@@ -86,11 +88,11 @@ func TestSetDesktopIconCopiesSelectedIcon(t *testing.T) {
 		t.Fatalf("expected active icon caracal-lakers.png, got %q", payload.ActiveID)
 	}
 
-	target, err := os.ReadFile(filepath.Join(root, "build", "appicon.png"))
+	targetHash, err := fileSHA256(filepath.Join(root, "build", "appicon.png"))
 	if err != nil {
 		t.Fatalf("read target icon: %v", err)
 	}
-	if string(target) != string(selectedIcon) {
+	if targetHash != fmt.Sprintf("%x", sha256.Sum256(selectedIcon)) {
 		t.Fatalf("target icon was not updated")
 	}
 }
