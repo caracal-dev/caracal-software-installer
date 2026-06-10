@@ -208,8 +208,8 @@ def build_markdown(packages: list[dict[str, str]], entries: dict[str, dict[str, 
     lines.append("- **Open Source** — upstream project ships under a recognized open-source license.")
     lines.append("- **Free Version** — at least one no-cost build is available (may be a demo or feature-limited).")
     lines.append(
-        "- **Install Mode** — `Direct` means Caracal can download and install the catalog item. "
-        "`Assisted` means Caracal opens the developer's site and may provide helper scripts for installing an upstream-supplied download."
+        "- **Install Mode** — `Direct` means the software can be downloaded and installed directly by the catalog. "
+        "`Assisted` means you are redirected to an official site to download the software, then can right click on the downloaded file to install via Caracal's helper scripts."
     )
     lines.append("- **Formats** — plugin targets installed (CLAP / VST2 / VST3 / LV2). Empty for standalone-only apps.")
     lines.append("- **License** — SPDX-style identifier when known.")
