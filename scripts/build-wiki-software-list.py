@@ -181,6 +181,16 @@ def yn(value: bool) -> str:
     return "Yes" if value else "No"
 
 
+def license_allows_catalog_install(entry: dict[str, str]) -> bool:
+    return bool_field(entry, "open_source", False)
+
+
+def install_mode(entry: dict[str, str]) -> str:
+    if license_allows_catalog_install(entry):
+        return "Direct"
+    return "Assisted"
+
+
 def build_markdown(packages: list[dict[str, str]], entries: dict[str, dict[str, str]]) -> tuple[str, int]:
     groups: "OrderedDict[tuple[str, str], OrderedDict[tuple[str, str], list[dict[str, str]]]]" = OrderedDict()
     for pkg in packages:
@@ -198,7 +208,8 @@ def build_markdown(packages: list[dict[str, str]], entries: dict[str, dict[str, 
     lines.append("- **Open Source** — upstream project ships under a recognized open-source license.")
     lines.append("- **Free Version** — at least one no-cost build is available (may be a demo or feature-limited).")
     lines.append(
-        "- **Installs In-App** — Caracal can install it directly. `No` means the catalog opens the developer's website so you can download it yourself."
+        "- **Install Mode** — `Direct` means Caracal can download and install the catalog item. "
+        "`Assisted` means Caracal opens the developer's site and may provide helper scripts for installing an upstream-supplied download."
     )
     lines.append("- **Formats** — plugin targets installed (CLAP / VST2 / VST3 / LV2). Empty for standalone-only apps.")
     lines.append("- **License** — SPDX-style identifier when known.")
@@ -209,13 +220,12 @@ def build_markdown(packages: list[dict[str, str]], entries: dict[str, dict[str, 
         lines.append(f"## {cat_name}\n")
         for (_, sub_name), pkgs in subs.items():
             lines.append(f"### {sub_name}\n")
-            lines.append("| Name | Vendor | Open Source | Free Version | Installs In-App | Formats | License | Version | Site |")
-            lines.append("|------|--------|-------------|--------------|-----------------|---------|---------|---------|------|")
+            lines.append("| Name | Vendor | Open Source | Free Version | Install Mode | Formats | License | Version | Site |")
+            lines.append("|------|--------|-------------|--------------|--------------|---------|---------|---------|------|")
             for pkg in pkgs:
                 entry = entries.get(pkg["id"], {})
                 open_source = bool_field(entry, "open_source", False)
                 has_free = bool_field(entry, "has_free_version", True)
-                dl_in_app = bool_field(entry, "dl_within_app", True)
                 formats = fmt_formats(entry.get("formats") or "")
                 license_label = normalize_license(entry.get("license_type") or "") if open_source else ""
                 license_url = (entry.get("link_to_license") or "").strip()
@@ -229,7 +239,7 @@ def build_markdown(packages: list[dict[str, str]], entries: dict[str, dict[str, 
                 name = pkg["name"] or entry.get("name") or pkg["id"]
                 vendor = pkg["vendor"] or "—"
                 lines.append(
-                    f"| {name} | {vendor} | {yn(open_source)} | {yn(has_free)} | {yn(dl_in_app)} "
+                    f"| {name} | {vendor} | {yn(open_source)} | {yn(has_free)} | {install_mode(entry)} "
                     f"| {formats or '—'} | {license_cell} | {version} | {site_cell} |"
                 )
                 total += 1
