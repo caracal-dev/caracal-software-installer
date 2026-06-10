@@ -24,6 +24,11 @@ export namespace guiapp {
 	    label: string;
 	    url: string;
 	}
+	export interface LicenseView {
+	    label: string;
+	    url: string;
+	    kind: string;
+	}
 	export interface PackageView {
 	    id: string;
 	    name: string;
@@ -38,6 +43,7 @@ export namespace guiapp {
 	    availabilityNote: string;
 	    openSource: boolean;
 	    hasFreeVersion: boolean;
+	    license?: LicenseView;
 	    externalActionUrl: string;
 	    installActions: ActionView[];
 	    uninstallActions: ActionView[];
@@ -70,4 +76,3 @@ export namespace guiapp {
 	
 
 }
-

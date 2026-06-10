@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -84,14 +85,20 @@ func runInstall(indexOverride string, args []string) int {
 	fs.SetOutput(os.Stderr)
 	dryRun := fs.Bool("dry-run", false, "print installer actions without running them")
 	force := fs.Bool("force", false, "run install actions even if installed markers are already present")
+	var localFiles stringList
+	fs.Var(&localFiles, "from-file", "install from a local archive/package; package id is optional when the file can be matched")
 
 	if err := fs.Parse(args); err != nil {
 		return 2
 	}
 
 	ids := fs.Args()
+	if len(localFiles) > 0 {
+		return runInstallFromFiles(indexOverride, *dryRun, *force, localFiles, ids)
+	}
 	if len(ids) == 0 {
 		fmt.Fprintln(os.Stderr, "usage: caracal install [--dry-run] [--force] <id> [id...]")
+		fmt.Fprintln(os.Stderr, "       caracal install [--dry-run] [--force] --from-file <archive> [id]")
 		return 2
 	}
 
@@ -153,6 +160,82 @@ func runInstall(indexOverride string, args []string) int {
 	return 0
 }
 
+func runInstallFromFiles(indexOverride string, dryRun bool, force bool, localFiles []string, ids []string) int {
+	if len(ids) > 1 {
+		fmt.Fprintln(os.Stderr, "usage: caracal install --from-file <archive> [id]")
+		return 2
+	}
+
+	records, err := loadRecords(indexOverride)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	byID := recordsByID(records)
+
+	jobs := make([]installer.Job, 0, len(localFiles))
+	for _, rawPath := range localFiles {
+		localPath, err := resolveLocalInstallFile(rawPath)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return 1
+		}
+
+		var record catalogRecord
+		if len(ids) == 1 {
+			var ok bool
+			record, ok = byID[ids[0]]
+			if !ok {
+				fmt.Fprintf(os.Stderr, "software id not found: %s\n", ids[0])
+				return 1
+			}
+		} else {
+			record, err = matchLocalInstallRecord(records, localPath)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				return 1
+			}
+		}
+
+		pkg, err := localInstallPackage(record, localPath)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return 1
+		}
+
+		state := installer.Detect(pkg)
+		if state.Installed && !force && !dryRun {
+			fmt.Printf("%s is already installed. Use --force to run the installer anyway.\n", pkg.ID)
+			continue
+		}
+
+		jobs = append(jobs, installer.Job{Package: pkg, Mode: installer.ModeInstall})
+	}
+
+	if len(jobs) == 0 {
+		return 0
+	}
+
+	if dryRun {
+		for _, job := range jobs {
+			fmt.Printf("%s:\n", job.Package.ID)
+			for _, action := range job.Package.InstallActions {
+				fmt.Printf("  %s\n", action.Title)
+				fmt.Printf("    %s\n", shellCommand(action.Exec))
+			}
+		}
+		return 0
+	}
+
+	results := installer.Run(jobs)
+	for _, result := range results {
+		if !result.Success {
+			return 1
+		}
+	}
+	return 0
+}
+
 func runScan(indexOverride string, args []string) int {
 	fs := flag.NewFlagSet("scan", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
@@ -179,7 +262,7 @@ func runScan(indexOverride string, args []string) int {
 		progress = nil
 	}
 
-	failures, checked, err := downloadindex.CheckURLs(indexPath, *timeout, progress)
+	failures, checked, err := downloadindex.CheckURLs(indexPath, *timeout, scanProgress(progress))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[error] %v\n", err)
 		return 1
@@ -187,15 +270,71 @@ func runScan(indexOverride string, args []string) int {
 
 	if len(failures) > 0 {
 		for _, failure := range failures {
-			fmt.Fprintf(os.Stderr, "[broken] %s %s: %s\n", failure.PackageID, failure.Field, failure.URL)
+			fmt.Fprintf(os.Stderr, "%s %s %s: %s\n", colorize("[broken]", ansiRed), failure.PackageID, failure.Field, failure.URL)
 			fmt.Fprintln(os.Stderr, failure.Err)
 		}
-		fmt.Fprintf(os.Stderr, "Found %d broken link(s).\n", len(failures))
+		fmt.Fprintf(os.Stderr, "%s Found %d broken install link(s).\n", colorize("[fail]", ansiRed), len(failures))
 		return 1
 	}
 
-	fmt.Printf("Scanned %d software entries; all links responded.\n", checked)
+	fmt.Printf("%s Scanned %d software entries; all install links responded.\n", colorize("[ok]", ansiGreen), checked)
 	return 0
+}
+
+const (
+	ansiReset = "\033[0m"
+	ansiGreen = "\033[32m"
+	ansiRed   = "\033[31m"
+	ansiCyan  = "\033[36m"
+)
+
+func scanProgress(output *os.File) func(downloadindex.URLCheckEvent) {
+	if output == nil {
+		return nil
+	}
+
+	spinner := []byte{'|', '/', '-', '\\'}
+	frame := 0
+	return func(event downloadindex.URLCheckEvent) {
+		switch event.Status {
+		case downloadindex.URLCheckChecking:
+			fmt.Fprintf(
+				output,
+				"\r\033[2K%s %c %-28s %-15s %s",
+				colorize("[scan]", ansiCyan),
+				spinner[frame%len(spinner)],
+				event.PackageID,
+				event.Field,
+				event.URL,
+			)
+			frame++
+		case downloadindex.URLCheckPassed:
+			fmt.Fprintf(
+				output,
+				"\r\033[2K%s %-28s %-15s %s\n",
+				colorize("[ok]", ansiGreen),
+				event.PackageID,
+				event.Field,
+				event.URL,
+			)
+		case downloadindex.URLCheckFailed:
+			fmt.Fprintf(
+				output,
+				"\r\033[2K%s %-28s %-15s %s\n",
+				colorize("[fail]", ansiRed),
+				event.PackageID,
+				event.Field,
+				event.URL,
+			)
+		}
+	}
+}
+
+func colorize(value string, color string) string {
+	if color == "" || os.Getenv("NO_COLOR") != "" {
+		return value
+	}
+	return color + value + ansiReset
 }
 
 func runLaunch(args []string) int {
@@ -510,6 +649,282 @@ func externalURL(entry downloadindex.Entry) string {
 	return entry["repo_url"]
 }
 
+func resolveLocalInstallFile(rawPath string) (string, error) {
+	path := strings.TrimSpace(rawPath)
+	if path == "" {
+		return "", fmt.Errorf("local install file path is empty")
+	}
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return "", fmt.Errorf("resolve local install file %q: %w", path, err)
+	}
+	info, err := os.Stat(absPath)
+	if err != nil {
+		return "", fmt.Errorf("local install file not found: %s", absPath)
+	}
+	if info.IsDir() {
+		return "", fmt.Errorf("local install path must be a file, got directory: %s", absPath)
+	}
+	if !hasSupportedLocalInstallExtension(absPath) {
+		return "", fmt.Errorf("unsupported local install file type: %s", absPath)
+	}
+	return absPath, nil
+}
+
+func hasSupportedLocalInstallExtension(path string) bool {
+	lower := strings.ToLower(filepath.Base(path))
+	for _, suffix := range []string{
+		".zip",
+		".7z",
+		".deb",
+		".tar",
+		".tar.gz",
+		".tgz",
+		".tar.xz",
+		".txz",
+		".tar.bz2",
+		".tbz2",
+		".tar.zst",
+		".clap",
+		".vst3",
+		".so",
+	} {
+		if strings.HasSuffix(lower, suffix) {
+			return true
+		}
+	}
+	return false
+}
+
+func matchLocalInstallRecord(records []catalogRecord, localPath string) (catalogRecord, error) {
+	type scoredRecord struct {
+		record catalogRecord
+		score  int
+	}
+
+	matches := make([]scoredRecord, 0)
+	for _, record := range records {
+		score := localInstallMatchScore(record, localPath)
+		if score > 0 {
+			matches = append(matches, scoredRecord{record: record, score: score})
+		}
+	}
+
+	if len(matches) == 0 {
+		return catalogRecord{}, fmt.Errorf("could not match %s to a Caracal package; pass the package id explicitly, for example: caracal install --from-file %s reaper", filepath.Base(localPath), shellQuote(localPath))
+	}
+
+	sort.Slice(matches, func(i int, j int) bool {
+		if matches[i].score == matches[j].score {
+			return matches[i].record.Package.ID < matches[j].record.Package.ID
+		}
+		return matches[i].score > matches[j].score
+	})
+
+	if len(matches) > 1 && matches[0].score == matches[1].score {
+		ids := []string{matches[0].record.Package.ID, matches[1].record.Package.ID}
+		for _, match := range matches[2:] {
+			if match.score != matches[0].score {
+				break
+			}
+			ids = append(ids, match.record.Package.ID)
+		}
+		return catalogRecord{}, fmt.Errorf("could not choose one Caracal package for %s; matched: %s. Pass the package id explicitly", filepath.Base(localPath), strings.Join(ids, ", "))
+	}
+
+	return matches[0].record, nil
+}
+
+func localInstallMatchScore(record catalogRecord, localPath string) int {
+	if !recordHasLocalInstallRoute(record) {
+		return 0
+	}
+
+	base := strings.ToLower(filepath.Base(localPath))
+	baseKey := normalizeFileMatchKey(stripArchiveSuffix(base))
+	score := 0
+
+	if urlBase := strings.ToLower(filepath.Base(strings.TrimSpace(record.Index["url"]))); urlBase != "" && urlBase != "." {
+		urlBase = strings.Split(urlBase, "?")[0]
+		if base == urlBase {
+			score = max(score, 120)
+		}
+		if urlKey := normalizeFileMatchKey(stripArchiveSuffix(urlBase)); urlKey != "" && baseKey == urlKey {
+			score = max(score, 110)
+		}
+	}
+
+	for _, candidate := range []string{
+		record.Package.ID,
+		record.Package.Name,
+		record.Index["name"],
+		record.Index["primary_bundle_name"],
+	} {
+		key := normalizeFileMatchKey(candidate)
+		if key == "" {
+			continue
+		}
+		switch {
+		case baseKey == key:
+			score = max(score, 100)
+		case strings.Contains(baseKey, key):
+			score = max(score, min(90, 40+len(key)))
+		}
+	}
+
+	return score
+}
+
+func recordHasLocalInstallRoute(record catalogRecord) bool {
+	id := record.Package.ID
+	switch id {
+	case "reaper", "renoise", "bitwig-studio", "mixbus", "decent-sampler", "sunvox", "virtual-ans":
+		return true
+	}
+	if isAlienDebPackageID(id) {
+		return true
+	}
+	if strings.TrimSpace(record.Index["formats"]) != "" && strings.TrimSpace(record.Index["primary_bundle_name"]) != "" {
+		return true
+	}
+	if strings.HasSuffix(strings.ToLower(record.Index["url"]), ".deb") {
+		return true
+	}
+	return false
+}
+
+func stripArchiveSuffix(value string) string {
+	for _, suffix := range []string{
+		".tar.gz",
+		".tar.xz",
+		".tar.bz2",
+		".tar.zst",
+		".tgz",
+		".txz",
+		".tbz2",
+		".zip",
+		".7z",
+		".deb",
+		".tar",
+		".clap",
+		".vst3",
+		".so",
+	} {
+		if strings.HasSuffix(value, suffix) {
+			return strings.TrimSuffix(value, suffix)
+		}
+	}
+	return value
+}
+
+func normalizeFileMatchKey(value string) string {
+	var builder strings.Builder
+	for _, r := range strings.ToLower(strings.TrimSpace(value)) {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			builder.WriteRune(r)
+		}
+	}
+	return builder.String()
+}
+
+func localInstallPackage(record catalogRecord, localPath string) (*catalog.Package, error) {
+	scriptDir, err := bootstrap.ResolveScriptDir()
+	if err != nil {
+		return nil, err
+	}
+
+	pkg := *record.Package
+	pkg.InstallActions = nil
+	pkg.ExternalActionURL = ""
+	pkg.AvailabilityNote = ""
+
+	script := func(name string, args ...string) []string {
+		exec := []string{"bash", filepath.Join(scriptDir, name)}
+		return append(exec, args...)
+	}
+	sudoScript := func(name string, args ...string) []string {
+		exec := []string{"sudo", "bash", filepath.Join(scriptDir, name)}
+		return append(exec, args...)
+	}
+
+	entry := record.Index
+	switch pkg.ID {
+	case "reaper":
+		pkg.InstallActions = []catalog.Action{{Title: "Install REAPER from local file", Exec: sudoScript("install-reaper-local.sh", localPath)}}
+	case "renoise":
+		pkg.InstallActions = []catalog.Action{{Title: "Install Renoise from local file", Exec: sudoScript("install-renoise-local.sh", localPath)}}
+	case "bitwig-studio":
+		pkg.InstallActions = []catalog.Action{{Title: "Install Bitwig Studio from local file", Exec: sudoScript("install-bitwig-local.sh", localPath)}}
+	case "mixbus":
+		pkg.InstallActions = []catalog.Action{{Title: "Install Mixbus from local file", Exec: sudoScript("install-mixbus-local.sh", localPath)}}
+	case "decent-sampler":
+		pkg.InstallActions = []catalog.Action{{Title: "Install Decent Sampler from local file", Exec: sudoScript("install-decent-sampler-local.sh", localPath)}}
+	case "sunvox":
+		pkg.InstallActions = []catalog.Action{{Title: "Install SunVox from local file", Exec: sudoScript("install-warmplace-zip-app.sh", "sunvox", "SunVox", entry["version"], entry["url"], "sunvox", "sunvox", "sunvox", "Modular tracker and synthesizer", localPath)}}
+	case "virtual-ans":
+		pkg.InstallActions = []catalog.Action{{Title: "Install Virtual ANS from local file", Exec: sudoScript("install-warmplace-zip-app.sh", "virtual-ans", "Virtual ANS", entry["version"], entry["url"], "virtual_ans", "virtual-ans", "virtual-ans", "Spectral drawing synthesizer", localPath)}}
+	default:
+		if isAlienDebPackageID(pkg.ID) || (strings.HasSuffix(strings.ToLower(localPath), ".deb") && strings.TrimSpace(entry["primary_bundle_name"]) == "") {
+			pkg.InstallActions = []catalog.Action{{
+				Title: fmt.Sprintf("Install %s from local file", pkg.Name),
+				Exec: script(
+					"install-plugin-archive.sh",
+					pkg.ID,
+					pkg.Name,
+					entry["url"],
+					entry["primary_bundle_name"],
+					entry["formats"],
+					entry["data_dir_name"],
+					entry["data_target_name"],
+					localPath,
+				),
+			}}
+			break
+		}
+		if strings.TrimSpace(entry["formats"]) != "" && strings.TrimSpace(entry["primary_bundle_name"]) != "" {
+			pkg.InstallActions = []catalog.Action{{
+				Title: fmt.Sprintf("Install %s from local file", pkg.Name),
+				Exec: script(
+					"install-plugin-archive.sh",
+					pkg.ID,
+					pkg.Name,
+					entry["url"],
+					entry["primary_bundle_name"],
+					entry["formats"],
+					entry["data_dir_name"],
+					entry["data_target_name"],
+					localPath,
+				),
+			}}
+		}
+	}
+
+	if len(pkg.InstallActions) == 0 {
+		return nil, fmt.Errorf("%s does not support local-file installs yet", pkg.ID)
+	}
+	return &pkg, nil
+}
+
+func isAlienDebPackageID(id string) bool {
+	switch id {
+	case "byod",
+		"ts-m1n3",
+		"chameleon",
+		"smartamp",
+		"smartpedal",
+		"proteus",
+		"epochamp",
+		"neuralpi",
+		"the-prince",
+		"chow-phaser",
+		"chow-tape-model",
+		"chow-multitool":
+		return true
+	default:
+		return false
+	}
+}
+
 func normalizeTag(value string) string {
 	value = strings.ToLower(strings.TrimSpace(value))
 	var builder strings.Builder
@@ -552,6 +967,7 @@ func shellQuote(value string) string {
 func printHelp() {
 	fmt.Println("Usage:")
 	fmt.Println("  caracal [--index path] install [--dry-run] [--force] <id> [id...]")
+	fmt.Println("  caracal [--index path] install [--dry-run] [--force] --from-file <archive> [id]")
 	fmt.Println("  caracal [--index path] scan [--timeout 20s] [--quiet]")
 	fmt.Println("  caracal launch")
 	fmt.Println("  caracal [--index path] list [filters]")

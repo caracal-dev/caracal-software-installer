@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ $# -lt 3 ]]; then
-  echo "Usage: $0 <package-id> <display-name> <deb-url>" >&2
+  echo "Usage: $0 <package-id> <display-name> <deb-url> [local-deb]" >&2
   exit 1
 fi
 
@@ -14,11 +14,15 @@ fi
 package_id="$1"
 display_name="$2"
 deb_url="$3"
+local_deb="${4:-}"
 
 state_root="/var/lib/caracal-software-installer/alien"
 state_path="${state_root}/${package_id}.package"
 workdir="$(mktemp -d)"
 deb_name="$(basename "${deb_url%%\?*}")"
+if [[ -n "${local_deb}" ]]; then
+  deb_name="$(basename "${local_deb}")"
+fi
 deb_path="${workdir}/${deb_name}"
 rpm_path=""
 rpm_name=""
@@ -83,12 +87,23 @@ install_rpm() {
 
 trap cleanup EXIT
 
-require_command curl
+if [[ -z "${local_deb}" ]]; then
+  require_command curl
+fi
 require_command alien
 require_command rpm
 
-echo "Downloading ${display_name}..."
-curl -fL --retry 3 --retry-delay 2 -o "${deb_path}" "${deb_url}"
+if [[ -n "${local_deb}" ]]; then
+  if [[ ! -f "${local_deb}" ]]; then
+    echo "Local Debian package not found: ${local_deb}" >&2
+    exit 1
+  fi
+  echo "Installing ${display_name} from ${local_deb}..."
+  cp -f "${local_deb}" "${deb_path}"
+else
+  echo "Downloading ${display_name}..."
+  curl -fL --retry 3 --retry-delay 2 -o "${deb_path}" "${deb_url}"
+fi
 
 echo "Converting ${deb_name} to RPM with alien..."
 (

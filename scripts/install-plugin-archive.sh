@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ $# -lt 4 ]]; then
-  echo "Usage: $0 <plugin-id> <display-name> <url> <primary-bundle-name> [formats] [data-dir-name] [data-target-name]" >&2
+  echo "Usage: $0 <plugin-id> <display-name> <url> <primary-bundle-name> [formats] [data-dir-name] [data-target-name] [local-archive]" >&2
   echo "Formats: comma-separated subset of clap,vst,vst3,lv2 (default: clap,vst,vst3,lv2)" >&2
   exit 1
 fi
@@ -14,9 +14,13 @@ primary_bundle_name="$4"
 formats="${5:-clap,vst,vst3,lv2}"
 data_dir_name="${6:-}"
 data_target_name="${7:-${data_dir_name}}"
+local_archive="${8:-}"
 
 workdir="$(mktemp -d)"
 archive_name="$(basename "${url%%\?*}")"
+if [[ -n "${local_archive}" ]]; then
+  archive_name="$(basename "${local_archive}")"
+fi
 archive_path="${workdir}/${archive_name}"
 extract_dir="${workdir}/extract"
 target_vst_dir="${HOME}/.vst"
@@ -229,8 +233,17 @@ copy_data_tree() {
 
 trap cleanup EXIT
 
-echo "Downloading ${display_name}..."
-curl -fL --retry 3 --retry-delay 2 -o "${archive_path}" "${url}"
+if [[ -n "${local_archive}" ]]; then
+  if [[ ! -f "${local_archive}" ]]; then
+    echo "Local archive not found: ${local_archive}" >&2
+    exit 1
+  fi
+  echo "Installing ${display_name} from ${local_archive}..."
+  cp -f "${local_archive}" "${archive_path}"
+else
+  echo "Downloading ${display_name}..."
+  curl -fL --retry 3 --retry-delay 2 -o "${archive_path}" "${url}"
+fi
 extract_archive "${archive_path}" "${extract_dir}"
 mkdir -p "${manifest_root}"
 : >"${manifest_tmp}"

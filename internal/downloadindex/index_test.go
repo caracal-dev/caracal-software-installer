@@ -66,22 +66,51 @@ func TestValidateAcceptsVariableLengthRows(t *testing.T) {
 	}
 }
 
-func TestURLCandidatesIncludeEveryDistinctURLField(t *testing.T) {
-	candidates := urlCandidates(Entry{
+func TestInstallURLCandidatesUseDownloadURLForOpenSourceEntries(t *testing.T) {
+	candidates := installURLCandidates(Entry{
 		"url":             "https://example.test/download",
 		"repo_url":        "https://example.test/repo",
 		"project_website": "https://example.test/download",
+		"open_source":     "true",
 	})
 
-	if len(candidates) != 2 {
+	if len(candidates) != 1 {
 		t.Fatalf("unexpected candidate count %d: %#v", len(candidates), candidates)
 	}
 
 	if candidates[0].Field != "url" || candidates[0].URL != "https://example.test/download" {
-		t.Fatalf("unexpected first candidate: %#v", candidates[0])
+		t.Fatalf("unexpected candidate: %#v", candidates[0])
 	}
-	if candidates[1].Field != "repo_url" || candidates[1].URL != "https://example.test/repo" {
-		t.Fatalf("unexpected second candidate: %#v", candidates[1])
+}
+
+func TestInstallURLCandidatesUseProjectWebsiteForProprietaryEntries(t *testing.T) {
+	candidates := installURLCandidates(Entry{
+		"url":             "https://example.test/download",
+		"project_website": "https://example.test/product",
+		"open_source":     "false",
+	})
+
+	if len(candidates) != 1 {
+		t.Fatalf("unexpected candidate count %d: %#v", len(candidates), candidates)
+	}
+
+	if candidates[0].Field != "project_website" || candidates[0].URL != "https://example.test/product" {
+		t.Fatalf("unexpected candidate: %#v", candidates[0])
+	}
+}
+
+func TestInstallURLCandidatesFallbackToRepoURLWhenNoDownloadURLExists(t *testing.T) {
+	candidates := installURLCandidates(Entry{
+		"repo_url":    "https://example.test/repo",
+		"open_source": "true",
+	})
+
+	if len(candidates) != 1 {
+		t.Fatalf("unexpected candidate count %d: %#v", len(candidates), candidates)
+	}
+
+	if candidates[0].Field != "repo_url" || candidates[0].URL != "https://example.test/repo" {
+		t.Fatalf("unexpected candidate: %#v", candidates[0])
 	}
 }
 

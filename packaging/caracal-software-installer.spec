@@ -1,6 +1,6 @@
 %global debug_package %{nil}
 %undefine _disable_source_fetch
-%global upstream_version %{?version_override}%{!?version_override:2.6.5}
+%global upstream_version %{?version_override}%{!?version_override:2.7.1}
 %global github_owner %{?github_owner_override}%{!?github_owner_override:caracal-dev}
 %global github_repo %{?github_repo_override}%{!?github_repo_override:caracal-software-installer}
 %global source_tag %{?source_tag_override}%{!?source_tag_override:v%{upstream_version}}
@@ -65,6 +65,7 @@ install -pm0644 build/icons/*.png %{buildroot}%{_datadir}/caracal-software-insta
 install -pm0644 logo.txt %{buildroot}%{_datadir}/caracal-software-installer/logo.txt
 install -pm0644 build/appicon.png %{buildroot}%{_datadir}/pixmaps/caracal-software-installer.png
 install -Dpm0644 packaging/caracal-software-installer.desktop %{buildroot}%{_datadir}/applications/caracal-software-installer.desktop
+install -Dpm0644 packaging/caracal-install-local.desktop %{buildroot}%{_datadir}/applications/caracal-install-local.desktop
 
 %files
 %license LICENSE
@@ -81,6 +82,7 @@ install -Dpm0644 packaging/caracal-software-installer.desktop %{buildroot}%{_dat
 %{_datadir}/caracal-software-installer/build/icons/*
 %{_datadir}/pixmaps/caracal-software-installer.png
 %{_datadir}/applications/caracal-software-installer.desktop
+%{_datadir}/applications/caracal-install-local.desktop
 
 %changelog
 * Tue May 05 2026 Atumia <atumia@users.noreply.github.com> - %{version}-%{release}

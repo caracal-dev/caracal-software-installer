@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ $# -lt 8 ]]; then
-    echo "Usage: $0 <app-id> <display-name> <version> <url> <executable-name> <wrapper-name> <desktop-id> <comment>" >&2
+    echo "Usage: $0 <app-id> <display-name> <version> <url> <executable-name> <wrapper-name> <desktop-id> <comment> [local-zip]" >&2
     exit 1
 fi
 
@@ -14,9 +14,14 @@ executable_name="$5"
 wrapper_name="$6"
 desktop_id="$7"
 comment="$8"
+local_zip="${9:-}"
 
 workdir="$(mktemp -d)"
-archive_path="${workdir}/${app_id}.zip"
+archive_name="${app_id}.zip"
+if [[ -n "${local_zip}" ]]; then
+    archive_name="$(basename "${local_zip}")"
+fi
+archive_path="${workdir}/${archive_name}"
 extract_dir="${workdir}/extract"
 install_root="/opt/caracal/warmplace/${app_id}"
 install_dir="${install_root}/${version}"
@@ -127,8 +132,17 @@ copy_icon() {
 
 trap cleanup EXIT
 
-echo "Downloading ${display_name} ${version}..."
-curl -fL --retry 3 --retry-delay 2 -o "${archive_path}" "${url}"
+if [[ -n "${local_zip}" ]]; then
+    if [[ ! -f "${local_zip}" ]]; then
+        echo "Local ZIP not found: ${local_zip}" >&2
+        exit 1
+    fi
+    echo "Installing ${display_name} ${version} from ${local_zip}..."
+    cp -f "${local_zip}" "${archive_path}"
+else
+    echo "Downloading ${display_name} ${version}..."
+    curl -fL --retry 3 --retry-delay 2 -o "${archive_path}" "${url}"
+fi
 
 extract_zip "${archive_path}" "${extract_dir}"
 

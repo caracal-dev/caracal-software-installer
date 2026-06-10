@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install with Caracal
+GenericName=Audio Software Local Installer
+Comment=Install a downloaded DAW or plugin archive with Caracal
+Exec=caracal install --force --from-file %f
+TryExec=caracal
+Icon=caracal-software-installer
+Terminal=true
+NoDisplay=true
+StartupNotify=false
+Categories=AudioVideo;Audio;System;
+MimeType=application/zip;application/x-zip-compressed;application/x-tar;application/x-gtar;application/gzip;application/x-gzip;application/x-compressed-tar;application/x-xz-compressed-tar;application/x-bzip-compressed-tar;application/x-7z-compressed;application/vnd.debian.binary-package;application/x-deb;application/zstd;application/x-zstd-compressed-tar;application/octet-stream;

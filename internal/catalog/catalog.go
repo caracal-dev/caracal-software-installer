@@ -18,6 +18,12 @@ type Link struct {
 	URL   string
 }
 
+type License struct {
+	Label string
+	URL   string
+	Kind  string
+}
+
 type Package struct {
 	ID                string
 	Name              string
@@ -30,6 +36,7 @@ type Package struct {
 	SoftwareTypes     []string
 	OpenSource        bool
 	HasFreeVersion    bool
+	License           *License
 	AvailabilityNote  string
 	InstalledMarkers  []string
 	InstallActions    []Action
@@ -95,14 +102,6 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			entry["data_target_name"],
 		})
 		return append([]string{"bash", filepath.Join(scriptDir, "uninstall-plugin-archive.sh")}, args...)
-	}
-	alienInstall := func(id string) []string {
-		entry := mustEntry(id)
-		return []string{"sudo", "bash", filepath.Join(scriptDir, "install-alien-deb.sh"), id, entry["name"], entry["url"]}
-	}
-	alienUninstall := func(id string) []string {
-		entry := mustEntry(id)
-		return []string{"sudo", "bash", filepath.Join(scriptDir, "uninstall-alien-deb.sh"), id, entry["name"]}
 	}
 	sourceInstall := func(id string, projectName string) []string {
 		return script("install-source-plugin.sh", id, mustEntry(id)["name"], projectName)
@@ -188,16 +187,18 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 		markers := make([]string, 0, len(formats)+2)
 		markers = append(markers, ".local/share/caracal-software-installer/manifests/"+id+".txt")
 
-		for _, format := range formats {
-			switch format {
-			case "clap":
-				markers = append(markers, ".clap/"+primaryBundleName+".clap")
-			case "vst":
-				markers = append(markers, ".vst/"+primaryBundleName+".so")
-			case "vst3":
-				markers = append(markers, ".vst3/"+primaryBundleName+".vst3")
-			case "lv2":
-				markers = append(markers, ".lv2/"+primaryBundleName+".lv2")
+		if primaryBundleName != "" {
+			for _, format := range formats {
+				switch format {
+				case "clap":
+					markers = append(markers, ".clap/"+primaryBundleName+".clap")
+				case "vst":
+					markers = append(markers, ".vst/"+primaryBundleName+".so")
+				case "vst3":
+					markers = append(markers, ".vst3/"+primaryBundleName+".vst3")
+				case "lv2":
+					markers = append(markers, ".lv2/"+primaryBundleName+".lv2")
+				}
 			}
 		}
 
@@ -212,18 +213,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 		return markers
 	}
 	linkForID := func(id string) []Link {
-		entry := mustEntry(id)
-		var links []Link
-		if entry["project_website"] != "" {
-			links = append(links, Link{Label: "Site", URL: entry["project_website"]})
-		}
-		if entry["url"] != "" {
-			links = append(links, Link{Label: "Download", URL: entry["url"]})
-		}
-		if entry["repo_url"] != "" {
-			links = append(links, Link{Label: "Source", URL: entry["repo_url"]})
-		}
-		return links
+		return linksForEntry(mustEntry(id))
 	}
 	downloadWithinApp := func(id string) bool {
 		value := strings.TrimSpace(mustEntry(id)["dl_within_app"])
@@ -240,18 +230,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 		return entry["project_website"]
 	}
 	boolFieldForID := func(id string, field string, defaultValue bool) bool {
-		value := strings.TrimSpace(strings.ToLower(mustEntry(id)[field]))
-		if value == "" {
-			return defaultValue
-		}
-		switch value {
-		case "true", "1", "yes":
-			return true
-		case "false", "0", "no":
-			return false
-		default:
-			return defaultValue
-		}
+		return boolField(mustEntry(id), field, defaultValue)
 	}
 	softwareTypesForPackage := func(pkg *Package) []string {
 		entry := mustEntry(pkg.ID)
@@ -355,20 +334,18 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			Name:        name,
 			Vendor:      vendor,
 			Summary:     summary,
-			Description: "Downloads the upstream Debian package, converts it to an RPM with alien, installs it as a system package, and refreshes Caracal plugin routing with ujust route-plugins.",
+			Description: fmt.Sprintf("Downloads the upstream Debian package, extracts it, and installs the contained %s into the current user's plugin directories.", archiveTargets(id)),
 			Notes: []string{
-				"Requires sudo because the converted RPM installs system package payloads.",
-				"On atomic Caracal systems, rpm-ostree may stage the install for the next boot if a live apply is not possible.",
+				"Does not require sudo.",
+				"Installed as a user-local plugin so it works cleanly on immutable systems.",
 			},
-			Links: linkForID(id),
-			InstalledMarkers: []string{
-				"/var/lib/caracal-software-installer/alien/" + id + ".package",
-			},
+			Links:            linkForID(id),
+			InstalledMarkers: archiveInstalledMarkers(id),
 			InstallActions: []Action{
-				{Title: fmt.Sprintf("Install %s", name), Exec: alienInstall(id)},
+				{Title: fmt.Sprintf("Install %s", name), Exec: archiveInstall(id)},
 			},
 			UninstallActions: []Action{
-				{Title: fmt.Sprintf("Uninstall %s", name), Exec: alienUninstall(id)},
+				{Title: fmt.Sprintf("Uninstall %s", name), Exec: archiveUninstall(id)},
 			},
 		}
 	}
@@ -1406,15 +1383,105 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 	for _, category := range categories {
 		for _, subcategory := range category.Subcategories {
 			for _, pkg := range subcategory.Packages {
+				entry := mustEntry(pkg.ID)
 				pkg.SoftwareTypes = softwareTypesForPackage(pkg)
 				pkg.OpenSource = boolFieldForID(pkg.ID, "open_source", false)
 				pkg.HasFreeVersion = boolFieldForID(pkg.ID, "has_free_version", true)
-
+				pkg.License = licenseForEntry(entry, pkg.OpenSource)
+				pkg.Links = linksForEntry(entry)
+				if !pkg.OpenSource {
+					pkg.InstallActions = nil
+					pkg.ExternalActionURL = strings.TrimSpace(entry["project_website"])
+					if pkg.ExternalActionURL != "" {
+						pkg.AvailabilityNote = "This proprietary package opens the developer website instead of downloading from Caracal."
+					} else {
+						pkg.AvailabilityNote = "This proprietary package is listed for reference only until a developer website is added."
+					}
+				}
 			}
 		}
 	}
 
 	return categories
+}
+
+func boolField(entry downloadindex.Entry, field string, defaultValue bool) bool {
+	value := strings.TrimSpace(strings.ToLower(entry[field]))
+	if value == "" {
+		return defaultValue
+	}
+	switch value {
+	case "true", "1", "yes":
+		return true
+	case "false", "0", "no":
+		return false
+	default:
+		return defaultValue
+	}
+}
+
+func linksForEntry(entry downloadindex.Entry) []Link {
+	openSource := boolField(entry, "open_source", false)
+	var links []Link
+	if entry["project_website"] != "" {
+		links = append(links, Link{Label: "Site", URL: entry["project_website"]})
+	}
+	if openSource && entry["url"] != "" {
+		links = append(links, Link{Label: "Download", URL: entry["url"]})
+	}
+	if openSource && entry["repo_url"] != "" {
+		links = append(links, Link{Label: "Source", URL: entry["repo_url"]})
+	}
+	return links
+}
+
+func licenseForEntry(entry downloadindex.Entry, openSource bool) *License {
+	if !openSource {
+		return nil
+	}
+
+	label := normalizeLicenseLabel(entry["license_type"])
+	if label == "" {
+		return nil
+	}
+
+	return &License{
+		Label: label,
+		URL:   strings.TrimSpace(entry["link_to_license"]),
+		Kind:  licenseKind(label),
+	}
+}
+
+func normalizeLicenseLabel(raw string) string {
+	switch strings.ToUpper(strings.TrimSpace(raw)) {
+	case "":
+		return ""
+	case "GPL", "GPL3", "GPL3.0", "GPL-3", "GPL-3.0":
+		return "GPL-3.0"
+	case "GPL2", "GPL-2", "GPL-2.0":
+		return "GPL-2.0"
+	case "AGPL", "AGPL3", "AGPL3.0", "AGPL-3", "AGPL-3.0":
+		return "AGPL-3.0"
+	case "LGPL", "LGPL3", "LGPL3.0", "LGPL-3", "LGPL-3.0":
+		return "LGPL-3.0"
+	case "APACHE", "APACHE2", "APACHE-2", "APACHE-2.0":
+		return "Apache-2.0"
+	case "MIT":
+		return "MIT"
+	case "BSD":
+		return "BSD"
+	case "VARIOUS":
+		return "Various"
+	default:
+		return strings.TrimSpace(raw)
+	}
+}
+
+func licenseKind(label string) string {
+	kind := strings.ToLower(label)
+	kind = strings.ReplaceAll(kind, ".", "-")
+	kind = strings.ReplaceAll(kind, " ", "-")
+	return kind
 }
 
 func CountPackages(categories []*Category) int {

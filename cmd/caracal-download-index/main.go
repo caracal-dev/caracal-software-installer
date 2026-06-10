@@ -86,7 +86,11 @@ func runValidate(indexPath string, args []string) int {
 		return 0
 	}
 
-	failures, checked, err := downloadindex.CheckURLs(indexPath, *timeout, os.Stdout)
+	failures, checked, err := downloadindex.CheckURLs(indexPath, *timeout, func(event downloadindex.URLCheckEvent) {
+		if event.Status == downloadindex.URLCheckChecking {
+			fmt.Fprintf(os.Stdout, "[check] %s %s: %s\n", event.PackageID, event.Field, event.URL)
+		}
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[error] %v\n", err)
 		return 1

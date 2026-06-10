@@ -149,7 +149,8 @@ button {
 
 .main-panel {
   padding: 28px;
-  overflow: auto;
+  min-width: 0;
+  overflow: visible;
 }
 
 .hero {
@@ -316,6 +317,24 @@ button {
 .detail-column {
   display: grid;
   gap: 20px;
+  position: sticky;
+  top: 28px;
+  align-self: start;
+  max-height: calc(100vh - 56px);
+  min-height: 0;
+}
+
+.detail-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 56px);
+  overflow: hidden;
+}
+
+.sidebar-view {
+  min-height: 0;
+  overflow: auto;
+  padding-right: 4px;
 }
 
 .panel-tabs {
@@ -626,6 +645,12 @@ button {
   text-transform: uppercase;
 }
 
+button.package-trait {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+}
+
 .package-trait-open {
   background: rgba(166, 218, 149, 0.12);
   border-color: rgba(166, 218, 149, 0.28);
@@ -642,6 +667,46 @@ button {
   background: rgba(228, 104, 118, 0.12);
   border-color: rgba(228, 104, 118, 0.28);
   color: #f2a7b5;
+}
+
+.package-trait-license,
+.inline-link[class*="package-license-"] {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.package-license-gpl-3-0,
+.package-license-gpl-2-0,
+.package-license-agpl-3-0,
+.package-license-lgpl-3-0 {
+  background: rgba(127, 180, 202, 0.12);
+  border-color: rgba(127, 180, 202, 0.3);
+  color: var(--info);
+}
+
+.package-license-mit {
+  background: rgba(166, 218, 149, 0.12);
+  border-color: rgba(166, 218, 149, 0.3);
+  color: var(--success);
+}
+
+.package-license-apache-2-0 {
+  background: rgba(246, 193, 119, 0.12);
+  border-color: rgba(246, 193, 119, 0.32);
+  color: var(--accent-warm);
+}
+
+.package-license-bsd {
+  background: rgba(126, 156, 216, 0.12);
+  border-color: rgba(126, 156, 216, 0.32);
+  color: var(--subtle);
+}
+
+.package-license-various,
+.package-license-other {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--muted);
 }
 
 .package-actions {
@@ -947,6 +1012,21 @@ button {
   .sidebar {
     position: static;
     height: auto;
+  }
+
+  .detail-column {
+    position: static;
+    max-height: none;
+  }
+
+  .detail-panel {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .sidebar-view {
+    overflow: visible;
+    padding-right: 0;
   }
 }
 

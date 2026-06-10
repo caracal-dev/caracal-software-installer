@@ -74,6 +74,7 @@ type PackageView struct {
 	AvailabilityNote  string           `json:"availabilityNote"`
 	OpenSource        bool             `json:"openSource"`
 	HasFreeVersion    bool             `json:"hasFreeVersion"`
+	License           *LicenseView     `json:"license,omitempty"`
 	ExternalActionURL string           `json:"externalActionUrl"`
 	InstallActions    []ActionView     `json:"installActions"`
 	UninstallActions  []ActionView     `json:"uninstallActions"`
@@ -95,6 +96,12 @@ type PackageStateView struct {
 type LinkView struct {
 	Label string `json:"label"`
 	URL   string `json:"url"`
+}
+
+type LicenseView struct {
+	Label string `json:"label"`
+	URL   string `json:"url"`
+	Kind  string `json:"kind"`
 }
 
 type ActionView struct {
@@ -701,6 +708,7 @@ func buildCategoryViews(categories []*catalog.Category) []CategoryView {
 					SoftwareTypes:     append([]string(nil), pkg.SoftwareTypes...),
 					OpenSource:        pkg.OpenSource,
 					HasFreeVersion:    pkg.HasFreeVersion,
+					License:           buildLicense(pkg.License),
 					ExternalActionURL: pkg.ExternalActionURL,
 					AvailabilityNote:  pkg.AvailabilityNote,
 					InstallActions:    buildActions(pkg.InstallActions),
@@ -727,6 +735,17 @@ func buildLinks(links []catalog.Link) []LinkView {
 		})
 	}
 	return views
+}
+
+func buildLicense(license *catalog.License) *LicenseView {
+	if license == nil {
+		return nil
+	}
+	return &LicenseView{
+		Label: license.Label,
+		URL:   license.URL,
+		Kind:  license.Kind,
+	}
 }
 
 func buildActions(actions []catalog.Action) []ActionView {

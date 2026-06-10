@@ -543,6 +543,14 @@ function renderPackageTraits(node, pkg) {
     },
   ];
 
+  if (pkg.openSource && pkg.license?.label) {
+    traits.push({
+      label: pkg.license.label,
+      kind: `license package-license-${licenseKindClass(pkg.license.kind)}`,
+      url: pkg.license.url,
+    });
+  }
+
   if (pkg.hasFreeVersion === false) {
     traits.push({
       label: "$$ No Free Version",
@@ -558,9 +566,20 @@ function renderPackageTraits(node, pkg) {
   node.classList.remove("is-hidden");
 
   for (const trait of traits) {
-    const item = document.createElement("span");
+    const item = document.createElement(trait.url ? "button" : "span");
     item.className = `package-trait package-trait-${trait.kind}`;
     item.textContent = trait.label;
+    if (trait.url) {
+      item.type = "button";
+      item.title = `${trait.label} license`;
+      item.addEventListener("click", async () => {
+        try {
+          await backend().OpenLink(trait.url);
+        } catch (error) {
+          appendLog("stderr", error?.message || String(error));
+        }
+      });
+    }
     node.appendChild(item);
   }
 }
@@ -681,6 +700,15 @@ function renderDetails() {
     fragments.push(`<ul>${pkg.notes.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}</ul>`);
   }
 
+  if (pkg.openSource && pkg.license?.label) {
+    fragments.push("<h4>License</h4>");
+    if (pkg.license.url) {
+      fragments.push(`<div class="detail-actions"><button class="inline-link detail-license-button package-license-${licenseKindClass(pkg.license.kind)}" type="button">${escapeHtml(pkg.license.label)}</button></div>`);
+    } else {
+      fragments.push(`<div class="detail-actions"><span class="inline-link package-license-${licenseKindClass(pkg.license.kind)}">${escapeHtml(pkg.license.label)}</span></div>`);
+    }
+  }
+
   if (pkg.installActions?.length || pkg.uninstallActions?.length) {
     fragments.push("<h4>Installer Actions</h4>");
     const actions = [...pkg.installActions, ...pkg.uninstallActions];
@@ -720,6 +748,17 @@ function renderDetails() {
       }
     });
   });
+
+  const licenseButton = elements.detailBody.querySelector(".detail-license-button");
+  if (licenseButton && pkg.license?.url) {
+    licenseButton.addEventListener("click", async () => {
+      try {
+        await backend().OpenLink(pkg.license.url);
+      } catch (error) {
+        appendLog("stderr", error?.message || String(error));
+      }
+    });
+  }
 
   const reportButton = elements.detailBody.querySelector(".report-link-button");
   if (reportButton) {
@@ -958,6 +997,8 @@ function statusClass(label) {
       return "installed";
     case "Available":
       return "available";
+    case "Available on site":
+      return "catalog";
     case "Run complete":
       return "installed";
     case "Catalog only":
@@ -965,6 +1006,10 @@ function statusClass(label) {
     default:
       return "neutral";
   }
+}
+
+function licenseKindClass(kind) {
+  return String(kind || "other").replaceAll(/[^a-z0-9-]/gi, "-").toLowerCase();
 }
 
 function escapeHtml(value) {

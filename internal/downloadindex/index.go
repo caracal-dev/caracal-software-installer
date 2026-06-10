@@ -32,6 +32,8 @@ var knownFields = map[string]struct{}{
 	"dl_within_app":       {},
 	"open_source":         {},
 	"has_free_version":    {},
+	"link_to_license":     {},
+	"license_type":        {},
 }
 
 var requiredFields = []string{"id", "name"}
@@ -42,6 +44,22 @@ type URLFailure struct {
 	PackageID string
 	Field     string
 	URL       string
+	Err       error
+}
+
+type URLCheckStatus string
+
+const (
+	URLCheckChecking URLCheckStatus = "checking"
+	URLCheckPassed   URLCheckStatus = "passed"
+	URLCheckFailed   URLCheckStatus = "failed"
+)
+
+type URLCheckEvent struct {
+	PackageID string
+	Field     string
+	URL       string
+	Status    URLCheckStatus
 	Err       error
 }
 
@@ -118,7 +136,7 @@ func Validate(indexPath string) (int, error) {
 	return len(lookup), nil
 }
 
-func CheckURLs(indexPath string, timeout time.Duration, progress io.Writer) ([]URLFailure, int, error) {
+func CheckURLs(indexPath string, timeout time.Duration, progress func(URLCheckEvent)) ([]URLFailure, int, error) {
 	lookup, err := Load(indexPath)
 	if err != nil {
 		return nil, 0, err
@@ -129,17 +147,40 @@ func CheckURLs(indexPath string, timeout time.Duration, progress io.Writer) ([]U
 
 	for _, packageID := range sortedIDs(lookup) {
 		entry := lookup[packageID]
-		for _, candidate := range urlCandidates(entry) {
+		for _, candidate := range installURLCandidates(entry) {
 			if progress != nil {
-				fmt.Fprintf(progress, "[check] %s %s: %s\n", packageID, candidate.Field, candidate.URL)
+				progress(URLCheckEvent{
+					PackageID: packageID,
+					Field:     candidate.Field,
+					URL:       candidate.URL,
+					Status:    URLCheckChecking,
+				})
 			}
 
 			if err := probeURL(client, candidate.URL); err != nil {
+				if progress != nil {
+					progress(URLCheckEvent{
+						PackageID: packageID,
+						Field:     candidate.Field,
+						URL:       candidate.URL,
+						Status:    URLCheckFailed,
+						Err:       err,
+					})
+				}
 				failures = append(failures, URLFailure{
 					PackageID: packageID,
 					Field:     candidate.Field,
 					URL:       candidate.URL,
 					Err:       err,
+				})
+				continue
+			}
+			if progress != nil {
+				progress(URLCheckEvent{
+					PackageID: packageID,
+					Field:     candidate.Field,
+					URL:       candidate.URL,
+					Status:    URLCheckPassed,
 				})
 			}
 		}
@@ -190,24 +231,29 @@ type urlCandidate struct {
 	URL   string
 }
 
-func urlCandidates(entry Entry) []urlCandidate {
-	fields := []string{"url", "repo_url", "project_website"}
-	candidates := make([]urlCandidate, 0, len(fields))
-	seen := make(map[string]struct{}, len(fields))
-
-	for _, field := range fields {
-		url := strings.TrimSpace(entry[field])
-		if url == "" {
-			continue
-		}
-		if _, ok := seen[url]; ok {
-			continue
-		}
-		seen[url] = struct{}{}
-		candidates = append(candidates, urlCandidate{Field: field, URL: url})
+func installURLCandidates(entry Entry) []urlCandidate {
+	openSource := boolField(entry["open_source"], false)
+	switch {
+	case !openSource && strings.TrimSpace(entry["project_website"]) != "":
+		return []urlCandidate{{Field: "project_website", URL: strings.TrimSpace(entry["project_website"])}}
+	case strings.TrimSpace(entry["url"]) != "":
+		return []urlCandidate{{Field: "url", URL: strings.TrimSpace(entry["url"])}}
+	case strings.TrimSpace(entry["repo_url"]) != "":
+		return []urlCandidate{{Field: "repo_url", URL: strings.TrimSpace(entry["repo_url"])}}
+	default:
+		return nil
 	}
+}
 
-	return candidates
+func boolField(value string, defaultValue bool) bool {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "true", "1", "yes":
+		return true
+	case "false", "0", "no":
+		return false
+	default:
+		return defaultValue
+	}
 }
 
 func loadRows(indexPath string) ([]Entry, error) {
