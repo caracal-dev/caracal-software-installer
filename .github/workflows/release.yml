@@ -121,3 +121,44 @@ jobs:
             dist/*.tar.gz
             dist/*.tar.gz.sha256
           generate_release_notes: true
+
+  update-wiki:
+    name: Update wiki software list
+    needs: release
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Clone wiki repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git" wiki
+
+      - name: Regenerate Software-List.md
+        run: python3 scripts/build-wiki-software-list.py wiki/Software-List.md
+
+      - name: Commit and push wiki changes
+        working-directory: wiki
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add Software-List.md
+            git commit -m "Refresh Software-List for ${GITHUB_REF_NAME}"
+            git push
+          else
+            echo "No catalog changes; wiki already up to date."
+          fi
