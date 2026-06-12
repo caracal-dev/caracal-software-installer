@@ -150,8 +150,20 @@ func runAction(job Job, action catalog.Action, opts RunOptions) error {
 		return fmt.Errorf("%s failed: %w", action.Title, err)
 	}
 
-	// #nosec G204 -- validateActionExec allow-lists the executable shape before spawning.
-	cmd := exec.Command(execArgs[0], execArgs[1:]...)
+	var cmd *exec.Cmd
+	switch filepath.Base(execArgs[0]) {
+	case "bash":
+		// #nosec G204 -- validateActionExec allow-lists the script path.
+		cmd = exec.Command("bash", execArgs[1:]...)
+	case "sudo":
+		// #nosec G204 -- validateActionExec allow-lists the script path.
+		cmd = exec.Command("sudo", execArgs[1:]...)
+	case "pkexec":
+		// #nosec G204 -- validateActionExec allow-lists the script path.
+		cmd = exec.Command("pkexec", execArgs[1:]...)
+	default:
+		return fmt.Errorf("unsupported action executable: %s", execArgs[0])
+	}
 
 	if opts.Interactive {
 		cmd.Stdin = os.Stdin

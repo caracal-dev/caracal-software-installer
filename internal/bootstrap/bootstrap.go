@@ -134,14 +134,19 @@ func cleanReadablePath(path string) (string, error) {
 		return "", fmt.Errorf("refusing to read unsafe path %q", path)
 	}
 
-	info, err := os.Stat(clean)
+	abs, err := filepath.Abs(clean)
+	if err != nil {
+		return "", err
+	}
+
+	info, err := os.Stat(abs)
 	if err != nil {
 		return "", err
 	}
 	if !info.Mode().IsRegular() {
-		return "", &fs.PathError{Op: "read", Path: clean, Err: fs.ErrInvalid}
+		return "", &fs.PathError{Op: "read", Path: abs, Err: fs.ErrInvalid}
 	}
-	return clean, nil
+	return abs, nil
 }
 
 func ResolveDownloadIndexPath(scriptDir string) (string, error) {

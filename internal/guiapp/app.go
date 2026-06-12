@@ -620,19 +620,27 @@ func cleanExistingRegularFilePath(path string) (string, error) {
 		return "", fmt.Errorf("refusing to open unsafe path %q", path)
 	}
 
-	info, err := os.Stat(clean)
+	abs, err := filepath.Abs(clean)
+	if err != nil {
+		return "", err
+	}
+
+	info, err := os.Stat(abs)
 	if err != nil {
 		return "", err
 	}
 	if !info.Mode().IsRegular() {
-		return "", &fs.PathError{Op: "open", Path: clean, Err: fs.ErrInvalid}
+		return "", &fs.PathError{Op: "open", Path: abs, Err: fs.ErrInvalid}
 	}
-	return clean, nil
+	return abs, nil
 }
 
 func cleanWritablePNGPath(path string) (string, error) {
 	clean := filepath.Clean(strings.TrimSpace(path))
 	if clean == "." || clean == string(filepath.Separator) || filepath.Ext(clean) != ".png" {
+		return "", fmt.Errorf("refusing to write unsafe icon path %q", path)
+	}
+	if !filepath.IsAbs(clean) && strings.HasPrefix(clean, "..") {
 		return "", fmt.Errorf("refusing to write unsafe icon path %q", path)
 	}
 	return clean, nil
@@ -794,3 +802,4 @@ func buildPackageStateView(pkg *catalog.Package, state installer.PackageState) P
 
 	return view
 }
+

@@ -1,11 +1,19 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-const distDir = path.resolve(__dirname, "..", "dist");
+const projectRoot = path.resolve(__dirname, "..");
+const distDir = path.resolve(projectRoot, "dist");
 const required = ["index.html", "main.css", "main.js"];
 
 function statRequiredPath(targetPath, label) {
-  const stat = fs.statSync(targetPath, { throwIfNoEntry: false });
+  const absolutePath = path.resolve(targetPath);
+  const relative = path.relative(projectRoot, absolutePath);
+  if (relative.startsWith("..") && !path.isAbsolute(relative)) {
+    console.error(`Refusing to stat path outside project root: ${targetPath}`);
+    process.exit(1);
+  }
+
+  const stat = fs.statSync(absolutePath, { throwIfNoEntry: false });
   if (!stat) {
     console.error(`Missing ${label}: ${targetPath}`);
     process.exit(1);
@@ -15,7 +23,8 @@ function statRequiredPath(targetPath, label) {
 
 function requiredDistAsset(file) {
   const fullPath = path.resolve(distDir, file);
-  if (path.dirname(fullPath) !== distDir) {
+  const relative = path.relative(distDir, fullPath);
+  if (relative.startsWith("..") || path.isAbsolute(relative)) {
     console.error(`Refusing unsafe frontend asset path: ${file}`);
     process.exit(1);
   }
