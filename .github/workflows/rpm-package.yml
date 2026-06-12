@@ -168,7 +168,7 @@ jobs:
 
       - name: Attach RPM artifacts to GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@c95fe1489396fe8a219612e0da28c1213ee4882a # v2.6.2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           files: |
             rpmbuild/SRPMS/*.src.rpm
