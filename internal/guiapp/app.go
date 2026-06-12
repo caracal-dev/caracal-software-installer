@@ -17,6 +17,7 @@ import (
 	"github.com/caracal-dev/caracal-software-installer/internal/bootstrap"
 	"github.com/caracal-dev/caracal-software-installer/internal/catalog"
 	"github.com/caracal-dev/caracal-software-installer/internal/installer"
+	"github.com/caracal-dev/caracal-software-installer/internal/localinstall"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -26,6 +27,8 @@ type App struct {
 
 	mu      sync.Mutex
 	running bool
+
+	pendingLocalFiles []string
 }
 
 type CatalogPayload struct {
@@ -154,8 +157,34 @@ func New(loaded *bootstrap.Resolved) *App {
 	return &App{loaded: loaded}
 }
 
+func NewWithLocalFiles(loaded *bootstrap.Resolved, localFiles []string) *App {
+	files := make([]string, 0, len(localFiles))
+	for _, file := range localFiles {
+		if strings.TrimSpace(file) != "" {
+			files = append(files, file)
+		}
+	}
+	return &App{loaded: loaded, pendingLocalFiles: files}
+}
+
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
+}
+
+func (a *App) DomReady(ctx context.Context) {
+	a.ctx = ctx
+	if len(a.pendingLocalFiles) == 0 {
+		return
+	}
+
+	files := append([]string(nil), a.pendingLocalFiles...)
+	a.pendingLocalFiles = nil
+	if err := a.RunLocalFiles(files); err != nil {
+		runtime.EventsEmit(a.ctx, "installer:action-output", OutputEvent{
+			Stream:  "stderr",
+			Message: err.Error(),
+		})
+	}
 }
 
 func (a *App) GetCatalog() CatalogPayload {
@@ -225,6 +254,38 @@ func (a *App) RunSelection(ids []string) error {
 	if len(jobs) == 0 {
 		a.mu.Unlock()
 		return fmt.Errorf("none of the selected packages are currently actionable")
+	}
+
+	a.running = true
+	a.mu.Unlock()
+
+	go a.run(jobs, skipped)
+	return nil
+}
+
+func (a *App) RunLocalFiles(files []string) error {
+	a.mu.Lock()
+	if a.running {
+		a.mu.Unlock()
+		return fmt.Errorf("an install run is already in progress")
+	}
+
+	records, err := localinstall.LoadRecords(a.loaded.ScriptDir, a.loaded.DownloadIndexPath)
+	if err != nil {
+		a.mu.Unlock()
+		return err
+	}
+	jobs, skipped, err := localinstall.ResolveJobs(a.loaded.ScriptDir, records, files, nil, true)
+	if err != nil {
+		a.mu.Unlock()
+		return err
+	}
+	if len(jobs) == 0 {
+		a.mu.Unlock()
+		if len(skipped) > 0 {
+			return fmt.Errorf("selected local file package is already installed")
+		}
+		return fmt.Errorf("no local files could be installed")
 	}
 
 	a.running = true
@@ -802,4 +863,3 @@ func buildPackageStateView(pkg *catalog.Package, state installer.PackageState) P
 
 	return view
 }
-

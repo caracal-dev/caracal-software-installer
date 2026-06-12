@@ -4,6 +4,7 @@ import (
 	"embed"
 	"io/fs"
 	"log"
+	"os"
 
 	"github.com/caracal-dev/caracal-software-installer/internal/bootstrap"
 	"github.com/caracal-dev/caracal-software-installer/internal/guiapp"
@@ -26,7 +27,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	app := guiapp.New(loaded)
+	app := guiapp.NewWithLocalFiles(loaded, os.Args[1:])
 	if err := wails.Run(&options.App{
 		Title:            "Caracal Software Installer",
 		Width:            1440,
@@ -37,7 +38,8 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: frontend,
 		},
-		OnStartup: app.Startup,
+		OnStartup:  app.Startup,
+		OnDomReady: app.DomReady,
 		Bind: []interface{}{
 			app,
 		},
