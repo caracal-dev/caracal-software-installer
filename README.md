@@ -114,13 +114,32 @@ The app looks for installer scripts in:
 Most package installs write to `/opt`, `/usr/local`, or the current user's home directory so they work on an atomic Caracal system without rpm layering.
 
 ## Contributing
+
 Pull requests welcome. Just create a feature branch and submit a pull request with details about the change, what software you are adding to the catalog etc.
 
 If you are currently running a Fedora Atomic image, you can clone this repo and run it locally and see if the installation you added work.
 
-## TODO
-1. ~~Add an uninstall option~~
-2. Add sudo password and installation processing to happen within the program program so the user does not exit and then return.
-3. Move all the Caracal default plugins and music software here and embed install into Caracal OS
-4. Add more plugins
-5. Fix general jank
+### Adding generic software
+
+For simple additions, the installer already has generic scripts for plugin archives, Debian packages, and AppImages. More custom installs may need their own script, but please use the generic path when the upstream package is a normal Linux VST, CLAP, LV2, AppImage, or `.deb` payload.
+
+1. Add a row to `data/download-index.csv`.
+   - Required basics: `id`, `name`, `url`, `project_website`, `dl_within_app`, `open_source`, and `has_free_version`.
+   - For plugins, set `formats` to any comma-separated mix of `clap`, `vst`, `vst3`, and `lv2`.
+   - For plugin archives and `.deb` files, set `primary_bundle_name` when the installed bundle name differs from the package id. Add `data_dir_name` and `data_target_name` if the plugin ships a required data folder.
+   - Add `version`, `category`, `link_to_license`, and `license_type` when known.
+2. Add the catalog entry in `internal/catalog/catalog.go` under the right category.
+   - Use `genericArchivePackage("id", "Vendor", "Summary.")` for generic VST, VST3, CLAP, or LV2 archives/direct plugin downloads.
+   - Use `alienDebPackage("id", "Vendor", "Summary.")` for a `.deb` that can be extracted into user-local plugin paths.
+   - Use `appImagePackage("id", "Vendor", "Summary.", "search-token")` for an AppImage that can be integrated with AppImageLauncher.
+3. Validate the index:
+
+```bash
+scripts/download-index validate
+```
+
+Use `scripts/download-index validate --check-urls` when you also want to check that upstream URLs still resolve.
+
+Proprietary software needs extra care. We can't redistribute proprietary software so are not allowed to download the package directly, so set `dl_within_app` to `false`, provide a `project_website` link so the UI can launch the vendor website or download page, and include an install/uninstall script path for the user's manual download when needed. Proprietary entries should still explain whether there is a free/demo version via `has_free_version`.
+
+Contributions of more generic installation scripts are welcome too. Build-from-source helpers would be especially useful; the current generic coverage is mostly plugin archives, extracted `.deb` plugin payloads, and AppImages.
