@@ -9,10 +9,9 @@ fi
 app_id="$1"
 search_token="$2"
 
-if ! command -v ail-cli >/dev/null 2>&1; then
-    echo "ail-cli is required to unintegrate AppImages. Install AppImageLauncher first." >&2
-    exit 1
-fi
+appimagelauncher_available() {
+    command -v ail-cli >/dev/null 2>&1 && [[ -x /opt/appimagelauncher.AppDir/usr/bin/ail-cli ]]
+}
 
 declare -a appimage_paths=()
 
@@ -48,8 +47,13 @@ if [[ ${#appimage_paths[@]} -eq 0 ]]; then
     echo "No integrated ${app_id} AppImage found; cleaning stale desktop integration paths"
 else
     for appimage_path in "${appimage_paths[@]}"; do
-        echo "Unintegrating ${appimage_path} with ail-cli..."
-        ail-cli unintegrate "${appimage_path}" || true
+        if appimagelauncher_available; then
+            echo "Unintegrating ${appimage_path} with ail-cli..."
+            ail-cli unintegrate "${appimage_path}" || true
+        else
+            echo "AppImageLauncher is unavailable or incomplete; removing ${appimage_path} manually."
+        fi
+
         rm -f "${appimage_path}"
     done
 fi

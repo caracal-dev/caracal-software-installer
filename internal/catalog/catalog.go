@@ -357,10 +357,11 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 			Name:        name,
 			Vendor:      vendor,
 			Summary:     summary,
-			Description: "Downloads the upstream AppImage, then uses AppImageLauncher's ail-cli to integrate it into the desktop session without GUI interaction.",
+			Description: "Downloads the upstream AppImage, then uses AppImageLauncher's ail-cli to integrate it into the desktop session without GUI interaction. If AppImageLauncher is unavailable or fails, installs the AppImage manually with a user desktop entry.",
 			Notes: []string{
 				"Does not require sudo.",
-				"Uses ail-cli for desktop integration.",
+				"Uses ail-cli for desktop integration when available.",
+				"Falls back to a manual install in ~/Applications.",
 			},
 			Links: linkForID(id),
 			InstalledMarkers: []string{
@@ -1304,10 +1305,11 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 							Name:        "MuseScore Studio",
 							Vendor:      "MuseScore",
 							Summary:     "Standalone notation and scoring app distributed as a Linux AppImage.",
-							Description: "Downloads the upstream MuseScore Studio AppImage, then uses AppImageLauncher's ail-cli to integrate it into the desktop session without GUI interaction.",
+							Description: "Downloads the upstream MuseScore Studio AppImage, then uses AppImageLauncher's ail-cli to integrate it into the desktop session without GUI interaction. If AppImageLauncher is unavailable or fails, installs the AppImage manually with a user desktop entry.",
 							Notes: []string{
 								"Does not require sudo.",
-								"Uses ail-cli for desktop integration.",
+								"Uses ail-cli for desktop integration when available.",
+								"Falls back to a manual install in ~/Applications.",
 							},
 							Links: linkForID("musescore-studio"),
 							InstalledMarkers: []string{

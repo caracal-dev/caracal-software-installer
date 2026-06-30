@@ -1,6 +1,6 @@
 %global debug_package %{nil}
 %undefine _disable_source_fetch
-%global upstream_version %{?version_override}%{!?version_override:2.7.7}
+%global upstream_version %{?version_override}%{!?version_override:2.8.1}
 %global github_owner %{?github_owner_override}%{!?github_owner_override:caracal-dev}
 %global github_repo %{?github_repo_override}%{!?github_repo_override:caracal-software-installer}
 %global source_tag %{?source_tag_override}%{!?source_tag_override:v%{upstream_version}}
@@ -77,7 +77,7 @@ install -Dpm0644 packaging/caracal-install-local.desktop %{buildroot}%{_datadir}
 %{_prefix}/lib/caracal-software-installer/scripts/*
 %{_prefix}/lib/caracal-software-installer/data/*
 %{_datadir}/caracal-software-installer/logo.txt
-%{_datadir}/caracal-software-installer/assets/images/*
+%{_datadir}/caracal-software-installer/assets/images
 %{_datadir}/caracal-software-installer/assets/screenshots/*
 %{_datadir}/caracal-software-installer/build/icons/*
 %{_datadir}/pixmaps/caracal-software-installer.png
