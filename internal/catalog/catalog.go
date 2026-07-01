@@ -1149,6 +1149,12 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("multi-comp", "dusk audio", "Compressor distributed as Linux LV2 and VST3 bundles."),
 						genericArchivePackage("multi-q", "dusk audio", "Surgical EQ distributed as Linux LV2 and VST3 bundles."),
 						genericArchivePackage("tal-eq", "TAL Software", "Commercial equalizer plugin distributed as Linux CLAP, VST3, and VST2 targets."),
+						genericArchivePackage("tdr-infrasonic", "Tokyo Dawn Labs", "Specialized filter with minimum and mixed phase modes, variable slope control, dry mix, and filtering loss compensation."),
+						genericArchivePackage("tdr-elliptical", "Tokyo Dawn Labs", "Low-frequency stereo-width control using elliptical filtering on the stereo difference channel."),
+						genericArchivePackage("tdr-ultrasonic", "Tokyo Dawn Labs", "Filter designed to control ultrasonic content in oversampled recording, processing, and playback chains."),
+						genericArchivePackage("tdr-arbiter", "Tokyo Dawn Labs", "Frequency-specific spectral balancer for mixing, restoration, and mastering workflows."),
+						genericArchivePackage("tdr-limiter6-ge", "Tokyo Dawn Labs", "Modern dynamics compression and limiting toolkit with six specialized reorderable modules."),
+						genericArchivePackage("tdr-prism", "Tokyo Dawn Labs", "Frequency analyzer focused on human audio perception with straightforward configuration."),
 					},
 				},
 				{
