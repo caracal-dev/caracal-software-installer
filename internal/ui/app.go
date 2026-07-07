@@ -388,6 +388,7 @@ func (a *App) refreshPackageTable() {
 	}
 
 	a.packageTable.Select(a.selectedRowIndex+1, 0)
+	a.packageTable.ScrollToBeginning()
 	a.refreshDetails()
 	a.updateStatus()
 }
@@ -621,10 +622,12 @@ func (a *App) showResults(results []installer.Result) {
 		title = "Run complete"
 	}
 
-	a.showInfoModal(
-		title,
-		fmt.Sprintf("%d succeeded, %d failed.\n\n%s", successCount, failureCount, strings.TrimSpace(builder.String())),
-	)
+	body := fmt.Sprintf("%d succeeded, %d failed.\n\n%s", successCount, failureCount, strings.TrimSpace(builder.String()))
+	if failureCount > 0 {
+		body += "\n\nReport this issue at:\nhttps://github.com/caracal-dev/caracal-software-installer/issues"
+	}
+
+	a.showInfoModal(title, body)
 }
 
 func (a *App) showInfoModal(title string, message string) {

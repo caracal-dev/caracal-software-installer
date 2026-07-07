@@ -625,6 +625,30 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 							},
 						},
 						{
+							ID:          "mod-desktop",
+							Name:        "MOD Desktop",
+							Vendor:      "MOD Audio",
+							Summary:     "MOD's modular pedalboard environment reimagined as a standalone desktop application.",
+							Description: "Downloads the official MOD Desktop tarball, extracts the bundled app folder into /opt/mod-desktop (writable on atomic Fedora via /var/opt), and publishes a system wrapper plus desktop entry in /usr/local.",
+							Notes: []string{
+								"Requires sudo because it writes to /opt and /usr/local.",
+								"Ships its own Python runtime, jackd, and libjack, so the install does not pull in extra OS packages on the immutable image.",
+								"Builds custom pedalboards, chains plugins, and sculpts tones without needing a MOD hardware device.",
+							},
+							Links: linkForID("mod-desktop"),
+							InstalledMarkers: []string{
+								"/opt/mod-desktop/mod-desktop/mod-desktop",
+								"/usr/local/bin/mod-desktop",
+								"/usr/local/share/applications/mod-desktop.desktop",
+							},
+							InstallActions: []Action{
+								{Title: "Install MOD Desktop", Exec: sudoScript("install-mod-desktop.sh")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall MOD Desktop", Exec: sudoScript("uninstall-mod-desktop.sh")},
+							},
+						},
+						{
 							ID:          "surge-xt",
 							Name:        "Surge XT",
 							Vendor:      "Surge Synth Team",
@@ -646,73 +670,9 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Surge XT", Exec: sudoScript("uninstall-surge-xt.sh")},
 							},
 						},
-						{
-							ID:          "wavetable",
-							Name:        "Wavetable",
-							Vendor:      "FigBug",
-							Summary:     "Two-oscillator wavetable synth with VST, VST3, and LV2 targets.",
-							Description: "Downloads the upstream Linux archive and installs the contained VST2, VST3, and LV2 payloads into the current user's plugin directories.",
-							Notes: []string{
-								"Does not require sudo.",
-								"Installed as a user-local plugin set so it works cleanly on immutable systems.",
-							},
-							Links: linkForID("wavetable"),
-							InstalledMarkers: []string{
-								".vst/Wavetable.so",
-								".vst3/Wavetable.vst3",
-								".lv2/Wavetable.lv2",
-							},
-							InstallActions: []Action{
-								{Title: "Install Wavetable", Exec: archiveInstall("wavetable")},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall Wavetable", Exec: archiveUninstall("wavetable")},
-							},
-						},
-						{
-							ID:          "ob-xf",
-							Name:        "OB-Xf",
-							Vendor:      "Surge Synth Team",
-							Summary:     "Open-source OB-style synth distributed as Linux plugin bundles.",
-							Description: "Downloads the upstream Linux archive and installs the contained VST3 and LV2 bundles into the current user's plugin directories.",
-							Notes: []string{
-								"Does not require sudo.",
-								"Installed as a user-local plugin so it works cleanly on immutable systems.",
-							},
-							Links: linkForID("ob-xf"),
-							InstalledMarkers: []string{
-								".vst3/OB-Xf.vst3",
-								".lv2/OB-Xf.lv2",
-							},
-							InstallActions: []Action{
-								{Title: "Install OB-Xf", Exec: archiveInstall("ob-xf")},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall OB-Xf", Exec: archiveUninstall("ob-xf")},
-							},
-						},
-						{
-							ID:          "odin2",
-							Name:        "Odin2",
-							Vendor:      "TheWaveWarden",
-							Summary:     "Hybrid synth distributed as a Linux archive with CLAP and VST3 targets.",
-							Description: "Downloads the upstream Linux archive and installs the contained CLAP and VST3 bundles into the current user's plugin directories.",
-							Notes: []string{
-								"Does not require sudo.",
-								"Installed as a user-local plugin so it works cleanly on immutable systems.",
-							},
-							Links: linkForID("odin2"),
-							InstalledMarkers: []string{
-								".clap/Odin2.clap",
-								".vst3/Odin2.vst3",
-							},
-							InstallActions: []Action{
-								{Title: "Install Odin2", Exec: archiveInstall("odin2")},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall Odin2", Exec: archiveUninstall("odin2")},
-							},
-						},
+						genericArchivePackage("wavetable", "FigBug", "Two-oscillator wavetable synth with VST, VST3, and LV2 targets."),
+						genericArchivePackage("ob-xf", "Surge Synth Team", "Open-source OB-style synth distributed as Linux plugin bundles."),
+						genericArchivePackage("odin2", "TheWaveWarden", "Hybrid synth distributed as a Linux archive with CLAP and VST3 targets."),
 						{
 							ID:          "tal-noisemaker",
 							Name:        "TAL-Noisemaker",
@@ -764,12 +724,61 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Yoshimi", Exec: sourceUninstall("yoshimi", "Yoshimi")},
 							},
 						},
+						{
+							ID:          "synthv1",
+							Name:        "Synthv1",
+							Vendor:      "rncbc",
+							Summary:     "Subtractive synth built from source into ~/.local.",
+							Description: "Downloads the current Synthv1 source archive, builds it locally, and installs its binary and plugin bundles into the current user's ~/.local tree.",
+							Notes: []string{
+								"Does not require sudo.",
+								"Builds from source, so make and the required development libraries must already be available.",
+							},
+							Links: linkForID("synthv1"),
+							InstalledMarkers: []string{
+								".local/lib/lv2/synthv1.lv2",
+								".local/bin/synthv1",
+							},
+							InstallActions: []Action{
+								{Title: "Install Synthv1", Exec: sourceInstall("synthv1", "synthv1")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall Synthv1", Exec: sourceUninstall("synthv1", "Synthv1")},
+							},
+						},
+						{
+							ID:          "padhv1",
+							Name:        "Padhv1",
+							Vendor:      "rncbc",
+							Summary:     "Pad-oriented synth built from source into ~/.local.",
+							Description: "Downloads the current Padhv1 source archive, builds it locally, and installs its binary and plugin bundles into the current user's ~/.local tree.",
+							Notes: []string{
+								"Does not require sudo.",
+								"Builds from source, so make and the required development libraries must already be available.",
+							},
+							Links: linkForID("padhv1"),
+							InstalledMarkers: []string{
+								".local/lib/lv2/padhv1.lv2",
+								".local/bin/padhv1",
+							},
+							InstallActions: []Action{
+								{Title: "Install Padhv1", Exec: sourceInstall("padhv1", "padhv1")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall Padhv1", Exec: sourceUninstall("padhv1", "Padhv1")},
+							},
+						},
 						genericArchivePackage("ensoniq", "sojusrecords", "Ensoniq SD-1 inspired synth packaged as a Linux VST3 archive."),
 						genericArchivePackage("kr106", "kayrockscreenprinting", "Vintage-inspired synth distributed as Linux VST3 and LV2 bundles."),
 						genericArchivePackage("tb4006", "Robot Planet", "Bassline synth distributed as a Linux VST3 archive."),
 						genericArchivePackage("suboctb", "yimrakhee", "Sub-octave focused synth packaged with CLAP and VST3 targets."),
 						genericArchivePackage("floe-vst", "floe audio", "Synth voice distributed as a Linux VST3 archive."),
 						genericArchivePackage("floe-clap", "floe audio", "Synth voice distributed as a Linux CLAP archive."),
+						genericArchivePackage("termenflux", "Hergezod", "Open-source Theremin-style instrument distributed as a Linux LV2 archive."),
+						genericArchivePackage("commodore-64-sid", "Socalabs", "Commodore 64 SID chip emulation distributed as a Linux Debian package."),
+						genericArchivePackage("nes-rp2a03", "Socalabs", "Nintendo Entertainment System RP2A03 chip emulation distributed as a Linux Debian package."),
+						genericArchivePackage("nintendo-gameboy-papu", "Socalabs", "Nintendo Gameboy PAPU chip emulation distributed as a Linux Debian package."),
+						genericArchivePackage("socalabs-organ", "Socalabs", "Classic tonewheel organ emulation distributed as a Linux Debian package."),
 					},
 				},
 				{
@@ -835,37 +844,6 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Decent Sampler", Exec: sudoScript("uninstall-decent-sampler.sh")},
 							},
 						},
-						genericArchivePackage("looper-pedal", "rbmannchued", "Looper plugin distributed as a Linux LV2 bundle."),
-						genericArchivePackage("tal-sampler", "TAL Software", "Analog-modeled sampler instrument distributed as Linux CLAP, VST3, and VST2 targets."),
-					},
-				},
-				{
-					ID:          "rncbc-instruments",
-					Name:        "rncbc Instruments",
-					Description: "Classic Linux instrument plugins built from source into the current user's home directory.",
-					Packages: []*Package{
-						{
-							ID:          "synthv1",
-							Name:        "Synthv1",
-							Vendor:      "rncbc",
-							Summary:     "Subtractive synth built from source into ~/.local.",
-							Description: "Downloads the current Synthv1 source archive, builds it locally, and installs its binary and plugin bundles into the current user's ~/.local tree.",
-							Notes: []string{
-								"Does not require sudo.",
-								"Builds from source, so make and the required development libraries must already be available.",
-							},
-							Links: linkForID("synthv1"),
-							InstalledMarkers: []string{
-								".local/lib/lv2/synthv1.lv2",
-								".local/bin/synthv1",
-							},
-							InstallActions: []Action{
-								{Title: "Install Synthv1", Exec: sourceInstall("synthv1", "synthv1")},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall Synthv1", Exec: sourceUninstall("synthv1", "Synthv1")},
-							},
-						},
 						{
 							ID:          "samplv1",
 							Name:        "Samplv1",
@@ -888,28 +866,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Samplv1", Exec: sourceUninstall("samplv1", "Samplv1")},
 							},
 						},
-						{
-							ID:          "padhv1",
-							Name:        "Padhv1",
-							Vendor:      "rncbc",
-							Summary:     "Pad-oriented synth built from source into ~/.local.",
-							Description: "Downloads the current Padhv1 source archive, builds it locally, and installs its binary and plugin bundles into the current user's ~/.local tree.",
-							Notes: []string{
-								"Does not require sudo.",
-								"Builds from source, so make and the required development libraries must already be available.",
-							},
-							Links: linkForID("padhv1"),
-							InstalledMarkers: []string{
-								".local/lib/lv2/padhv1.lv2",
-								".local/bin/padhv1",
-							},
-							InstallActions: []Action{
-								{Title: "Install Padhv1", Exec: sourceInstall("padhv1", "padhv1")},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall Padhv1", Exec: sourceUninstall("padhv1", "Padhv1")},
-							},
-						},
+						genericArchivePackage("looper-pedal", "rbmannchued", "Looper plugin distributed as a Linux LV2 bundle."),
+						genericArchivePackage("tal-sampler", "TAL Software", "Analog-modeled sampler instrument distributed as Linux CLAP, VST3, and VST2 targets."),
 					},
 				},
 				{
@@ -917,27 +875,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 					Name:        "Drums & Percussion",
 					Description: "Drum machines, drum instruments, and groove-oriented tools.",
 					Packages: []*Package{
-						{
-							ID:          "jdrummer",
-							Name:        "jDrummer",
-							Vendor:      "jmantra",
-							Summary:     "Drum instrument distributed as a Linux VST3 archive.",
-							Description: "Downloads the upstream jDrummer Linux archive and installs its VST3 bundle into the current user's plugin directories.",
-							Notes: []string{
-								"Does not require sudo.",
-								"Installed as a user-local plugin so it works cleanly on immutable systems.",
-							},
-							Links: linkForID("jdrummer"),
-							InstalledMarkers: []string{
-								".vst3/jdrummer.vst3",
-							},
-							InstallActions: []Action{
-								{Title: "Install jDrummer", Exec: archiveInstall("jdrummer")},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall jDrummer", Exec: archiveUninstall("jdrummer")},
-							},
-						},
+						genericArchivePackage("jdrummer", "jmantra", "Drum instrument distributed as a Linux VST3 archive."),
 						{
 							ID:          "drumkv1",
 							Name:        "Drumkv1",
@@ -960,29 +898,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Drumkv1", Exec: sourceUninstall("drumkv1", "Drumkv1")},
 							},
 						},
-						{
-							ID:          "drum-locker",
-							Name:        "Drum Locker",
-							Vendor:      "Audio Assault",
-							Summary:     "Drum and groove production plugin installed from the official Linux archive.",
-							Description: "Downloads Drum Locker and installs its VST3 and LV2 bundles plus its Audio Assault data pack into the current user's home directory.",
-							Notes: []string{
-								"Does not require sudo.",
-								"Installed as a user-local plugin so it works cleanly on immutable systems.",
-							},
-							Links: linkForID("drum-locker"),
-							InstalledMarkers: []string{
-								".vst3/Drum Locker.vst3",
-								".lv2/Drum Locker.lv2",
-								"Audio Assault/PluginData/Audio Assault/DrumLockerData",
-							},
-							InstallActions: []Action{
-								{Title: "Install Drum Locker", Exec: archiveInstall("drum-locker")},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall Drum Locker", Exec: archiveUninstall("drum-locker")},
-							},
-						},
+						genericArchivePackage("drum-locker", "Audio Assault", "Drum and groove production plugin installed from the official Linux archive."),
 						genericArchivePackage("avl-drumkits", "x42", "AVL Drumkits sample-player plugin distributed as a Linux LV2 bundle."),
 						genericArchivePackage("tal-drum", "TAL Software", "Drum instrument distributed as Linux CLAP, VST3, and VST2 targets."),
 						{
@@ -1027,29 +943,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 					Name:        "Amp & Guitar",
 					Description: "Amp sims, pedalboards, and guitar-focused processors.",
 					Packages: []*Package{
-						{
-							ID:          "amp-locker",
-							Name:        "Amp Locker",
-							Vendor:      "Audio Assault",
-							Summary:     "Amp sim platform installed from the official Linux archive.",
-							Description: "Downloads Amp Locker and installs its VST3 and LV2 bundles plus its Audio Assault data pack into the current user's home directory.",
-							Notes: []string{
-								"Does not require sudo.",
-								"Installed as a user-local plugin so it works cleanly on immutable systems.",
-							},
-							Links: linkForID("amp-locker"),
-							InstalledMarkers: []string{
-								".vst3/Amp Locker.vst3",
-								".lv2/Amp Locker.lv2",
-								"Audio Assault/PluginData/Audio Assault/AmpLockerData",
-							},
-							InstallActions: []Action{
-								{Title: "Install Amp Locker", Exec: archiveInstall("amp-locker")},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall Amp Locker", Exec: archiveUninstall("amp-locker")},
-							},
-						},
+						genericArchivePackage("amp-locker", "Audio Assault", "Amp sim platform installed from the official Linux archive."),
 						alienDebPackage("byod", "Chowdhury DSP", "Modular pedalboard and amp chain plugin distributed as a Linux Debian package."),
 						{
 							ID:          "neural-amp-model",
@@ -1114,29 +1008,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 					Name:        "Mixing & Channel Strip",
 					Description: "Mix-focused processors and channel-strip style tools.",
 					Packages: []*Package{
-						{
-							ID:          "mix-locker",
-							Name:        "Mix Locker",
-							Vendor:      "Audio Assault",
-							Summary:     "Channel-strip and mix processing platform installed from the official Linux archive.",
-							Description: "Downloads Mix Locker and installs its VST3 and LV2 bundles plus its Audio Assault data pack into the current user's home directory.",
-							Notes: []string{
-								"Does not require sudo.",
-								"Installed as a user-local plugin so it works cleanly on immutable systems.",
-							},
-							Links: linkForID("mix-locker"),
-							InstalledMarkers: []string{
-								".vst3/Mix Locker.vst3",
-								".lv2/Mix Locker.lv2",
-								"Audio Assault/PluginData/Audio Assault/MixLockerData",
-							},
-							InstallActions: []Action{
-								{Title: "Install Mix Locker", Exec: archiveInstall("mix-locker")},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall Mix Locker", Exec: archiveUninstall("mix-locker")},
-							},
-						},
+						genericArchivePackage("mix-locker", "Audio Assault", "Channel-strip and mix processing platform installed from the official Linux archive."),
 						genericArchivePackage("acmt-plugin-suite", "ACMT", "Commercial analogue-modeled plugin suite available from the upstream Linux download page."),
 						genericArchivePackage("the-trick", "Mouse Plugins", "Focused EQ processor distributed as a Linux VST3 archive."),
 						genericArchivePackage("polarity", "Polarity", "Spectral compressor plugin packaged with CLAP and VST3 targets."),
@@ -1155,6 +1027,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("tdr-arbiter", "Tokyo Dawn Labs", "Frequency-specific spectral balancer for mixing, restoration, and mastering workflows."),
 						genericArchivePackage("tdr-limiter6-ge", "Tokyo Dawn Labs", "Modern dynamics compression and limiting toolkit with six specialized reorderable modules."),
 						genericArchivePackage("tdr-prism", "Tokyo Dawn Labs", "Frequency analyzer focused on human audio perception with straightforward configuration."),
+						genericArchivePackage("wstd-mseq", "Wasted Audio", "Pay-what-you-want 3-band mid/side EQ processor available from the upstream site."),
 					},
 				},
 				{
@@ -1221,27 +1094,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("mpe-emulator", "Attila M. Magyar", "MIDI processor for adding MPE-style expression mappings to ordinary controllers."),
 						genericArchivePackage("zl-splitter", "ZL Audio", "Open-source splitter plugin distributed as Linux VST3 and LV2 bundles."),
 						genericArchivePackage("tal-dac", "TAL Software", "Commercial lo-fi converter plugin distributed as Linux CLAP, VST3, and VST2 targets."),
-						{
-							ID:          "intersect",
-							Name:        "INTERSECT",
-							Vendor:      "tucktuckg00se",
-							Summary:     "Sample slicer instrument packaged as a VST3 archive.",
-							Description: "Downloads INTERSECT and installs its VST3 bundle into the current user's plugin directories.",
-							Notes: []string{
-								"Does not require sudo.",
-								"Installed as a user-local plugin so it works cleanly on immutable systems.",
-							},
-							Links: linkForID("intersect"),
-							InstalledMarkers: []string{
-								".vst3/INTERSECT.vst3",
-							},
-							InstallActions: []Action{
-								{Title: "Install INTERSECT", Exec: archiveInstall("intersect")},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall INTERSECT", Exec: archiveUninstall("intersect")},
-							},
-						},
+						genericArchivePackage("intersect", "tucktuckg00se", "Sample slicer instrument packaged as a VST3 archive."),
 						genericArchivePackage("spectrus", "Morphulus", "Multi-effect processor distributed as Linux VST3 and LV2 bundles."),
 						genericArchivePackage("warp-core", "Manas World", "Pitch-focused processor distributed as Linux LV2 and VST3 bundles."),
 						genericArchivePackage("chord-analyzer", "dusk audio", "Chord analysis plugin distributed as Linux LV2 and VST3 bundles."),
@@ -1306,32 +1159,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 							},
 						},
 						appImagePackage("milkytracker", "MilkyTracker", "Music creation tool inspired by Fast Tracker 2.", "milky"),
-						{
-							ID:          "musescore-studio",
-							Name:        "MuseScore Studio",
-							Vendor:      "MuseScore",
-							Summary:     "Standalone notation and scoring app distributed as a Linux AppImage.",
-							Description: "Downloads the upstream MuseScore Studio AppImage, then uses AppImageLauncher's ail-cli to integrate it into the desktop session without GUI interaction. If AppImageLauncher is unavailable or fails, installs the AppImage manually with a user desktop entry.",
-							Notes: []string{
-								"Does not require sudo.",
-								"Uses ail-cli for desktop integration when available.",
-								"Falls back to a manual install in ~/Applications.",
-							},
-							Links: linkForID("musescore-studio"),
-							InstalledMarkers: []string{
-								"Applications/musescore-studio.appimage",
-								"Applications/*musescore*.appimage",
-								"AppImages/musescore-studio.appimage",
-								"AppImages/*musescore*.appimage",
-								".local/share/applications/*musescore*.desktop",
-							},
-							InstallActions: []Action{
-								{Title: "Install MuseScore Studio", Exec: script("install-appimage-with-ail-cli.sh", "musescore-studio", "MuseScore Studio", mustEntry("musescore-studio")["url"])},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall MuseScore Studio", Exec: script("uninstall-appimage-with-ail-cli.sh", "musescore-studio", "musescore")},
-							},
-						},
+						appImagePackage("musescore-studio", "MuseScore", "Standalone notation and scoring app distributed as a Linux AppImage.", "musescore"),
 						{
 							ID:          "declick",
 							Name:        "Declick",

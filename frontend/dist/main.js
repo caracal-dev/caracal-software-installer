@@ -228,6 +228,25 @@ function bindEvents() {
         }
         appendLog("stderr", `${result.packageName}: ${result.error}`);
       });
+
+      if (failures.length > 0) {
+        const reportLine = document.createElement("div");
+        reportLine.className = "log-line event";
+        const prefix = document.createTextNode("Report this issue at: ");
+        const reportLink = document.createElement("a");
+        reportLink.href = "https://github.com/caracal-dev/caracal-software-installer/issues";
+        reportLink.textContent = "https://github.com/caracal-dev/caracal-software-installer/issues";
+        reportLink.target = "_blank";
+        reportLink.className = "log-link";
+        reportLine.appendChild(prefix);
+        reportLine.appendChild(reportLink);
+        elements.log.appendChild(reportLine);
+        elements.log.scrollTop = elements.log.scrollHeight;
+        const queueView = document.getElementById("queue-view");
+        if (queueView) {
+          queueView.scrollTop = queueView.scrollHeight;
+        }
+      }
     });
   }
 }
@@ -295,6 +314,7 @@ function ensureActiveLocation() {
 }
 
 function render() {
+  window.scrollTo({ top: 0, behavior: "instant" });
   renderNav();
   renderPackages();
   renderSidebar();
@@ -784,9 +804,22 @@ function toggleSelection(id) {
 function appendLog(kind, message) {
   const line = document.createElement("div");
   line.className = `log-line ${kind}`;
-  line.textContent = message;
+  if (message.startsWith("http")) {
+    const link = document.createElement("a");
+    link.href = message;
+    link.textContent = message;
+    link.target = "_blank";
+    link.className = "log-link";
+    line.appendChild(link);
+  } else {
+    line.textContent = message;
+  }
   elements.log.appendChild(line);
   elements.log.scrollTop = elements.log.scrollHeight;
+  const queueView = document.getElementById("queue-view");
+  if (queueView) {
+    queueView.scrollTop = queueView.scrollHeight;
+  }
 }
 
 function attachThumbnail(imageNode, fallbackNode, tokenNode, pkg) {

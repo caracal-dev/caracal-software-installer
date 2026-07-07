@@ -994,6 +994,16 @@ button.package-trait {
   color: var(--text);
 }
 
+.log-link {
+  color: #7dd3fc;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.log-link:hover {
+  color: #bae6fd;
+}
+
 .empty-state {
   padding: 24px;
   border-radius: var(--radius-lg);

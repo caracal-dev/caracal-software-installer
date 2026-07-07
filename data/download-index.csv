@@ -127,3 +127,10 @@ tdr-ultrasonic,TDR Ultrasonic,,https://www.tokyodawn.net/tdr-ultrasonic/,vst3,TD
 tdr-arbiter,TDR Arbiter,,https://www.tokyodawn.net/tdr-arbiter/,vst3,TDR Arbiter,,,,,,,,,Spectral Balancer,https://www.tokyodawn.net/tdr-arbiter/,false,false,false
 tdr-limiter6-ge,TDR Limiter 6 GE,,https://www.tokyodawn.net/tdr-limiter6-ge/,vst3,TDR Limiter 6 GE,,,,,,,,,Limiter,https://www.tokyodawn.net/tdr-limiter6-ge/,false,false,false
 tdr-prism,TDR Prism,,https://www.tokyodawn.net/tdr-prism/,vst3,TDR Prism,,,,,,,,,Frequency Analyzer,https://www.tokyodawn.net/tdr-prism/,false,false,true
+mod-desktop,MOD Desktop,0.0.12,https://github.com/moddevices/mod-desktop/releases/download/0.0.12/mod-desktop-0.0.12-linux-x86_64.tar.xz,,,,,,,,,,https://github.com/mod-audio/mod-desktop,,DAW,https://mod.audio/,true,true,true,https://github.com/mod-audio/mod-desktop/blob/main/LICENSE,AGPL-3.0
+termenflux,TermenFlux,0.1,https://github.com/hergezod/TermenFlux/releases/download/v0.1/TermenFlux_v0.1_x86_64_lv2.zip,lv2,TermenFlux,,,,,,,,,Synth,https://github.com/hergezod/TermenFlux,true,true,true,https://github.com/hergezod/TermenFlux/blob/main/LICENSE,GPL
+wstd-mseq,WSTD MSEQ,,https://wasted.audio/software/wstd_mseq,"vst3,lv2,clap",WSTD MSEQ,,,,,,,,,EQ,https://wasted.audio/software/wstd_mseq,false,true,true,,GPL
+commodore-64-sid,Commodore 64 SID,,https://socalabs.com/files/get.php?id=SID.deb,"vst3,lv2,clap",Commodore64SID,,,,,,,,,Synth,https://socalabs.com/,true,true,true,,GPL
+nes-rp2a03,Nintendo Entertainment System RP2A03,,https://socalabs.com/files/get.php?id=RP2A03.deb,"vst3,lv2,clap",NES_RP2A03,,,,,,,,,Synth,https://socalabs.com/,true,true,true,,GPL
+nintendo-gameboy-papu,Nintendo Gameboy PAPU,,https://socalabs.com/files/get.php?id=PAPU.deb,"vst3,lv2,clap",Gameboy_PAPU,,,,,,,,,Synth,https://socalabs.com/,true,true,true,,GPL
+socalabs-organ,Organ,,https://socalabs.com/files/get.php?id=Organ.deb,"vst3,lv2,clap",Organ,,,,,,,,,Synth,https://socalabs.com/,true,true,true,,GPL
