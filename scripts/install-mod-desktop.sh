@@ -60,7 +60,7 @@ chmod -R a+rX "${MOD_DESKTOP_APP_DIR}"
 cat > "${MOD_DESKTOP_WRAPPER}" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
-APP_DIR="/opt/mod-desktop/mod-desktop"
+APP_DIR="/opt/mod-desktop"
 cd "${APP_DIR}"
 exec "${APP_DIR}/mod-desktop" "$@"
 EOF
