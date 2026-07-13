@@ -13,6 +13,7 @@ function statRequiredPath(targetPath, label) {
     process.exit(1);
   }
 
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- validated above against traversal
   const stat = fs.statSync(absolutePath, { throwIfNoEntry: false });
   if (!stat) {
     console.error(`Missing ${label}: ${targetPath}`);

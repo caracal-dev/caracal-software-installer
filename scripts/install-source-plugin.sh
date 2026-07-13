@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -lt 3 ]]; then
-    echo "Usage: $0 <index-id> <display-name> <project-name>" >&2
+if [[ $# -lt 2 ]]; then
+    echo "Usage: $0 <index-id> <display-name>" >&2
     exit 1
 fi
 
 index_id="$1"
 display_name="$2"
-project_name="$3"
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 url="$("${script_dir}/download-index" get "${index_id}" "url")"

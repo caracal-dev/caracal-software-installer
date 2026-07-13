@@ -103,8 +103,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 		})
 		return append([]string{"bash", filepath.Join(scriptDir, "uninstall-plugin-archive.sh")}, args...)
 	}
-	sourceInstall := func(id string, projectName string) []string {
-		return script("install-source-plugin.sh", id, mustEntry(id)["name"], projectName)
+	sourceInstall := func(id string) []string {
+		return script("install-source-plugin.sh", id, mustEntry(id)["name"])
 	}
 	sourceUninstall := func(projectName string, displayName string) []string {
 		return script("uninstall-source-plugin.sh", projectName, displayName)
@@ -718,7 +718,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								".local/bin/yoshimi",
 							},
 							InstallActions: []Action{
-								{Title: "Install Yoshimi", Exec: sourceInstall("yoshimi", "yoshimi")},
+								{Title: "Install Yoshimi", Exec: sourceInstall("yoshimi")},
 							},
 							UninstallActions: []Action{
 								{Title: "Uninstall Yoshimi", Exec: sourceUninstall("yoshimi", "Yoshimi")},
@@ -740,7 +740,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								".local/bin/synthv1",
 							},
 							InstallActions: []Action{
-								{Title: "Install Synthv1", Exec: sourceInstall("synthv1", "synthv1")},
+								{Title: "Install Synthv1", Exec: sourceInstall("synthv1")},
 							},
 							UninstallActions: []Action{
 								{Title: "Uninstall Synthv1", Exec: sourceUninstall("synthv1", "Synthv1")},
@@ -762,7 +762,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								".local/bin/padhv1",
 							},
 							InstallActions: []Action{
-								{Title: "Install Padhv1", Exec: sourceInstall("padhv1", "padhv1")},
+								{Title: "Install Padhv1", Exec: sourceInstall("padhv1")},
 							},
 							UninstallActions: []Action{
 								{Title: "Uninstall Padhv1", Exec: sourceUninstall("padhv1", "Padhv1")},
@@ -860,7 +860,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								".local/bin/samplv1",
 							},
 							InstallActions: []Action{
-								{Title: "Install Samplv1", Exec: sourceInstall("samplv1", "samplv1")},
+								{Title: "Install Samplv1", Exec: sourceInstall("samplv1")},
 							},
 							UninstallActions: []Action{
 								{Title: "Uninstall Samplv1", Exec: sourceUninstall("samplv1", "Samplv1")},
@@ -892,7 +892,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								".local/bin/drumkv1",
 							},
 							InstallActions: []Action{
-								{Title: "Install Drumkv1", Exec: sourceInstall("drumkv1", "drumkv1")},
+								{Title: "Install Drumkv1", Exec: sourceInstall("drumkv1")},
 							},
 							UninstallActions: []Action{
 								{Title: "Uninstall Drumkv1", Exec: sourceUninstall("drumkv1", "Drumkv1")},
