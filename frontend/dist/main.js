@@ -864,7 +864,7 @@ function attachThumbnail(imageNode, fallbackNode, tokenNode, pkg) {
 }
 
 function thumbnailCandidates(pkg) {
-  const extensions = ["png", "jpg", "jpeg", "webp", "svg"];
+  const extensions = ["webp", "png", "jpg", "jpeg", "svg"];
   return extensions.map((extension) => `/assets/images/thumbnails/${pkg.id}.${extension}`);
 }
 

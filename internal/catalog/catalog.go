@@ -487,6 +487,30 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Bitwig Studio", Exec: sudoScript("uninstall-bitwig.sh")},
 							},
 						},
+						{
+							ID:          "tape-16",
+							Name:        "Tape 16",
+							Vendor:      "EMR Music Group",
+							Summary:     "A decisive 16-track tape workflow for modern sessions.",
+							Description: "Opens the upstream project page so you can download the current Linux build directly from the developer. Once downloaded, the installer extracts the appropriate display-server .deb (Wayland or X11) and installs the app into /opt/tape-16 with desktop integration in /usr/local.",
+							Notes: []string{
+								"Requires sudo because it writes to /opt and /usr/local.",
+								"The installer auto-detects Wayland vs X11 and picks the matching .deb profile.",
+								"Download the Linux ZIP from the developer site first, then right-click to install with Caracal.",
+							},
+							Links: linkForID("tape-16"),
+							InstalledMarkers: []string{
+								"/opt/tape-16/tape16",
+								"/usr/local/bin/tape16",
+								"/usr/local/share/applications/tape16.desktop",
+							},
+							InstallActions: []Action{
+								{Title: "Install Tape 16", Exec: sudoScript("install-tape-16.sh")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall Tape 16", Exec: sudoScript("uninstall-tape-16.sh")},
+							},
+						},
 					},
 				},
 				{
@@ -989,7 +1013,6 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall AIDA-X", Exec: archiveUninstall("aida-x")},
 							},
 						},
-						genericArchivePackage("neampmod-the-tweed-vst3", "danielwray", "Tweed-style amp sim distributed as a direct Linux VST3 download."),
 						genericArchivePackage("neampmod-the-tweed-clap", "danielwray", "Tweed-style amp sim distributed as a direct Linux CLAP download."),
 						genericArchivePackage("chow-centaur", "Chowdhury DSP", "Klon-style overdrive pedal distributed as Linux VST3 and LV2 bundles."),
 						genericArchivePackage("ratatouille", "brummer10", "Neural model and impulse response mixer distributed as a Linux LV2 bundle."),
@@ -1028,6 +1051,13 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("tdr-limiter6-ge", "Tokyo Dawn Labs", "Modern dynamics compression and limiting toolkit with six specialized reorderable modules."),
 						genericArchivePackage("tdr-prism", "Tokyo Dawn Labs", "Frequency analyzer focused on human audio perception with straightforward configuration."),
 						genericArchivePackage("wstd-mseq", "Wasted Audio", "Pay-what-you-want 3-band mid/side EQ processor available from the upstream site."),
+						genericArchivePackage("legend-channel", "PAA Audio", "One strip modeled at the circuit level — mic pre, filters, 4-band EQ, compressor, and gate."),
+						genericArchivePackage("na-glue-comp", "PAA Audio", "Stereo bus compressor built on a classic British VCA topology with transformer saturation."),
+						genericArchivePackage("tonesmifteq", "Hermann", "Modern 12-band parametric equalizer with FFT convolution and zero-latency biquad engines."),
+						genericArchivePackage("apu-loudness-meter", "APU Software", "Real-time loudness meter supporting multiple measurement types simultaneously."),
+						genericArchivePackage("apu-loudness-leveler", "APU Software", "Real-time volume leveler designed to keep audio within your target loudness range."),
+						genericArchivePackage("apu-loudness-compressor", "APU Software", "Real-time compressor supporting a variety of loudness types and advanced features."),
+						genericArchivePackage("apu-loudness-limiter", "APU Software", "Real-time limiter supporting multiple loudness measurement types simultaneously."),
 					},
 				},
 				{
@@ -1073,6 +1103,9 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("wet-reverb", "yonie", "Reverb plugin distributed as a Linux VST3 archive."),
 						genericArchivePackage("tal-g-verb", "TAL Software", "Commercial reverb plugin distributed as Linux CLAP, VST3, and VST2 targets."),
 						genericArchivePackage("tal-dub-x", "TAL Software", "Commercial delay plugin distributed as Linux CLAP, VST3, and VST2 targets."),
+						genericArchivePackage("dlay-lite", "FRCTL Audio", "A simple free delay — pick a preset, set MIX and WASH, done."),
+						genericArchivePackage("dlay", "FRCTL Audio", "One canvas, 64 taps — drag to design, sweep to morph, flip the feedback path through seven character modes."),
+						genericArchivePackage("paa-vintage-delay", "PAA Audio", "BBD-modeled analog echo sampled from real hardware."),
 					},
 				},
 				{
@@ -1119,6 +1152,9 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 								{Title: "Uninstall Zam Plugin Suite", Exec: script("uninstall-zam-plugins.sh")},
 							},
 						},
+						genericArchivePackage("agnarohm-v2", "iraisynn attinom", "Comprehensive multi-effects processor combining over 15 studio-grade effects into a single signal chain."),
+						genericArchivePackage("tape56k", "PAA Audio", "One-knob tape saturation that makes every source sound better on instruments, buses, or the master."),
+						genericArchivePackage("apu-dynamics-optimizer", "APU Software", "Standalone loudness optimization tool supporting a variety of loudness types and real-time dynamics controls."),
 					},
 				},
 			},
@@ -1160,27 +1196,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						},
 						appImagePackage("milkytracker", "MilkyTracker", "Music creation tool inspired by Fast Tracker 2.", "milky"),
 						appImagePackage("musescore-studio", "MuseScore", "Standalone notation and scoring app distributed as a Linux AppImage.", "musescore"),
-						{
-							ID:          "declick",
-							Name:        "Declick",
-							Vendor:      "Michael Wahl",
-							Summary:     "Audio restoration utility built from the upstream source tarball into /usr/local/bin.",
-							Description: "Downloads the upstream Declick source tarball, builds it with make, and installs the resulting command-line utility into /usr/local/bin.",
-							Notes: []string{
-								"Requires sudo because upstream installs to /usr/local/bin.",
-								"Builds from source, so make and a working native build toolchain are required on the target system.",
-							},
-							Links: linkForID("declick"),
-							InstalledMarkers: []string{
-								"/usr/local/bin/declick",
-							},
-							InstallActions: []Action{
-								{Title: "Install Declick", Exec: sudoScript("install-declick.sh")},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall Declick", Exec: sudoScript("uninstall-declick.sh")},
-							},
-						},
+						genericArchivePackage("easylink", "PAA Audio", "Stream your DAW audio to any phone over WiFi in real-time with ultra-low latency."),
+						alienDebPackage("unshuffle", "calloga", "Source-folder organizer that scans, classifies, and optionally builds a structured sample library on disk."),
 					},
 				},
 				{

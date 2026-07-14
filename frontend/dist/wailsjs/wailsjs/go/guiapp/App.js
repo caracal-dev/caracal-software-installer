@@ -18,6 +18,10 @@ export function RefreshCatalog() {
   return window['go']['guiapp']['App']['RefreshCatalog']();
 }
 
+export function RunLocalFiles(arg1) {
+  return window['go']['guiapp']['App']['RunLocalFiles'](arg1);
+}
+
 export function RunSelection(arg1) {
   return window['go']['guiapp']['App']['RunSelection'](arg1);
 }

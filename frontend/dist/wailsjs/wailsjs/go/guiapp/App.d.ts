@@ -10,6 +10,8 @@ export function OpenLink(arg1:string):Promise<void>;
 
 export function RefreshCatalog():Promise<guiapp.CatalogPayload>;
 
+export function RunLocalFiles(arg1:Array<string>):Promise<void>;
+
 export function RunSelection(arg1:Array<string>):Promise<void>;
 
 export function SetDesktopIcon(arg1:string):Promise<guiapp.IconSettingsPayload>;

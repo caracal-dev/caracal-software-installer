@@ -20,14 +20,14 @@ export namespace guiapp {
 	    statusLabel: string;
 	    actionLabel: string;
 	}
-	export interface LinkView {
-	    label: string;
-	    url: string;
-	}
 	export interface LicenseView {
 	    label: string;
 	    url: string;
 	    kind: string;
+	}
+	export interface LinkView {
+	    label: string;
+	    url: string;
 	}
 	export interface PackageView {
 	    id: string;
@@ -74,5 +74,7 @@ export namespace guiapp {
 	
 	
 	
+	
 
 }
+
