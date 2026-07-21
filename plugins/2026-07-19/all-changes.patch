@@ -1,0 +1,35 @@
+# Dev Agent handoff — plugins @ 2026-07-19
+# Generated: 2026-07-19T00:22:30Z
+
+## Repository: caracal-software-installer
+
+Branch: main
+HEAD: 7ac000d88e688ae9dd5384b96d736eabc0e851c8
+
+
+## Repository: caracal-software-installer-dev
+
+Branch: main
+HEAD: 4da5093af9a345ea418bf3eba7fcb18dd0ababcc
+
+### Uncommitted diff:
+
+diff --git a/data/download-index.csv b/data/download-index.csv
+index 9702b50..113ed8f 100644
+--- a/data/download-index.csv
++++ b/data/download-index.csv
+@@ -149,3 +149,8 @@ apu-dynamics-optimizer,APU Dynamics Optimizer,5.6.2,https://apu.software/downloa
+ apu-loudness-limiter,APU Loudness Limiter,5.6.2,https://apu.software/download/#ref-limiter,vst3,APU Loudness Limiter,,,,,,,,,Limiter,https://apu.software/download/#ref-limiter,false,false,false,,
+ easylink,EasyLink,,https://paa-audio.de/plugins/easylink,vst3,EasyLink,,,,,,,,,Utility,https://paa-audio.de/plugins/easylink,false,false,true,,
+ unshuffle,Unshuffle,1.0.2,https://github.com/calloga/unshuffle/releases/download/v1.0.2/unshuffle_1.0.2_amd64.deb,,,,,,,,,,,Utility,https://calloga.com/,true,true,true,https://github.com/calloga/unshuffle/blob/main/LICENSE,MIT
++guitarix,Guitarix,0.47.0,https://github.com/brummer10/guitarix/releases/download/V0.47.0/guitarix2-0.47.0.tar.xz,lv2,guitarix2,,,,,,,https://github.com/brummer10/guitarix,,Guitar Amp,https://guitarix.org/,true,true,true,https://github.com/brummer10/guitarix/blob/trunk/COPYING,GPL-2.0+
++neuralrack,NeuralRack,0.3.3,https://github.com/brummer10/NeuralRack/releases/download/v0.3.3/NeuralRack-v0.3.3-linux-x86_64.tar.xz,clap,NeuralRack,,,,,,,https://github.com/brummer10/NeuralRack,,Guitar Amp,https://github.com/brummer10/NeuralRack,true,true,true,https://github.com/brummer10/NeuralRack/blob/main/LICENSE,BSD-3-Clause
++the-victor,The Victor,2.2.0,https://github.com/danielwray/neampmod-the-victor/releases/download/v2.2.0/neampmod-the-victor-linux-v2.2.0.clap,clap,neampmod-the-victor,,,,,,,https://github.com/danielwray/neampmod-the-victor,,Guitar Amp,https://github.com/danielwray/neampmod-the-victor,true,true,true,https://github.com/danielwray/neampmod-the-victor/blob/main/LICENSE,GPL-3.0
++lamb,Lamb,2.1.0,https://github.com/magnetophon/lamb-rs/releases/download/v2.1.0/lamb-v2.1.0-ubuntu-20.04.zip,"clap,vst3",lamb,,,,,,,https://github.com/magnetophon/lamb-rs,,Compressor,https://github.com/magnetophon/lamb-rs,true,true,true,https://github.com/magnetophon/lamb-rs/blob/main/LICENSE.md,AGPL-3.0
++squeezer,Squeezer,2.5.4,https://github.com/mzuther/Squeezer/releases/download/v2.5.4/squeezer-linux64-vst2_2.5.4.tar.gz,vst,Squeezer,,,,,,,https://github.com/mzuther/Squeezer,,Compressor,https://github.com/mzuther/Squeezer,true,true,true,https://github.com/mzuther/Squeezer/blob/master/LICENSE,GPL-3.0
+
+### Untracked files:
+
+ M data/download-index.csv
+
+

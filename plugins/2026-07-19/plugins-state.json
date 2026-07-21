@@ -1,0 +1,69 @@
+{
+  "backfill_file": "/home/admin/linuxdaw-backfill-FULL-2026-07-14.md",
+  "last_run": "2026-07-19T07:00:00Z",
+  "cursor": 5,
+  "added": [
+    {
+      "id": "guitarix",
+      "name": "Guitarix",
+      "category": "Guitar Amp",
+      "version": "0.47.0",
+      "added_at": "2026-07-19T07:00:00Z",
+      "url": "https://github.com/brummer10/guitarix/releases/download/V0.47.0/guitarix2-0.47.0.tar.xz",
+      "license": "GPL-2.0+"
+    },
+    {
+      "id": "neuralrack",
+      "name": "NeuralRack",
+      "category": "Guitar Amp",
+      "version": "0.3.3",
+      "added_at": "2026-07-19T07:00:00Z",
+      "url": "https://github.com/brummer10/NeuralRack/releases/download/v0.3.3/NeuralRack-v0.3.3-linux-x86_64.tar.xz",
+      "license": "BSD-3-Clause"
+    },
+    {
+      "id": "the-victor",
+      "name": "The Victor",
+      "category": "Guitar Amp",
+      "version": "2.2.0",
+      "added_at": "2026-07-19T07:00:00Z",
+      "url": "https://github.com/danielwray/neampmod-the-victor/releases/download/v2.2.0/neampmod-the-victor-linux-v2.2.0.clap",
+      "license": "GPL-3.0"
+    },
+    {
+      "id": "lamb",
+      "name": "Lamb",
+      "category": "Compressor",
+      "version": "2.1.0",
+      "added_at": "2026-07-19T07:00:00Z",
+      "url": "https://github.com/magnetophon/lamb-rs/releases/download/v2.1.0/lamb-v2.1.0-ubuntu-20.04.zip",
+      "license": "AGPL-3.0"
+    },
+    {
+      "id": "squeezer",
+      "name": "Squeezer",
+      "category": "Compressor",
+      "version": "2.5.4",
+      "added_at": "2026-07-19T07:00:00Z",
+      "url": "https://github.com/mzuther/Squeezer/releases/download/v2.5.4/squeezer-linux64-vst2_2.5.4.tar.gz",
+      "license": "GPL-3.0"
+    }
+  ],
+  "skipped": [
+    {
+      "original_cursor": 0,
+      "id": "GFX",
+      "vendor": "ToneLib",
+      "price": "$89.95",
+      "reason": "Proprietary (paid, no open-source license)"
+    },
+    {
+      "original_cursor": 2,
+      "id": "Metal",
+      "vendor": "ToneLib",
+      "price": "$69.95",
+      "reason": "Proprietary (paid, no open-source license)"
+    }
+  ],
+  "notes": "First run on caracal-dev profile. Cursor advanced 0->5. Two Amp-category entries (GFX and Metal) were skipped as proprietary; replaced with two open-source Compressor entries (lamb, squeezer) to maintain the 5-per-day target while honoring the 'no proprietary plugins' rule."
+}
