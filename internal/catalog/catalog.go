@@ -521,6 +521,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						appImagePackage("helio", "Helio", "Open-source music sequencer for desktop and mobile platforms.", "helio"),
 						appImagePackage("shoopdaloop", "Sander Vocke", "Live looping application with DAW elements distributed as an AppImage.", "shoopdaloop"),
 						appImagePackage("stargate", "Stargate", "Cross-platform all-in-one DAW and plugin suite distributed as an AppImage.", "stargate"),
+						appImagePackage("lmms", "LMMS", "Cross-platform open-source digital audio workstation distributed as a Linux AppImage.", "lmms"),
 						{
 							ID:          "zrythm",
 							Name:        "Zrythm",
@@ -1063,11 +1064,27 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("apu-loudness-limiter", "APU Software", "Real-time limiter supporting multiple loudness measurement types simultaneously."),
 						genericArchivePackage("lamb", "magnetophon", "Lookahead compressor/limiter distributed as a Linux CLAP and VST3 archive."),
 						genericArchivePackage("squeezer", "mzuther", "Flexible general-purpose audio compressor distributed as a Linux VST2 archive."),
-						genericArchivePackage("calf-compressor", "Calf Studio Gear", "Compressor distributed as a Linux LV2 bundle."),
-						genericArchivePackage("calf-mono-compressor", "Calf Studio Gear", "Mono compressor distributed as a Linux LV2 bundle."),
-						genericArchivePackage("calf-multiband-compressor", "Calf Studio Gear", "Multiband compressor distributed as a Linux LV2 bundle."),
-						genericArchivePackage("calf-sidechain-compressor", "Calf Studio Gear", "Sidechain compressor distributed as a Linux LV2 bundle."),
-						genericArchivePackage("pnch", "unplugred", "Audio plugin distributed as a Linux VST3 and CLAP archive."),
+						{
+							ID:          "curvessor",
+							Name:        "Curvessor",
+							Vendor:      "unevens",
+							Summary:     "Compressor/limiter with tube character, built from source as user-local CLAP and VST3 plugins.",
+							Description: "Downloads the upstream Curvessor master branch source, extracts it, runs cmake + make, and installs the resulting CLAP and VST3 plugin bundles into the current user's plugin directories.",
+							Notes: []string{
+								"Does not require sudo.",
+								"Builds from source, so git, make, cmake, and a working native build toolchain (gcc, g++) are required on the target system.",
+								"On atomic Caracal images this install will fail (no compiler available) until a build toolchain is added to the runtime image — same constraint as Loopino. See install-loopino.sh for the deprecation note pattern.",
+							},
+							Links: linkForID("curvessor"),
+							InstallActions: []Action{
+								{Title: "Install Curvessor", Exec: sourceInstall("curvessor")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall Curvessor", Exec: sourceUninstall("curvessor", "Curvessor")},
+							},
+						},
+						genericArchivePackage("valentine", "tote-bag-labs", "Compressor/limiter focused on clean transient response, distributed as a Linux VST3, LV2, and CLAP archive."),
+						genericArchivePackage("zerocomp", "Jun-Murakami", "Zero-latency compressor with feedback topology, distributed as a Linux VST3, LV2, and CLAP archive."),
 					},
 				},
 				{
@@ -1104,6 +1121,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						alienDebPackage("chow-phaser", "Chowdhury DSP", "Phaser effect distributed as a Linux Debian package."),
 						genericArchivePackage("room-reverb", "ElephantDSP", "Room reverb plugin distributed as Linux CLAP, LV2, and VST3 bundles."),
 						genericArchivePackage("del2", "magnetophon", "Delay processor distributed as Linux VST3 and CLAP bundles."),
+					alienDebPackage("chow-matrix", "Chowdhury DSP", "Feedback-delay network plugin distributed as a Linux Debian package."),
 						genericArchivePackage("panoramatone", "PilCAki", "Vibrato processor distributed as a Linux VST3 bundle."),
 						genericArchivePackage("tentacles", "PilCAki", "Tentacle-inspired vibrato processor available from the project site."),
 						genericArchivePackage("aelapse", "smiarx", "Delay and reverb processor distributed as Linux VST3 and LV2 bundles."),
