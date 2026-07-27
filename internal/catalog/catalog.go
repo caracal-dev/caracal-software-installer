@@ -870,7 +870,6 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						},
 						genericArchivePackage("looper-pedal", "rbmannchued", "Looper plugin distributed as a Linux LV2 bundle."),
 						genericArchivePackage("loopino-clap", "brummer10", "Creative audio sampler with drag-and-drop loop loading, trim, and export, distributed as a Linux CLAP plugin."),
-						genericArchivePackage("loopino-vst2", "brummer10", "Creative audio sampler with drag-and-drop loop loading, trim, and export, distributed as a Linux VST2 plugin."),
 						genericArchivePackage("tal-sampler", "TAL Software", "Analog-modeled sampler instrument distributed as Linux CLAP, VST3, and VST2 targets."),
 					},
 				},
