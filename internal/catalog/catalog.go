@@ -521,6 +521,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						appImagePackage("helio", "Helio", "Open-source music sequencer for desktop and mobile platforms.", "helio"),
 						appImagePackage("shoopdaloop", "Sander Vocke", "Live looping application with DAW elements distributed as an AppImage.", "shoopdaloop"),
 						appImagePackage("stargate", "Stargate", "Cross-platform all-in-one DAW and plugin suite distributed as an AppImage.", "stargate"),
+						appImagePackage("lmms", "LMMS", "Cross-platform open-source digital audio workstation distributed as a Linux AppImage.", "lmms"),
 						{
 							ID:          "zrythm",
 							Name:        "Zrythm",
@@ -824,29 +825,6 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 					Description: "Sample playback tools that round out the base system.",
 					Packages: []*Package{
 						{
-							ID:          "loopino",
-							Name:        "Loopino",
-							Vendor:      "brummer10",
-							Summary:     "Live looper instrument built from source as user-local CLAP and VST2 plugins.",
-							Description: "Clones the Loopino repository, initializes submodules, builds the CLAP and VST2 plugin targets from source, and installs them into the current user's plugin directories. The standalone target is intentionally skipped.",
-							Notes: []string{
-								"Does not require sudo.",
-								"Builds from source, so git, make, and a working native build toolchain are required on the target system.",
-								"Installs only CLAP and VST2, matching the current Caracal post-install preference for Loopino.",
-							},
-							Links: linkForID("loopino"),
-							InstalledMarkers: []string{
-								".clap/*Loopino*",
-								".vst/*Loopino*",
-							},
-							InstallActions: []Action{
-								{Title: "Install Loopino", Exec: script("install-loopino.sh")},
-							},
-							UninstallActions: []Action{
-								{Title: "Uninstall Loopino", Exec: script("uninstall-loopino.sh")},
-							},
-						},
-						{
 							ID:          "decent-sampler",
 							Name:        "Decent Sampler",
 							Vendor:      "Decent Samples",
@@ -891,6 +869,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 							},
 						},
 						genericArchivePackage("looper-pedal", "rbmannchued", "Looper plugin distributed as a Linux LV2 bundle."),
+						genericArchivePackage("loopino-clap", "brummer10", "Creative audio sampler with drag-and-drop loop loading, trim, and export, distributed as a Linux CLAP plugin."),
 						genericArchivePackage("tal-sampler", "TAL Software", "Analog-modeled sampler instrument distributed as Linux CLAP, VST3, and VST2 targets."),
 					},
 				},
@@ -1027,9 +1006,11 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						alienDebPackage("epochamp", "GuitarML", "Amp-modeling plugin for realistic guitar tones."),
 						alienDebPackage("neuralpi", "GuitarML", "Neural amp and pedal emulation plugin based on the NeuralPi project."),
 						alienDebPackage("the-prince", "GuitarML", "Transparent-overdrive-style pedal plugin cloned with neural networks."),
-					},
-				},
-				{
+						genericArchivePackage("fire", "jerryuhoo", "Multi-stage distortion/saturation plugin distributed as a Linux CLAP and VST3 archive."),
+						genericArchivePackage("peakeater", "vvvar", "Peak-shaping distortion and transient designer distributed as Linux CLAP, LV2, and VST3 bundles."),
+						genericArchivePackage("plasma", "Dimethoxy", "Aggressive distortion pedal with wavefolding and clipping stages, distributed as Linux LV2 and VST3 bundles."),
+						genericArchivePackage("setekh", "fullfxmedia", "Multi-stage distortion pedal with EQ and gain controls, distributed as a Linux CLAP bundle."),
+					{
 					ID:          "mixing-and-channel-strip",
 					Name:        "Mixing & Channel Strip",
 					Description: "Mix-focused processors and channel-strip style tools.",
@@ -1063,11 +1044,28 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("apu-loudness-limiter", "APU Software", "Real-time limiter supporting multiple loudness measurement types simultaneously."),
 						genericArchivePackage("lamb", "magnetophon", "Lookahead compressor/limiter distributed as a Linux CLAP and VST3 archive."),
 						genericArchivePackage("squeezer", "mzuther", "Flexible general-purpose audio compressor distributed as a Linux VST2 archive."),
-						genericArchivePackage("calf-compressor", "Calf Studio Gear", "Compressor distributed as a Linux LV2 bundle."),
-						genericArchivePackage("calf-mono-compressor", "Calf Studio Gear", "Mono compressor distributed as a Linux LV2 bundle."),
-						genericArchivePackage("calf-multiband-compressor", "Calf Studio Gear", "Multiband compressor distributed as a Linux LV2 bundle."),
-						genericArchivePackage("calf-sidechain-compressor", "Calf Studio Gear", "Sidechain compressor distributed as a Linux LV2 bundle."),
-						genericArchivePackage("pnch", "unplugred", "Audio plugin distributed as a Linux VST3 and CLAP archive."),
+						{
+							ID:          "curvessor",
+							Name:        "Curvessor",
+							Vendor:      "unevens",
+							Summary:     "Compressor/limiter with tube character, built from source as user-local CLAP and VST3 plugins.",
+							Description: "Downloads the upstream Curvessor master branch source, extracts it, runs cmake + make, and installs the resulting CLAP and VST3 plugin bundles into the current user's plugin directories.",
+							Notes: []string{
+								"Does not require sudo.",
+								"Builds from source, so git, make, cmake, and a working native build toolchain (gcc, g++) are required on the target system.",
+								"On atomic Caracal images this install will fail (no compiler available) until a build toolchain is added to the runtime image — same constraint as Loopino. See install-loopino.sh for the deprecation note pattern.",
+							},
+							Links: linkForID("curvessor"),
+							InstallActions: []Action{
+								{Title: "Install Curvessor", Exec: sourceInstall("curvessor")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall Curvessor", Exec: sourceUninstall("curvessor", "Curvessor")},
+							},
+						},
+						genericArchivePackage("valentine", "tote-bag-labs", "Compressor/limiter focused on clean transient response, distributed as a Linux VST3, LV2, and CLAP archive."),
+						genericArchivePackage("zerocomp", "Jun-Murakami", "Zero-latency compressor with feedback topology, distributed as a Linux VST3, LV2, and CLAP archive."),
+						genericArchivePackage("zeroeq", "Jun-Murakami", "Linear-phase mastering equalizer with TPDF dithering, distributed as a Linux VST3, LV2, and CLAP archive."),
 					},
 				},
 				{
@@ -1104,6 +1102,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						alienDebPackage("chow-phaser", "Chowdhury DSP", "Phaser effect distributed as a Linux Debian package."),
 						genericArchivePackage("room-reverb", "ElephantDSP", "Room reverb plugin distributed as Linux CLAP, LV2, and VST3 bundles."),
 						genericArchivePackage("del2", "magnetophon", "Delay processor distributed as Linux VST3 and CLAP bundles."),
+					alienDebPackage("chow-matrix", "Chowdhury DSP", "Feedback-delay network plugin distributed as a Linux Debian package."),
 						genericArchivePackage("panoramatone", "PilCAki", "Vibrato processor distributed as a Linux VST3 bundle."),
 						genericArchivePackage("tentacles", "PilCAki", "Tentacle-inspired vibrato processor available from the project site."),
 						genericArchivePackage("aelapse", "smiarx", "Delay and reverb processor distributed as Linux VST3 and LV2 bundles."),
@@ -1116,7 +1115,8 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("dlay-lite", "FRCTL Audio", "A simple free delay — pick a preset, set MIX and WASH, done."),
 						genericArchivePackage("dlay", "FRCTL Audio", "One canvas, 64 taps — drag to design, sweep to morph, flip the feedback path through seven character modes."),
 						genericArchivePackage("paa-vintage-delay", "PAA Audio", "BBD-modeled analog echo sampled from real hardware."),
-					},
+						genericArchivePackage("aether", "Dougal-s", "Granular reverb focused on shimmer and atmospheric textures, distributed as a Linux LV2 bundle."),
+						genericArchivePackage("cloudreverb", "xunil-cloud", "Algorithmic reverb with modulation and diffusion controls, distributed as a Linux LV2 and VST3 archive."),
 				},
 				{
 					ID:          "creative-and-utility",
@@ -1165,15 +1165,16 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("agnarohm-v2", "iraisynn attinom", "Comprehensive multi-effects processor combining over 15 studio-grade effects into a single signal chain."),
 						genericArchivePackage("tape56k", "PAA Audio", "One-knob tape saturation that makes every source sound better on instruments, buses, or the master."),
 						genericArchivePackage("apu-dynamics-optimizer", "APU Software", "Standalone loudness optimization tool supporting a variety of loudness types and real-time dynamics controls."),
-					},
-				},
-			},
-		},
-		{
-			ID:          "utilities",
-			Name:        "Utilities",
-			Description: "Audio-adjacent helpers and diagnostics.",
-			Accent:      "#c084fc",
+						genericArchivePackage("consolex", "airwindows", "Console-modeling effect suite derived from the Airwindows catalogue, distributed as a Linux CLAP and VST3 archive."),
+						genericArchivePackage("gate-12", "tiagolr", "Noise gate and expander with sidechain filtering, distributed as a Linux LV2 and VST3 archive."),
+						genericArchivePackage("master-me", "trummerschlunk", "Mastering limiter and loudness maximizer with True Peak limiting, distributed as a Linux CLAP, VST, VST3, LV2, and LADSPA archive."),
+						genericArchivePackage("panacea", "consint", "Stereo panning and spatial placement plugin with psychoacoustic mode, distributed as a Linux VST archive."),
+						genericArchivePackage("podcast-plugins", "trummerschlunk", "Bundled vocal processing suite tuned for podcasting and voice work, distributed as a Linux CLAP, VST, VST3, LV2, and LADSPA archive."),
+						alienDebPackage("retuner", "Kushview", "Tuning and pitch correction plugin distributed as a Linux Debian package."),
+						genericArchivePackage("spectral-shift", "trencrumb", "Spectral panning and frequency shifting effect distributed as a Linux CLAP, LV2, and VST3 archive."),
+						genericArchivePackage("k-meter", "mzuther", "ITU-R BS.1770-compliant K-weighted loudness meter, distributed as a Linux VST2 archive."),
+						genericArchivePackage("stomptuner", "brummer10", "Chromatic tuner pedal for guitar and bass, distributed as a Linux CLAP, LV2, and VST3 archive."),
+						genericArchivePackage("solidarp", "SolidFuel", "MIDI arpeggiator with pattern sequencing and chord-aware mode, distributed as a Linux VST3 archive."),
 			Subcategories: []*Subcategory{
 				{
 					ID:          "creative-and-desktop",
