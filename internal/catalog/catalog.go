@@ -1010,7 +1010,9 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("peakeater", "vvvar", "Peak-shaping distortion and transient designer distributed as Linux CLAP, LV2, and VST3 bundles."),
 						genericArchivePackage("plasma", "Dimethoxy", "Aggressive distortion pedal with wavefolding and clipping stages, distributed as Linux LV2 and VST3 bundles."),
 						genericArchivePackage("setekh", "fullfxmedia", "Multi-stage distortion pedal with EQ and gain controls, distributed as a Linux CLAP bundle."),
-					{
+					},
+				},
+				{
 					ID:          "mixing-and-channel-strip",
 					Name:        "Mixing & Channel Strip",
 					Description: "Mix-focused processors and channel-strip style tools.",
@@ -1102,7 +1104,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						alienDebPackage("chow-phaser", "Chowdhury DSP", "Phaser effect distributed as a Linux Debian package."),
 						genericArchivePackage("room-reverb", "ElephantDSP", "Room reverb plugin distributed as Linux CLAP, LV2, and VST3 bundles."),
 						genericArchivePackage("del2", "magnetophon", "Delay processor distributed as Linux VST3 and CLAP bundles."),
-					alienDebPackage("chow-matrix", "Chowdhury DSP", "Feedback-delay network plugin distributed as a Linux Debian package."),
+						alienDebPackage("chow-matrix", "Chowdhury DSP", "Feedback-delay network plugin distributed as a Linux Debian package."),
 						genericArchivePackage("panoramatone", "PilCAki", "Vibrato processor distributed as a Linux VST3 bundle."),
 						genericArchivePackage("tentacles", "PilCAki", "Tentacle-inspired vibrato processor available from the project site."),
 						genericArchivePackage("aelapse", "smiarx", "Delay and reverb processor distributed as Linux VST3 and LV2 bundles."),
@@ -1117,6 +1119,7 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("paa-vintage-delay", "PAA Audio", "BBD-modeled analog echo sampled from real hardware."),
 						genericArchivePackage("aether", "Dougal-s", "Granular reverb focused on shimmer and atmospheric textures, distributed as a Linux LV2 bundle."),
 						genericArchivePackage("cloudreverb", "xunil-cloud", "Algorithmic reverb with modulation and diffusion controls, distributed as a Linux LV2 and VST3 archive."),
+					},
 				},
 				{
 					ID:          "creative-and-utility",
@@ -1175,6 +1178,11 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("k-meter", "mzuther", "ITU-R BS.1770-compliant K-weighted loudness meter, distributed as a Linux VST2 archive."),
 						genericArchivePackage("stomptuner", "brummer10", "Chromatic tuner pedal for guitar and bass, distributed as a Linux CLAP, LV2, and VST3 archive."),
 						genericArchivePackage("solidarp", "SolidFuel", "MIDI arpeggiator with pattern sequencing and chord-aware mode, distributed as a Linux VST3 archive."),
+					},
+				},
+			},
+		},
+		{
 			Subcategories: []*Subcategory{
 				{
 					ID:          "creative-and-desktop",
