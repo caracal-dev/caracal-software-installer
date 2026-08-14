@@ -205,7 +205,8 @@ find_plugin_files() {
 copy_plugin_file() {
   local source="$1"
   local destination_root="$2"
-  local target="${destination_root}/$(basename "${source}")"
+  local target
+  target="${destination_root}/$(basename "${source}")"
 
   mkdir -p "${destination_root}"
   install -m755 "${source}" "${target}"
