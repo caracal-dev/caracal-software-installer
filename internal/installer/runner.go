@@ -3,6 +3,7 @@ package installer
 import (
 	"bufio"
 	"fmt"
+	"time"
 	"io"
 	"os"
 	"os/exec"
@@ -45,6 +46,43 @@ type RunOptions struct {
 	OnJobStart          func(index int, total int, job Job)
 	OnActionStart       func(job Job, action catalog.Action)
 	OnActionOutput      func(job Job, action catalog.Action, stream string, text string)
+}
+
+func logDir() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	dir := filepath.Join(home, ".local", "share", "caracal-software-installer", "logs")
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return "", fmt.Errorf("create log directory: %w", err)
+	}
+	return dir, nil
+}
+
+func openActionLog(job Job, action catalog.Action) (*os.File, string, error) {
+	dir, err := logDir()
+	if err != nil {
+		return nil, "", err
+	}
+	now := time.Now()
+	slug := strings.ToLower(strings.ReplaceAll(action.Title, " ", "-"))
+	if len(slug) > 60 {
+		slug = slug[:60]
+	}
+	logPath := filepath.Join(dir, fmt.Sprintf("%s_%s_%s.log", job.Package.ID, slug, now.Format("20060102-150405")))
+	f, err := os.Create(logPath)
+	if err != nil {
+		return nil, "", fmt.Errorf("create log file: %w", err)
+	}
+	_, _ = fmt.Fprintf(f, "=== Caracal Software Installer ===\n")
+	_, _ = fmt.Fprintf(f, "Package:     %s (%s)\n", job.Package.Name, job.Package.ID)
+	_, _ = fmt.Fprintf(f, "Mode:        %s\n", job.Mode)
+	_, _ = fmt.Fprintf(f, "Action:      %s\n", action.Title)
+	_, _ = fmt.Fprintf(f, "Command:     %s\n", strings.Join(action.Exec, " "))
+	_, _ = fmt.Fprintf(f, "Started at:  %s\n", now.Format(time.RFC3339))
+	_, _ = fmt.Fprintf(f, "\n--- Output ---\n")
+	return f, logPath, nil
 }
 
 func Detect(pkg *catalog.Package) PackageState {
@@ -165,10 +203,23 @@ func runAction(job Job, action catalog.Action, opts RunOptions) error {
 		return fmt.Errorf("unsupported action executable: %s", execArgs[0])
 	}
 
+	logFile, logPath, logErr := openActionLog(job, action)
+	if logErr != nil {
+		fmt.Fprintf(os.Stderr, "warning: could not open action log: %v\n", logErr)
+	}
+	if logFile != nil {
+		defer logFile.Close()
+	}
+
 	if opts.Interactive {
 		cmd.Stdin = os.Stdin
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
+		if logFile != nil {
+			cmd.Stdout = io.MultiWriter(os.Stdout, logFile)
+			cmd.Stderr = io.MultiWriter(os.Stderr, logFile)
+		} else {
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+		}
 	} else {
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
@@ -185,18 +236,38 @@ func runAction(job Job, action catalog.Action, opts RunOptions) error {
 
 		var wg sync.WaitGroup
 		wg.Add(2)
-		go streamOutput(&wg, stdout, "stdout", job, action, opts.OnActionOutput)
-		go streamOutput(&wg, stderr, "stderr", job, action, opts.OnActionOutput)
+		go streamOutput(&wg, stdout, "stdout", job, action, opts.OnActionOutput, logFile)
+		go streamOutput(&wg, stderr, "stderr", job, action, opts.OnActionOutput, logFile)
 		wg.Wait()
 
-		if err := cmd.Wait(); err != nil {
-			return fmt.Errorf("%s failed: %w", action.Title, err)
+		runErr := cmd.Wait()
+
+		if logFile != nil {
+			finished := time.Now()
+			fmt.Fprintf(logFile, "\n--- End at %s ---\n", finished.Format(time.RFC3339))
+			if runErr != nil {
+				fmt.Fprintf(logFile, "Exit code:  %v\n", runErr)
+				fmt.Fprintf(logFile, "Log saved:  %s\n", logPath)
+			}
+		}
+
+		if runErr != nil {
+			return fmt.Errorf("%s failed: %w", action.Title, runErr)
 		}
 		return nil
 	}
 
 	if err := cmd.Run(); err != nil {
+		if logFile != nil {
+			fmt.Fprintf(logFile, "\n--- End (failed) ---\n")
+			fmt.Fprintf(logFile, "Error: %v\n", err)
+			fmt.Fprintf(logFile, "Log saved: %s\n", logPath)
+		}
 		return fmt.Errorf("%s failed: %w", action.Title, err)
+	}
+
+	if logFile != nil {
+		fmt.Fprintf(logFile, "\n--- End (success) ---\n")
 	}
 
 	return nil
@@ -251,19 +322,20 @@ func validateBashScriptExec(execArgs []string) error {
 	return nil
 }
 
-func streamOutput(wg *sync.WaitGroup, reader io.Reader, stream string, job Job, action catalog.Action, emit func(job Job, action catalog.Action, stream string, text string)) {
+func streamOutput(wg *sync.WaitGroup, reader io.Reader, stream string, job Job, action catalog.Action, emit func(job Job, action catalog.Action, stream string, text string), logFile io.Writer) {
 	defer wg.Done()
-
-	if emit == nil {
-		_, _ = io.Copy(io.Discard, reader)
-		return
-	}
 
 	scanner := bufio.NewScanner(reader)
 	buffer := make([]byte, 0, 64*1024)
 	scanner.Buffer(buffer, 1024*1024)
 	for scanner.Scan() {
-		emit(job, action, stream, scanner.Text())
+		line := scanner.Text()
+		if logFile != nil {
+			fmt.Fprintf(logFile, "[%s] %s\n", stream, line)
+		}
+		if emit != nil {
+			emit(job, action, stream, line)
+		}
 	}
 }
 
