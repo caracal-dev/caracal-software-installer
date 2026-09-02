@@ -1008,6 +1008,33 @@ func Build(scriptDir string, downloadLookup map[string]downloadindex.Entry) []*C
 						genericArchivePackage("neampmod-the-tweed-clap", "danielwray", "Tweed-style amp sim distributed as a direct Linux CLAP download."),
 						genericArchivePackage("chow-centaur", "Chowdhury DSP", "Klon-style overdrive pedal distributed as Linux VST3 and LV2 bundles."),
 						genericArchivePackage("ratatouille", "brummer10", "Neural model and impulse response mixer distributed as a Linux LV2 bundle."),
+						{
+							ID:          "tone-3000",
+							Name:        "Tone3000",
+							Vendor:      "Tone3000",
+							Summary:     "Plug in and play the world's largest library of Neural Amp Modeler (NAM) captures and impulse responses of amps, pedals, rigs, cabs and more.",
+							Description: "Downloads the upstream Linux tarball and installs the VST3, LV2, and CLAP plugins, standalone app, desktop entry, and factory presets into user-local directories.",
+							Notes: []string{
+								"Does not require sudo.",
+								"Installed as user-local plugins and app so it works cleanly on immutable systems.",
+								"Requires WebKitGTK at runtime (the plugin UI renders black without it).",
+							},
+							Links: linkForID("tone-3000"),
+							InstalledMarkers: []string{
+								".local/share/caracal-software-installer/manifests/tone-3000.txt",
+								".vst3/Tone3000.vst3",
+								".lv2/Tone3000.lv2",
+								".clap/Tone3000.clap",
+								".local/bin/TONE3000",
+								".local/share/applications/tone3000.desktop",
+							},
+							InstallActions: []Action{
+								{Title: "Install Tone3000", Exec: script("install-tone3000.sh")},
+							},
+							UninstallActions: []Action{
+								{Title: "Uninstall Tone3000", Exec: script("uninstall-tone3000.sh")},
+							},
+						},
 						genericArchivePackage("guitarix", "brummer10", "Open-source guitar amp and effect rack distributed as a Linux LV2 bundle."),
 						genericArchivePackage("neuralrack", "brummer10", "Neural amp modeler rack distributed as a Linux CLAP archive."),
 						genericArchivePackage("the-victor", "danielwray", "Fender Champ 5C1-style amp sim distributed as a direct Linux CLAP download."),
