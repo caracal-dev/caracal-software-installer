@@ -3,6 +3,7 @@
 Uses `gh api` for authenticated access (higher rate limits)."""
 import csv, io, re, json, base64, urllib.request, urllib.error, os, sys, time, subprocess
 from pathlib import Path
+from urllib.parse import urlparse
 from PIL import Image
 
 THUMB_DIR = Path("frontend/dist/assets/images/thumbnails")
@@ -10,8 +11,14 @@ CSV_PATH = Path("data/download-index.csv")
 SIZE = (800, 440)
 BG_COLOR = (26, 25, 46)
 
+def _valid_api_path(path):
+    """Reject GitHub API paths with unsafe characters."""
+    return bool(re.match(r'^[a-zA-Z0-9_/.\-]+$', path))
+
 def gh_api(path):
     """Call GitHub API via authenticated gh CLI."""
+    if not _valid_api_path(path):
+        return None
     try:
         result = subprocess.run(
             ["gh", "api", path, "--jq", "."],
@@ -20,11 +27,13 @@ def gh_api(path):
         if result.returncode != 0:
             return None
         return json.loads(result.stdout)
-    except Exception:
+    except (subprocess.TimeoutExpired, json.JSONDecodeError):
         return None
 
 def gh_api_raw(path):
     """Call GitHub API and return raw text output."""
+    if not _valid_api_path(path):
+        return None
     try:
         result = subprocess.run(
             ["gh", "api", path],
@@ -33,7 +42,7 @@ def gh_api_raw(path):
         if result.returncode != 0:
             return None
         return result.stdout
-    except Exception:
+    except (subprocess.TimeoutExpired, json.JSONDecodeError):
         return None
 
 def find_images_in_markdown(content):
@@ -107,7 +116,7 @@ def find_repo_screenshot(owner, repo):
                         u = f"https://raw.githubusercontent.com/{owner}/{repo}/{m.group(1)}/{m.group(2)}"
                     converted.append(u)
                 return converted, "readme"
-        except Exception:
+        except (json.JSONDecodeError, KeyError, UnicodeDecodeError, base64.binascii.Error):
             pass
     
     # 2. Search repo tree for screenshots
@@ -130,13 +139,16 @@ def find_repo_screenshot(owner, repo):
                 for score, path, size in candidates[:5]:
                     urls.append(f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}")
                 return urls, "tree"
-        except Exception:
+        except (json.JSONDecodeError, KeyError, subprocess.TimeoutExpired):
             continue
     
     return [], None
 
 def download_image(url, save_path):
     """Download an image to a path."""
+    parsed = urlparse(url)
+    if parsed.scheme not in ('https', 'http'):
+        return None
     req = urllib.request.Request(url, headers={
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
         "Accept": "image/webp,image/apng,image/*,*/*;q=0.8"
@@ -148,7 +160,7 @@ def download_image(url, save_path):
             return None
         save_path.write_bytes(data)
         return save_path
-    except Exception:
+    except (urllib.error.URLError, OSError):
         return None
 
 def process_image(src_path, dst_path):
@@ -175,7 +187,7 @@ def process_image(src_path, dst_path):
         
         canvas.save(dst_path, "WEBP", quality=85, method=6)
         return True
-    except Exception:
+    except (OSError, ValueError):
         return False
 
 def process_entry(eid, name, github_repo, url):
@@ -208,7 +220,7 @@ def process_entry(eid, name, github_repo, url):
                             tmp.unlink(missing_ok=True)
                             return (eid, "DONE", f"{w}x{h}", img_url[:70])
                         tmp.unlink(missing_ok=True)
-                except Exception as e:
+                except (urllib.error.URLError, OSError) as e:
                     print(f"  Failed: {e}")
                     if tmp.exists():
                         tmp.unlink()
@@ -218,28 +230,30 @@ def process_entry(eid, name, github_repo, url):
     else:
         # Non-GitHub: try website og:image
         print(f"  Non-GitHub: {url[:70]}")
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-            resp = urllib.request.urlopen(req, timeout=15)
-            html = resp.read().decode('utf-8', errors='replace')
-            m = re.search(r'<meta\s+property="og:image"\s+content="([^"]+)"', html, re.I)
-            if not m:
-                m = re.search(r'<meta\s+name="twitter:image"\s+content="([^"]+)"', html, re.I)
-            if m:
-                img_url = m.group(1)
-                if img_url.startswith('/'):
-                    from urllib.parse import urljoin
-                    img_url = urljoin(url, img_url)
-                tmp = THUMB_DIR / f".tmp_{eid}.download"
-                result = download_image(img_url, tmp)
-                if result and tmp.stat().st_size > 1000:
-                    img = Image.open(tmp)
-                    if process_image(tmp, thumb_path):
+        parsed = urlparse(url)
+        if parsed.scheme in ('https', 'http'):
+            try:
+                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+                resp = urllib.request.urlopen(req, timeout=15)
+                html = resp.read().decode('utf-8', errors='replace')
+                m = re.search(r'<meta\s+property="og:image"\s+content="([^"]+)"', html, re.I)
+                if not m:
+                    m = re.search(r'<meta\s+name="twitter:image"\s+content="([^"]+)"', html, re.I)
+                if m:
+                    img_url = m.group(1)
+                    if img_url.startswith('/'):
+                        from urllib.parse import urljoin
+                        img_url = urljoin(url, img_url)
+                    tmp = THUMB_DIR / f".tmp_{eid}.download"
+                    result = download_image(img_url, tmp)
+                    if result and tmp.stat().st_size > 1000:
+                        img = Image.open(tmp)
+                        if process_image(tmp, thumb_path):
+                            tmp.unlink(missing_ok=True)
+                            return (eid, "DONE", f"{img.size[0]}x{img.size[1]}", img_url[:70])
                         tmp.unlink(missing_ok=True)
-                        return (eid, "DONE", f"{img.size[0]}x{img.size[1]}", img_url[:70])
-                    tmp.unlink(missing_ok=True)
-        except Exception as e:
-            print(f"  Failed: {e}")
+            except (urllib.error.URLError, UnicodeDecodeError, OSError) as e:
+                print(f"  Failed: {e}")
         return (eid, "NONE", "", "")
 
 def main():
