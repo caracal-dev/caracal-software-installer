@@ -146,9 +146,9 @@ def find_repo_screenshot(owner, repo):
 
 def download_image(url, save_path):
     """Download an image to a path."""
-    parsed = urlparse(url)
-    if parsed.scheme not in ('https', 'http'):
+    if any(ord(c) < 33 for c in url):
         return None
+    parsed = urlparse(url)
     req = urllib.request.Request(url, headers={
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
         "Accept": "image/webp,image/apng,image/*,*/*;q=0.8"

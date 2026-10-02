@@ -21,6 +21,17 @@ archive_name="$(basename "${url%%\?*}")"
 if [[ -n "${local_archive}" ]]; then
   archive_name="$(basename "${local_archive}")"
 fi
+# Some download endpoints carry no archive extension in their basename
+# (e.g. https://host/files/get.php?id=Plugin_Linux.zip). Give those a
+# placeholder name and sniff the real type from the magic bytes after the
+# download so extract_archive can dispatch on it.
+case "$(printf '%s' "${archive_name}" | tr '[:upper:]' '[:lower:]')" in
+*.zip | *.7z | *.deb | *.tar | *.tar.gz | *.tgz | *.tar.xz | *.txz | *.tar.bz2 | *.tbz2 | *.tar.zst | *.clap | *.vst3 | *.so)
+  ;;
+*)
+  archive_name="${plugin_id}.download"
+  ;;
+esac
 archive_path="${workdir}/${archive_name}"
 extract_dir="${workdir}/extract"
 target_vst_dir="${HOME}/.vst"
@@ -244,6 +255,31 @@ if [[ -n "${local_archive}" ]]; then
 else
   echo "Downloading ${display_name}..."
   curl -fL --retry 3 --retry-delay 2 -o "${archive_path}" "${url}"
+fi
+if [[ "${archive_name}" == *.download ]]; then
+  magic="$(head -c 8 "${archive_path}" | od -An -tx1 | tr -d ' \n')"
+  sniffed=""
+  case "${magic}" in
+  504b0304*) sniffed="zip" ;;
+  377abcaf271c*) sniffed="7z" ;;
+  213c61726368*) sniffed="deb" ;;
+  1f8b*) sniffed="tar.gz" ;;
+  fd377a585a00*) sniffed="tar.xz" ;;
+  425a68*) sniffed="tar.bz2" ;;
+  28b52ffd*) sniffed="tar.zst" ;;
+  *)
+    if dd if="${archive_path}" bs=1 skip=257 count=5 2>/dev/null | grep -q ustar; then
+      sniffed="tar"
+    fi
+    ;;
+  esac
+  if [[ -z "${sniffed}" ]]; then
+    echo "Cannot determine archive type of ${archive_name}." >&2
+    exit 1
+  fi
+  archive_name="${plugin_id}.${sniffed}"
+  mv "${archive_path}" "${workdir}/${archive_name}"
+  archive_path="${workdir}/${archive_name}"
 fi
 extract_archive "${archive_path}" "${extract_dir}"
 mkdir -p "${manifest_root}"
